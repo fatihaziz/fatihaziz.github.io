@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -18,9 +19,11 @@ jobs:
         run: |
           echo 'export BUN_INSTALL="$HOME/.bun"' >> $GITHUB_ENV
           echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $GITHUB_ENV
-          source $GITHUB_ENV  # Ensure the environment variables are loaded
 
-      - name: Install dependencies and build
+      - name: Install Dependencies and Build
+        env:
+          BUN_INSTALL: ${{ secrets.BUN_INSTALL }}
+          PATH: ${{ secrets.PATH }}:${{ secrets.BUN_INSTALL }}/bin
         run: bun install -g pnpm && pnpm install && pnpm build --preset github_pages
 
       - name: Upload artifact
