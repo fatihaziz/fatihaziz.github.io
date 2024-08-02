@@ -24,3 +24,5 @@ logs
 !.env.example
 
 *.lockb
+*-lock*
+*.lock*
