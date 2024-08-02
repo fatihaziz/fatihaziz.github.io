@@ -36,9 +36,11 @@ jobs:
         id: detect-package-manager
         run: |
           if [ -f "${{ github.workspace }}/pnpm-lock.yaml" ]; then
+            npm install -g pnpm
             echo "manager=pnpm" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
           elif [ -f "${{ github.workspace }}/yarn.lock" ]; then
+            npm install -g yarn
             echo "manager=yarn" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
             exit 0
@@ -56,10 +58,6 @@ jobs:
         with:
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
-
-      - name: Install pnpm (if necessary)
-        if: ${{ steps.detect-package-manager.outputs.manager == 'pnpm' }}
-        run: npm install -g pnpm
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
