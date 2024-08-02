@@ -10,20 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Bun
-        run: bash <(curl -fsSL https://bun.sh/install)
-
-      - name: Set up Bun
-        run: |
-          echo 'export BUN_INSTALL="$HOME/.bun"' >> $GITHUB_ENV
-          echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $GITHUB_ENV
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "latest"
 
       - name: Install Dependencies and Build
-        env:
-          BUN_INSTALL: ${{ secrets.BUN_INSTALL }}
-          PATH: ${{ secrets.PATH }}:${{ secrets.BUN_INSTALL }}/bin
         run: bun install -g pnpm && pnpm install && pnpm build --preset github_pages
 
       - name: Upload artifact
