@@ -16,7 +16,7 @@ jobs:
           bun-version: "latest"
 
       - name: Install Dependencies and Build
-        run: bun install -g pnpm && pnpm install && pnpm build --preset github_pages
+        run: bun install -g pnpm && pnpm install --no-save && pnpm build --preset github_pages
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
