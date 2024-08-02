@@ -1,0 +1,58 @@
+## Author: Fatih Aziz <github.com/fatihaziz>
+## This section of code was written by Fatih Aziz and is provided under the MIT License.
+name: Send Telegram Notification
+
+on:
+  workflow_call:
+    secrets:
+      TELEGRAM_BOT_TOKEN:
+        required: true
+      TELEGRAM_CHAT_ID:
+        required: false
+    inputs:
+      chat_id:
+        description: "Telegram chat id"
+        required: true
+        type: string
+      job_title:
+        description: "Job title"
+        required: true
+        type: string
+      custom_message:
+        description: "Custom message"
+        required: false
+        type: string
+
+jobs:
+  send-notif:
+    name: Send Telegram Notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: send telegram message on push
+        uses: appleboy/telegram-action@master
+        continue-on-error: false
+        with:
+          to: ${{ (inputs.chat_id || secrets.TELEGRAM_CHAT_ID) }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: html
+          disable_web_page_preview: true
+          message: |
+            <b>GITHUB Notification</b>✨
+
+            <b>🪧Repository</b> : <b>${{ github.repository }}</b>
+
+            <b>👮Author</b> : <a href="https://github.com/${{ github.actor }}">@${{ github.actor }}</a>
+
+            <b>💌Commit Message</b> : ${{ github.event.head_commit.message || github.event.commits[0].message || 'No commit message' }}
+
+            <b>👌Job title</b> : ${{ inputs.job_title ||'No job provided' }}
+            <b>📨Message</b> : ${{ inputs.custom_message || 'No message provided' }}
+
+            <b>♻️Pull Request Title</b> : ${{ github.event.pull_request.title  || 'No pull request' }}
+            <b>⛓️Pull Request Url</b> : ${{ github.event.pull_request.html_url || 'No pull request' }}
+
+            <b>🔗Action url</b> : ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
+            <b>🔗See changes</b> : ${{ github.event.repository.html_url }}/commit/${{github.sha}}
+
+            <b>You are the best! q(≧▽≦q)</b>
+            <b>Keep it up! ヽ(✿ﾟ▽ﾟ)ノ</b>
