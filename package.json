@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@nuxt/webpack": "^2.18.1",
     "nuxt": "^3.12.4",
     "vue": "latest"
   },

@@ -1,0 +1,94 @@
+.btn-progressive,
+.btn-progressive *,
+.btn-progressive :after,
+.btn-progressive :before,
+.btn-progressive:after,
+.btn-progressive:before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+
+.btn-progressive {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: button;
+  background-color: #000;
+  background-image: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-size: 100%;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
+  padding: 0;
+}
+
+.btn-progressive:disabled {
+  cursor: default;
+}
+
+.btn-progressive:-moz-focusring {
+  outline: auto;
+}
+
+.btn-progressive svg {
+  display: block;
+  vertical-align: middle;
+}
+
+.btn-progressive [hidden] {
+  display: none;
+}
+
+.btn-progressive {
+  border: 1px solid;
+  box-sizing: border-box;
+  display: block;
+  font-weight: 900;
+  overflow: hidden;
+  padding: 1.1rem 4rem;
+  position: relative;
+  /* text-transform: uppercase; */
+}
+
+.btn-progressive .new {
+  background: #fff;
+  color: transparent;
+  display: grid;
+  inset: 0;
+  place-content: center;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-100%);
+  transition: transform 0.2s;
+
+  /* For transparent text with background */
+  background: url('~/assets/img/wallpaper_4.jpg') no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: auto;
+  background-position: center;
+  z-index: 1; /* Ensure this is on top */
+}
+
+.btn-progressive:hover .new {
+  transform: translateX(0);
+}
+
+/* Move the old span text out of the viewport */
+.btn-progressive .old {
+  display: grid;
+  inset: 0;
+  place-content: center;
+  pointer-events: none;
+  position: absolute;
+  transition: transform 0.2s;
+}
+
+.btn-progressive:hover .old {
+  position: absolute;
+  transform: translateX(100%);
+}
