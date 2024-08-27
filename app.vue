@@ -1,20 +1,27 @@
 
 <template>
   <div class="h-screen">
-    <LoadingScreen />
-    <NuxtLoadingIndicator />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+    <LoadingScreen @loading-finished="showContent"/>
+    <div :class="{ 'opacity-0': !contentVisible }" class="transition-opacity duration-500">
+      <NuxtLoadingIndicator v-if="!contentVisible" />
+      <NuxtLayout v-if="contentVisible">
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import LoadingScreen from '~/components/loading_screen.vue'
-  const { progress, isLoading, start, finish, clear } = useLoadingIndicator({
-    duration: 2000,
-    throttle: 200,
-    // This is how progress is calculated by default
-    estimatedProgress: (duration, elapsed) => (2 / Math.PI * 100) * Math.atan(elapsed / duration * 100 / 50)
-  })
+import { ref } from 'vue';
+import Loading_screen from './components/loading_screen.vue';
+
+const contentVisible = ref(false);
+
+const showContent = () => {
+  contentVisible.value = true;
+};
 </script>
+
+<style scoped>
+/* Add any additional styles here if necessary */
+</style>
