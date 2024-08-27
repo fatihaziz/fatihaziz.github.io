@@ -8,7 +8,7 @@ module.exports = {
     "./app.vue",
     "./error.vue",
   ],
-  darkMode: false,
+  media: false,
   theme: {
     extend: {
       fontFamily: {

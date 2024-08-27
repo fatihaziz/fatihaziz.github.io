@@ -1,5 +1,5 @@
-import { getAllFontCssFiles } from "./plugins/import_fonts"
-
+import { getAllFontCssFiles } from "./build/import_fonts"
+import path from 'path';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -19,5 +19,11 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  plugins: [  ]
+  ssr: false,
+  nitro: {
+    output: {
+      publicDir: path.join(__dirname, 'dist')
+    }
+  },
+  plugins: [],
 })

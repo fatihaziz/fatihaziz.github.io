@@ -31,5 +31,3 @@ export function getAllFontCssFiles() {
     return `~/${relativePath.replace(/\\/g, '/')}`;
   });
 }
-
-// export default defineNuxtPlugin(() => {})
