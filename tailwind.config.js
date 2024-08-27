@@ -13,8 +13,8 @@ module.exports = {
       fontFamily: {
         "neue-montreal": ['NeueMontreal', 'sans-serif'],
         "juliett": ['Juliett', 'sans-serif'],
-        // "neue-montreal": ['NeueMontreal', 'sans-serif'],
-        // "neue-montreal": ['NeueMontreal', 'sans-serif'],
+        "mangiola": ['Mangiola', 'sans-serif'],
+        "mondapick": ['Mondapick', 'sans-serif'],
       },
     },
   },

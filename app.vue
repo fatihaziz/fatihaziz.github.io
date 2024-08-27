@@ -1,11 +1,11 @@
 
 <template>
-  <div class='w-screen font-sans'>
-    <div class='hero-1 font-juliett bg-slate-600'>
-      <div class='title-1'>
+  <div class='w-screen font-neue-montreal'>
+    <div class='hero-1 bg-slate-600'>
+      <div class='title-1 font-mondapick'>
         Welcome adventurers!
       </div>
-      <div class='big-title-1'>
+      <div class='big-title-1 font-mondapick'>
         <!-- will add typing effect here later -->
         My name is Fatih.
       </div>
@@ -63,6 +63,5 @@
     min-height: 100%;
   }
 
-  .hero-1 {
-  }
+  .hero-1 {   }
 </style>

@@ -5,7 +5,9 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/main.css',
     '~/assets/font/neue-montreal/font.css',
-    '~/assets/font/juliett/font.css'
+    '~/assets/font/juliett/font.css',
+    '~/assets/font/mangiola/font.css',
+    '~/assets/font/mondapick/font.css',
   ],
   modules: [
     '@nuxtjs/tailwindcss',
