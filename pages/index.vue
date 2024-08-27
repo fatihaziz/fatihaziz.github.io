@@ -1,12 +1,22 @@
 <template>
   <div class='w-screen font-mangiola'>
     <section class='flex flex-col h-screen py-12 text-center text-white hero-1 bg-slate-600'>
+      <nav class="relative z-10 mx-10">
+        <a href='/' class="">
+          <img src="~/assets/img/logo_1.jpeg" class="w-16 h-16 rounded-full">
+        </a>
+      </nav>
        <!-- Dark Transparent Layer -->
       <div class="absolute inset-0 bg-black opacity-50"></div>
 
       <!-- Content -->
       <div class='relative z-10'>
-        <div class='title-1 font-mondapick'>
+        <!-- <div class="relative flex justify-center mt-24 w-max-16 h-max-16 logo-1">
+          <a href='/' class="">
+            <img src="~/assets/img/logo_1.jpeg" class="w-16 h-16 rounded-full">
+          </a>
+        </div> -->
+        <div class='title-1 font-mondapick mt-28'>
           Welcome home adventurers!
         </div>
         <div class='big-title-1 font-mondapick'>
@@ -47,7 +57,6 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import Loading_screen from '../components/loading_screen.vue';
 
 const textDay = ref(0);
 const textHour = ref(0);
@@ -109,7 +118,6 @@ onMounted(() => {
 
   .title-1 {
     font-size: 3rem;
-    margin-top: 9rem;
   }
 
   .big-title-1 {

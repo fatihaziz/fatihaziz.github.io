@@ -1,7 +1,6 @@
-
-<template>
+<!-- <template>
   <div class="h-screen">
-    <LoadingScreen @loading-finished="showContent"/>
+    <Loading_screen @loading-finished="showContent"/>
     <div :class="{ 'opacity-0': !contentVisible }" class="transition-opacity duration-500">
       <NuxtLoadingIndicator v-if="!contentVisible" />
       <NuxtLayout v-if="contentVisible">
@@ -9,17 +8,21 @@
       </NuxtLayout>
     </div>
   </div>
+</template> -->
+
+<template>
+  <div class="h-screen">
+    <Loading_screen class="z-50" />
+    <NuxtLoadingIndicator />
+    <NuxtLayout >
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import Loading_screen from './components/loading_screen.vue';
 
-const contentVisible = ref(false);
-
-const showContent = () => {
-  contentVisible.value = true;
-};
 </script>
 
 <style scoped>
