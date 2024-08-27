@@ -24,7 +24,7 @@
     "prebuild": "rm -rf ./.nuxt || rm -rf ./dist || rm -rf ./.output",
     "pregenerate": "pnpm prebuild",
     "preview": "nuxt preview",
-    "release-github": "cross-env env-cmd npx nuxt build --preset github_pages",
+    "release-github": "npx nuxt build --preset github_pages",
     "nuxt-serve": "pnpm build && pnpm start",
     "start": "nuxt start"
   },
