@@ -18,14 +18,15 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
+    "build-github": "npx nuxt build --preset github_pages",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "gh-publish": "pnpm build-github && gh-pages --dotfiles -d .output/public --cname fatihaziz.com",
+    "nuxt-serve": "pnpm build-github && pnpm generate && browser-sync .output/public/",
     "postinstall": "nuxt prepare",
     "prebuild": "rm -rf ./.nuxt || rm -rf ./dist || rm -rf ./.output",
     "pregenerate": "pnpm prebuild",
     "preview": "nuxt preview",
-    "release-github": "npx nuxt build --preset github_pages",
-    "nuxt-serve": "pnpm release-github && pnpm generate && browser-sync .output/public/",
     "start": "nuxt start"
   },
   "type": "module"

@@ -48,7 +48,7 @@
         <span>©2024 <a class="underline" href='https://github.com/fatihaziz'>Fatih Aziz</a></span>
         <br>
         <span class='text-sm'>
-          Image by <a class="underline" href='https://www.deviantart.com/arsenixc/art/Sky-city-838770346'>Arsenicx</a>
+          Image by <a class="underline" target="_blank" href='https://www.deviantart.com/arsenixc/art/Sky-city-838770346'>Arsenicx</a>
         </span>
       </footer>
     </section>
