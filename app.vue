@@ -1,17 +1,5 @@
-<!-- <template>
-  <div class="h-screen">
-    <Loading_screen @loading-finished="showContent"/>
-    <div :class="{ 'opacity-0': !contentVisible }" class="transition-opacity duration-500">
-      <NuxtLoadingIndicator v-if="!contentVisible" />
-      <NuxtLayout v-if="contentVisible">
-        <NuxtPage />
-      </NuxtLayout>
-    </div>
-  </div>
-</template> -->
-
 <template>
-  <div class="h-screen">
+  <div class="min-h-screen">
     <Loading_screen class="z-50" />
     <NuxtLoadingIndicator />
     <NuxtLayout >
