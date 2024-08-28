@@ -82,6 +82,9 @@ jobs:
       #   with:
       #     path: ./.output/public
 
+      - name: Create CNAME file
+        run: echo 'fatihaziz.com' > .output/public/CNAME
+
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
