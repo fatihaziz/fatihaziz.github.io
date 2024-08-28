@@ -25,6 +25,10 @@ import Loading_screen from './components/loading_screen.vue';
 
 </script>
 
+<script lang="ts">
+
+</script>
+
 <style scoped>
 /* Add any additional styles here if necessary */
 </style>
