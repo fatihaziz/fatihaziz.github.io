@@ -49,7 +49,7 @@
             <div class="time-unit">{{ textSecond }}<span>Seconds</span></div>
           </div>
           <span>
-            ...just maybe
+            ...just maybe <span class="owo">{{ owo }}</span>
           </span>
         </div>
         <div class='relative flex justify-center m-auto my-8 text-center button-1'>
@@ -77,6 +77,7 @@ const textDay = ref(0);
 const textHour = ref(0);
 const textMinute = ref(0);
 const textSecond = ref(0);
+const owo = ref("")
 
 function redirectToContact() {
   window.open("https://github.com/fatihaziz", "_blank");
@@ -86,6 +87,14 @@ function countDown() {
   const countDay = new Date('October 1, 2024 21:30:00');
   const now = new Date();
   const counter = countDay.getTime() - now.getTime();
+  if (counter < 0) {
+    textDay.value = 0
+    textHour.value = 0
+    textMinute.value = 0
+    textSecond.value = 0
+    owo.value = "OwO ... my time has come, but my author not <i>touching</i> me yet ..."
+    return
+  }
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;

@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@nuxt/webpack": "^2.18.1",
+    "defu": "^6.1.4",
+    "nuxt": "^3.13.2",
     "vue": "latest"
   },
   "devDependencies": {
@@ -10,7 +12,7 @@
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
     "eol-converter-cli": "^1.1.0",
-    "nuxt": "^3.13.0",
+    "nuxt": "^3.13.2",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10"
   },
@@ -24,6 +26,7 @@
     "gh-publish": "pnpm build-github && gh-pages --dotfiles -d .output/public --cname fatihaziz.com",
     "nuxt-serve": "pnpm build-github && pnpm generate && browser-sync .output/public/",
     "postinstall": "nuxt prepare",
+    "install-clean": "rm -rf node_modules && pnpm i",
     "prebuild": "rm -rf ./.nuxt || rm -rf ./dist || rm -rf ./.output",
     "pregenerate": "pnpm prebuild",
     "preview": "nuxt preview",

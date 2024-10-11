@@ -23,7 +23,6 @@ logs
 .env.*
 !.env.example
 
-*.lockb
-*-lock*
-*.lock*
-!pnpm-lock*
+/*.lockb
+/*-lock*
+/*lock*

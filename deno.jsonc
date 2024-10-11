@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "dom"
+    ]
+  },
+  "exclude": [
+    ".nuxt"
+  ],
+  "fmt": {},
+  "include": [
+    "./**/*.ts"
+  ],
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-explicit-any",
+        "require-await",
+        "no-unused-vars",
+        "ban-ts-comment"
+      ]
+    }
+  },
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "build": "deno run -A npm:nuxt build",
+    "build-github": "npx nuxt build --preset github_pages",
+    "cache": "(rm deno.lock || true) && deno install && deno cache --reload .",
+    "fix-import": "deno run -A fix_imports.ts",
+    "lint": "deno lint --fix src/"
+  }
+}
