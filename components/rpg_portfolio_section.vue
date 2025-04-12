@@ -1,5 +1,5 @@
 <template>
-  <section class="py-16 rpg-section bg-gray-100">
+  <section class="py-16 rpg-section bg-[#F5F5DC]"> <!-- Beige/Parchment Background -->
     <div class="container px-4 mx-auto">
       <h2 class="mb-12 text-4xl font-bold text-center rpg-title font-mondapick">Adventurer's Guild</h2>
       <div class="categories-container">
@@ -94,7 +94,10 @@ function closeModal() {
 </script>
 
 <style scoped>
-/* .rpg-section styling adjusted via Tailwind classes */
+.rpg-section {
+  /* Tailwind class bg-[#F5F5DC] applied above */
+  /* Consider adding a subtle background-image texture later for better parchment effect */
+}
 
 /* .rpg-title styling adjusted via Tailwind classes */
 

@@ -62,9 +62,9 @@
     </section>
 
     <!-- Cloud Transition Layer Placeholder -->
-    <div class="relative h-40 -mt-20 overflow-hidden cloud-transition bg-gradient-to-b from-transparent via-white to-white">
-      <!-- You can add SVG/image clouds here or use CSS pseudo-elements -->
-      <p class="absolute text-center text-gray-500 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">~ Cloud Layer ~</p>
+    <div class="relative h-40 -mt-20 overflow-hidden cloud-transition">
+      <!-- Placeholder for Ghibli-style cloud layers -->
+      <!-- We'll use pseudo-elements for a basic effect for now -->
     </div>
 
     <RpgPortfolioSection />
@@ -202,4 +202,39 @@ onMounted(() => {
       padding: 1.5rem 7rem;
     }
   }
+</style>
+
+<style scoped>
+  /* Cloud Transition Styling */
+  .cloud-transition {
+    /* background: linear-gradient(to bottom, transparent, #FFF 50%); /* Optional: Fades hero to white */
+    background-color: #FFF; /* Base white background */
+    z-index: 5; /* Ensure it's above hero if needed, adjust as necessary */
+  }
+
+  .cloud-transition::before,
+  .cloud-transition::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100px; /* Adjust height of cloud layers */
+    background: white; /* Cloud color */
+    border-radius: 50%; /* Makes the cloud shapes */
+    opacity: 0.9; /* Soft look */
+  }
+
+  .cloud-transition::before {
+    top: -50px; /* Position the first layer overlapping the top edge */
+    transform: scaleX(1.5); /* Wider shape */
+    z-index: 10;
+  }
+
+  .cloud-transition::after {
+    top: -20px; /* Position the second layer slightly lower */
+    transform: scaleX(1.2); /* Slightly narrower */
+    opacity: 0.7; /* More translucent */
+    z-index: 9;
+  }
+  /* NOTE: True Ghibli clouds + parallax would likely need SVGs/images and possibly JS */
 </style>

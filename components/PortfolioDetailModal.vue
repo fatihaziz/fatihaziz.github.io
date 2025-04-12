@@ -1,21 +1,21 @@
 <template>
   <transition name="modal-fade">
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60" @click.self="closeModal">
-      <div class="w-full max-w-lg p-6 mx-4 bg-white rounded-lg shadow-xl modal-content">
+      <div class="w-full max-w-lg p-6 mx-4 bg-[#F5F5DC] border-2 border-[#A0522D] rounded-lg shadow-xl modal-content"> <!-- Themed background and border -->
         <div class="flex items-start justify-between mb-4">
-          <h3 class="text-2xl font-semibold font-supreme">{{ item?.title }}</h3>
-          <button @click="closeModal" class="text-gray-500 hover:text-gray-800">&times;</button>
+          <h3 class="text-2xl font-semibold font-supreme text-[#5D4037]">{{ item?.title }}</h3> <!-- Darker brown title -->
+          <button @click="closeModal" class="text-[#A0522D] hover:text-[#793D22] text-2xl font-bold">&times;</button> <!-- Themed close 'X' -->
         </div>
         <div class="modal-body">
           <!-- Display item details here -->
-          <p class="text-gray-700">{{ item?.description }}</p>
+          <p class="text-[#5D4037]">{{ item?.description }}</p> <!-- Darker brown text -->
           <!-- Add more details as needed: images, links, tech stack etc. -->
-          <p class="mt-4 text-sm text-gray-500">Item ID: {{ item?.id }}</p>
+          <p class="mt-4 text-sm text-[#A0522D]">Item ID: {{ item?.id }}</p> <!-- Sienna accent text -->
         </div>
         <div class="mt-6 text-right">
-          <button @click="closeModal" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+          <button @click="closeModal" class="px-4 py-2 text-sm font-medium text-[#A0522D] bg-transparent border border-[#A0522D] rounded hover:bg-[#A0522D] hover:text-[#F5F5DC]">
             Close
-          </button>
+          </button> <!-- Themed Close Button -->
         </div>
       </div>
     </div>

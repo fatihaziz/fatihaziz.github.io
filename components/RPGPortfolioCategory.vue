@@ -1,6 +1,6 @@
 <template>
   <div class="mb-12 rpg-category">
-    <h3 class="mb-6 text-2xl font-semibold text-center font-mangiola">{{ category.title }}</h3>
+    <h3 class="mb-6 text-2xl font-semibold text-center font-supreme">{{ category.title }}</h3> <!-- Changed font to Supreme -->
     <div class="items-grid">
       <!-- Loop through items within the category -->
       <!-- Emit click event with item data -->
@@ -51,9 +51,11 @@ function emitItemClick(item: PortfolioItem) {
 
 <style scoped>
 .rpg-category {
-  /* Add specific styling for the category container if needed */
-  border-bottom: 1px dashed #ccc; /* Example separator */
-  padding-bottom: 2rem;
+  /* Thematic border for the category */
+  border: 2px solid #A0522D; /* Sienna border */
+  border-radius: 8px; /* Slightly rounded corners */
+  padding: 2rem; /* Padding inside the border */
+  background-color: rgba(255, 255, 255, 0.5); /* Optional: Slight white overlay */
 }
 
 .items-grid {

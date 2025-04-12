@@ -1,7 +1,7 @@
 <template>
-  <div class="p-4 transition-shadow duration-300 bg-white border border-gray-200 rounded-lg shadow-sm rpg-item hover:shadow-md" @click="$emit('click')"> <!-- Added click emitter -->
-    <!-- Icon can be added here if available -->
-    <!-- <div v-if="item.icon" class="mb-2 text-2xl">{{ item.icon }}</div> -->
+  <div class="p-4 transition-colors duration-200 bg-[#FDFBF5] border-2 border-[#A0522D] rounded-lg shadow-sm rpg-item hover:bg-[#F5F5DC] hover:border-[#793D22]" @click="$emit('click')"> <!-- RPG Item Styling -->
+    <!-- Display Icon Name (replace with actual icon later) -->
+    <div v-if="item.icon" class="mb-2 text-xs text-[#A0522D] font-mono">[ICON: {{ item.icon }}]</div>
     <h4 class="mb-2 text-lg font-semibold font-supreme">{{ item.title }}</h4>
     <p class="text-sm text-gray-600">{{ item.description }}</p>
     <!-- Add click handler later for detail view (Subtask 3.3) -->
