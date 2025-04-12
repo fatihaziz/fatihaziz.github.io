@@ -22,43 +22,22 @@
           </a>
         </div> -->
         <div class='title-1 font-mondapick'>
-          Welcome home adventurers!
+          Hi, I'm Fatih Al-Aziz
         </div>
         <div class='big-title-1 font-mondapick'>
           <!-- will add typing effect here later -->
-          Let's go explore my city!
+          Welcome to my digital space!
         </div>
         <div class='my-10 sub-title-1'>
           <p>
-            Oh, you need an armor? sorry i don't sell that <span class="font-sans">(ㅅ´ ˘ `)</span>
-            <br>
-            <b>Hmm, You asking me what i have then?</b>
-            <br>
-            I have Programming skill <span class="font-sans">(duh.. 𖦹_𖦹)</span>, project management skill, <br> <b>and An Epic Legendary Yggdrasil Sword!</b> <span class="font-sans">✮✮✮✮✮ ৻(  •̀ ᗜ •́  ৻)</span>
+            Code about AI, API, trade-bots, libs in Go, Rust, Python, and TS. <br>
+            Having (too much) fun with them; so I don't have a girlfriend. <span class="font-sans">(¬‿¬ )</span>
           </p>
-          <p>
-            ... ... ...
-          </p>
-          <p>
-            Well just kidding, enough jokes. It's just a simple web page. and its still on progress!
+          <p class="mt-4">
+            Based in Indonesia / Dubai, UAE. Currently working with <a href="https://github.com/turnkey-devs" target="_blank" class="underline hover:text-blue-300">@turnkey-devs</a>.
           </p>
         </div>
-        <div class="my-12" v-if="showCountdown" v-transition>
-          <span>
-            Maybe it will be ready in:
-          </span>
-          <div class="countdown font-mangiola">
-            <div class="time-unit">{{ textDay }}<span>Days</span></div>
-            <div class="time-unit">{{ textHour }}<span>Hours</span></div>
-            <div class="time-unit">{{ textMinute }}<span>Minutes</span></div>
-            <div class="time-unit">{{ textSecond }}<span>Seconds</span></div>
-          </div>
-          <span>
-            ...just maybe
-            <br>
-            <span class="owo" v-html="owo" ></span>
-          </span>
-        </div>
+        <!-- Countdown removed -->
         <div class='relative flex justify-center m-auto my-8 text-center button-1'>
           <button class="mx-auto text-center drop-shadow-lg cta-btn-1 btn-progressive" @click="redirectToContact()">
             <span class="old">Contact Me!</span>
@@ -66,14 +45,28 @@
           </button>
         </div>
       </div>
-      <footer class='relative z-10 mt-auto mb-0'>
-        <span>©2024 <a class="underline" target="_blank" href='https://github.com/fatihaziz'>Fatih Aziz</a></span>
+      <footer class='relative z-10 mt-auto mb-4 text-sm'> <!-- Added mb-4 for spacing -->
+        <div class="mb-2"> <!-- Links container -->
+          <a href="https://github.com/fatihaziz" target="_blank" class="underline hover:text-blue-300 mx-2">GitHub</a> |
+          <a href="https://linkedin.com/in/fatih-aziz" target="_blank" class="underline hover:text-blue-300 mx-2">LinkedIn</a> |
+          <a href="https://medium.com/@m.fatihalaziz" target="_blank" class="underline hover:text-blue-300 mx-2">Medium</a> |
+          <a href="http://fatihaziz.com" target="_blank" class="underline hover:text-blue-300 mx-2">Website</a> |
+          <a href="mailto:m.fatihalaziz@gmail.com" class="underline hover:text-blue-300 mx-2">Email</a>
+        </div>
+        <span>©2024 Fatih Al-Aziz</span>
         <br>
-        <span class='text-sm'>
-          Image by <a class="underline" target="_blank" href='https://www.deviantart.com/arsenixc/art/Sky-city-838770346'>Arsenicx</a>
+        <span class='text-xs opacity-75'> <!-- Made image credit smaller -->
+          Hero Image by <a class="underline" target="_blank" href='https://www.deviantart.com/arsenixc/art/Sky-city-838770346'>Arsenicx</a>
         </span>
       </footer>
     </section>
+
+    <!-- Cloud Transition Layer Placeholder -->
+    <div class="relative h-40 -mt-20 overflow-hidden cloud-transition bg-gradient-to-b from-transparent via-white to-white">
+      <!-- You can add SVG/image clouds here or use CSS pseudo-elements -->
+      <p class="absolute text-center text-gray-500 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">~ Cloud Layer ~</p>
+    </div>
+
     <RpgPortfolioSection />
   </div>
 </template>
@@ -82,43 +75,16 @@
 import { ref, onMounted } from 'vue';
 import RpgPortfolioSection from '~/components/rpg_portfolio_section.vue';
 
-const textDay = ref(0);
-const textHour = ref(0);
-const textMinute = ref(0);
-const textSecond = ref(0);
-const owo = ref("");
-const showCountdown = ref(false);
+// Countdown refs removed
 
 function redirectToContact() {
   window.open("https://github.com/fatihaziz", "_blank");
 }
 
-function countDown() {
-  const countDay = new Date('October 1, 2024 21:30:00');
-  const now = new Date();
-  const counter = countDay.getTime() - now.getTime();
-  if (counter < 0) {
-    textDay.value = 0
-    textHour.value = 0
-    textMinute.value = 0
-    textSecond.value = 0
-    owo.value = "OwO ... my time has come, but my author not <i>touching</i> me yet ..."
-    return
-  }
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  textDay.value = Math.floor(counter / day);
-  textHour.value = Math.floor((counter % day) / hour);
-  textMinute.value = Math.floor((counter % hour) / minute);
-  textSecond.value = Math.floor((counter % minute) / second);
-}
+// countDown function removed
 
 onMounted(() => {
-  showCountdown.value = true;
-  setInterval(countDown, 1000);
+  // Countdown interval removed
 });
 </script>
 

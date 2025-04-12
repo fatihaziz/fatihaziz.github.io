@@ -1,63 +1,111 @@
 <template>
-  <section class="rpg-section">
-    <h2 class="rpg-title">RPG Portfolio</h2>
-    <div class="rpg-content">
-      <!-- Example content, replace with dynamic data as needed -->
-      <transition-group name="fade" tag="div" class="rpg-content">
-        <div class="rpg-item" v-for="item in portfolioItems" :key="item.id">
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.description }}</p>
-        </div>
-      </transition-group>
+  <section class="py-16 rpg-section bg-gray-100">
+    <div class="container px-4 mx-auto">
+      <h2 class="mb-12 text-4xl font-bold text-center rpg-title font-mondapick">Adventurer's Guild</h2>
+      <div class="categories-container">
+        <!-- Listen for item clicks from category -->
+        <RPGPortfolioCategory
+          v-for="category in portfolioCategories"
+          :key="category.id"
+          :category="category"
+          @item-clicked="openModal"
+        />
+      </div>
     </div>
+
+    <!-- Modal Component -->
+    <PortfolioDetailModal
+      :show="isModalVisible"
+      :item="selectedItem"
+      @close="closeModal"
+    />
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import PortfolioDetailModal from './PortfolioDetailModal.vue'; // Import the modal
+import RPGPortfolioCategory from './RPGPortfolioCategory.vue';
 
-const portfolioItems = ref([
-  { id: 1, title: 'Workshop', description: 'Crafting and creating amazing projects.' },
-  { id: 2, title: 'Swordmaster', description: 'Mastering the art of coding and development.' },
-  // Add more items as needed
+// Define interfaces
+interface PortfolioItem {
+  id: number;
+  title: string;
+  description: string;
+  icon?: string;
+  // Add other potential fields
+}
+
+interface PortfolioCategory {
+  id: number;
+  title: string; // e.g., 'Workshop', 'Skills Forge'
+  items: PortfolioItem[];
+}
+
+// Updated data structure for categories and items
+const portfolioCategories = ref<PortfolioCategory[]>([
+  {
+    id: 1,
+    title: 'Workshop (Projects)',
+    items: [
+      { id: 101, title: 'Project Alpha', description: 'A revolutionary web app.', icon: 'hammer' },
+      { id: 102, title: 'Project Beta', description: 'AI-powered data analysis tool.', icon: 'brain' },
+      // Add more projects
+    ]
+  },
+  {
+    id: 2,
+    title: 'Skills Forge (Languages & Tools)',
+    items: [
+      { id: 201, title: 'Go', description: 'Backend development', icon: 'golang' },
+      { id: 202, title: 'Rust', description: 'Systems programming', icon: 'rust' },
+      { id: 203, title: 'TypeScript', description: 'Frontend & Backend', icon: 'typescript' },
+      { id: 204, title: 'Vue/Nuxt', description: 'Frontend framework', icon: 'vue' },
+      { id: 205, title: 'Docker', description: 'Containerization', icon: 'docker' },
+      // Add more skills/tools
+    ]
+  },
+  {
+    id: 3,
+    title: 'Guild Hall (Contributions)',
+    items: [
+       { id: 301, title: 'Open Source Lib X', description: 'Contributed feature Y.', icon: 'git-pull-request' },
+       // Add more contributions
+    ]
+  }
+  // Add more categories as needed
 ]);
+
+// State for modal
+const isModalVisible = ref(false);
+const selectedItem = ref<PortfolioItem | null>(null);
+
+// Function to open the modal with the selected item
+function openModal(item: PortfolioItem) {
+  selectedItem.value = item;
+  isModalVisible.value = true;
+}
+
+// Function to close the modal
+function closeModal() {
+  isModalVisible.value = false;
+  selectedItem.value = null; // Clear selected item
+}
 </script>
 
 <style scoped>
-.rpg-section {
-  padding: 2rem;
-  background-color: #f0f0f0;
-  border-top: 1px solid #ccc;
-}
+/* .rpg-section styling adjusted via Tailwind classes */
 
-.rpg-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
+/* .rpg-title styling adjusted via Tailwind classes */
 
-.rpg-content {
+/* Removed old .rpg-content and .rpg-item styles. These will be handled in RPGPortfolioCategory and RPGPortfolioItem */
+
+.categories-container {
+  /* Add styling for the category container if needed, e.g., grid layout */
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 2rem; /* Space between categories */
 }
 
-.rpg-item {
-  flex: 1 1 calc(33.333% - 1rem);
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-  background-color: #fff;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
-  .rpg-item {
-    flex: 1 1 calc(100% - 1rem);
-  }
-}
+/* Removed transition styles, can be added back if needed */
 </style>

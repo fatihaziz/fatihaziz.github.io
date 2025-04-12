@@ -16,9 +16,9 @@ import { ref, onMounted } from 'vue';
 const loading = ref(true);
 
 onMounted(() => {
-  setTimeout(() => {
+  // setTimeout(() => { // Removed delay
     loading.value = false;
-  }, 1314); // Total timeout of 5 seconds - 3 seconds delay + 2 seconds buffer
+  // }, 1314); // Removed delay
 });
 </script>
 <style scoped>
