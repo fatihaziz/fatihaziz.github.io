@@ -1,10 +1,15 @@
 <template>
-  <div class='w-screen font-mangiola'>
-    <section class='flex flex-col min-h-screen py-12 text-center text-white hero-1 bg-slate-600'>
-      <nav class="relative z-10 mx-10">
+  <div class='w-screen font-mangiola' v-cloak>
+    <section class='flex flex-col min-h-screen py-12 text-center text-white hero-1 bg-slate-600' v-transition>
+      <nav class="relative z-10 mx-10 flex justify-between items-center">
         <a href='/' class="">
           <img src="~/assets/img/logo_1.jpeg" class="w-16 h-16 rounded-full logo-1">
         </a>
+        <ul class="flex space-x-4 text-lg">
+          <li><a href="#workshop" class="hover:underline">Workshop</a></li>
+          <li><a href="#swordmaster" class="hover:underline">Swordmaster</a></li>
+          <li><a href="#portfolio" class="hover:underline">Portfolio</a></li>
+        </ul>
       </nav>
        <!-- Dark Transparent Layer -->
       <div class="absolute inset-0 bg-black opacity-55"></div>
@@ -38,7 +43,7 @@
             Well just kidding, enough jokes. It's just a simple web page. and its still on progress!
           </p>
         </div>
-        <div class="my-12">
+        <div class="my-12" v-if="showCountdown" v-transition>
           <span>
             Maybe it will be ready in:
           </span>
@@ -49,7 +54,9 @@
             <div class="time-unit">{{ textSecond }}<span>Seconds</span></div>
           </div>
           <span>
-            ...just maybe <span class="owo">{{ owo }}</span>
+            ...just maybe
+            <br>
+            <span class="owo" v-html="owo" ></span>
           </span>
         </div>
         <div class='relative flex justify-center m-auto my-8 text-center button-1'>
@@ -67,17 +74,20 @@
         </span>
       </footer>
     </section>
+    <RpgPortfolioSection />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
+import RpgPortfolioSection from '~/components/rpg_portfolio_section.vue';
 
 const textDay = ref(0);
 const textHour = ref(0);
 const textMinute = ref(0);
 const textSecond = ref(0);
-const owo = ref("")
+const owo = ref("");
+const showCountdown = ref(false);
 
 function redirectToContact() {
   window.open("https://github.com/fatihaziz", "_blank");
@@ -107,7 +117,7 @@ function countDown() {
 }
 
 onMounted(() => {
-  countDown();
+  showCountdown.value = true;
   setInterval(countDown, 1000);
 });
 </script>
