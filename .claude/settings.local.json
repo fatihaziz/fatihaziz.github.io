@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "mcp__pdf-mcp-server__extract_text_from_file",
+      "mcp__sequentialthinking__sequentialthinking"
+    ],
+    "deny": []
+  }
+}
