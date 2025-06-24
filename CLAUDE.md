@@ -80,10 +80,35 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 ## RPG Theme Context
 
 ### Design Philosophy
-- Studio Ghibli aesthetic with RPG game mechanics
+- Studio Ghibli aesthetic with RPG game mechanics inspired by Zelda and Harvest Moon
+- **Personal Portfolio as RPG Village**: Transform portfolio into an explorable town/village
 - Hero section with parallax background and custom wallpaper
 - Interactive elements with custom button animations
 - Portfolio sections themed as RPG categories (Workshop, Skills Forge, etc.)
+
+### New Vision: RPG Village Portfolio
+**Core Concept**: "Welcome home adventurer! Let's go explore my city!"
+
+#### Theme Translation
+- **Skills/Projects** = Different districts/buildings in the town
+- **Navigation** = Walking/exploring through different areas
+- **Portfolio Items** = Treasures/quests to discover
+- **About Section** = Tavern/inn where visitors learn your story
+- **Contact** = Guild hall for collaborations
+
+#### Visual & Interaction Concepts
+1. **Parallax Scrolling Town** - Different layers move at different speeds for depth
+2. **Clickable Buildings** - Each represents a skill category or project type
+3. **Character Progression** - Visitor "levels up" as they explore more content
+4. **Quest-Style Navigation** - "Discover the Frontend Workshop", "Visit the Design Studio"
+
+#### Content Mapping Strategy
+- **Town Square** → Hero/Welcome section
+- **Workshop** → Development projects
+- **Art Studio** → Design work
+- **Library** → Blog/writings
+- **Tavern** → About me story
+- **Guild Board** → Contact/collaboration
 
 ### Component Relationships
 - Hero section leads to RPG portfolio section
