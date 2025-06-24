@@ -110,6 +110,409 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 - **Tavern** → About me story
 - **Guild Board** → Contact/collaboration
 
+### User Journey Flow: The Adventurer's Path
+
+#### Act I: Arrival at the Village (Landing)
+**Scene: Town Square - Hero Section**
+- **Welcome Message**: "Welcome home adventurer! Let's go explore my city!"
+- **Character Introduction**: Brief intro as "Fatih the Code Wizard" (young CTO at 22)
+- **Village Overview**: Animated parallax showing all explorable buildings
+- **Call to Adventure**: "Choose your quest!" with directional indicators
+
+#### Act II: Village Exploration (Portfolio Discovery)
+**Scene: Interactive Village Map**
+
+1. **The Workshop** (Main Development Hub)
+   - **What**: Core programming projects and technical achievements
+   - **Content**: 
+     - TurnkeyID platform (Forex trading systems)
+     - Microservices architecture
+     - Trading bots & Expert Advisors
+     - AutoSSL tools & libraries
+   - **Interaction**: "Enter the Workshop" → Portfolio grid with project cards
+   - **RPG Element**: "Crafting Level: Expert" with skill progression bars
+
+2. **The Forge** (Skills & Technologies)
+   - **What**: Technical skills showcase with RPG-style skill trees
+   - **Content**:
+     - **Languages Mastery**: TypeScript, Rust, Python, Go (with XP bars)
+     - **Combat Skills**: Docker, Kubernetes, AWS (represented as battle stats)
+     - **Magic Schools**: Frontend (Vue.js), Backend (Node.js), DevOps
+   - **Interaction**: Hoverable skill trees with proficiency levels
+   - **RPG Element**: "Multi-Language Rainbow User" achievement system
+
+3. **The Library** (Knowledge & Articles)
+   - **What**: Medium articles, blog posts, technical writings
+   - **Content**: AI, API development, trade-bots knowledge base
+   - **Interaction**: "Browse the Ancient Texts" → Article cards with reading time
+   - **RPG Element**: "Scholar's Collection" with knowledge categories
+
+4. **The Tavern** (About & Story)
+   - **What**: Personal story, journey from competition to CTO
+   - **Content**: 
+     - Origin story: 2017 National Competition for Web Development
+     - Career progression: Portofolio Indonesia → TurnkeyID CTO
+     - Personal interests: Anime lover, music (Linkin Park, Imagine Dragons)
+     - Philosophy: "Invest in myself, then invest in other people"
+   - **Interaction**: "Sit by the fire and hear the tale"
+   - **RPG Element**: Timeline as "Hero's Journey" with milestones
+
+5. **The Guild Hall** (Contact & Collaboration)
+   - **What**: Professional networking and collaboration opportunities
+   - **Content**: 
+     - GitHub (5,572 contributions), LinkedIn (334 followers)
+     - TurnkeyID leadership role
+     - Open source contributions
+   - **Interaction**: "Join the Guild" → Contact forms and social links
+   - **RPG Element**: "Reputation Level: Trusted Leader"
+
+#### Act III: Character Progression (Engagement System)
+**Visitor Achievement System**
+- **Explorer Badge**: Visited all 5 main areas
+- **Scholar Achievement**: Read 3+ articles in Library
+- **Collaborator Status**: Contacted through Guild Hall
+- **Master Discoverer**: Found all hidden easter eggs (anime references, music quotes)
+
+#### Navigation Flow
+1. **Entry Point**: Town Square with animated welcome
+2. **Free Exploration**: Click any building to enter
+3. **Guided Tour Option**: "New to town? Let me show you around!"
+4. **Progress Tracking**: Visual indicators showing visited areas
+5. **Quick Travel**: Mini-map for fast navigation between areas
+6. **Return Home**: Always accessible Town Square button
+
+#### Technical Implementation Notes
+- **Parallax Layers**: Background mountains, middle buildings, foreground character
+- **State Management**: Track visitor progress and visited areas
+- **Smooth Transitions**: Scene changes between areas
+- **Mobile Consideration**: Simplified tap-based navigation (future consideration)
+- **Performance**: Lazy load area content, optimize animations
+
+### Interactive Mechanics Design
+
+#### Core Interaction Principles
+- **Natural Discovery**: Interactions feel intuitive, not forced
+- **Dual Purpose**: Each interaction both entertains AND informs
+- **Performance First**: Smooth animations that don't lag
+- **Memorable Experience**: Unique mechanics people will want to share
+
+#### Town Square - Hero Section
+**Day/Night Cycle Toggle**
+- Click sun/moon icon to change village atmosphere
+- Day: Bright, bustling village with birds and workshop smoke
+- Night: Lanterns light up, fireflies appear, cozy atmosphere
+- Smooth CSS filter transitions between states
+- Building lights toggle automatically
+
+**Weather System**
+- Click clouds for weather changes
+- Sunny → Shows "hot" technologies (trending skills)
+- Rainy → Reveals "problem-solving" projects
+- Snowy → Shows "cool" experimental projects
+
+#### The Workshop - Development Projects
+**Project Workbench (Drag & Drop)**
+- Drag technology "tools" from rack onto workbench
+- Combine techs to see what projects were built
+- Example: TypeScript + Docker = TurnkeyID microservices
+- Crafting animation with glow effects
+- Live code preview on hover
+
+**Implementation Concept**:
+```vue
+<!-- Draggable tech tools -->
+<div v-for="tech in technologies" 
+     draggable="true"
+     @dragstart="startDrag($event, tech)"
+     class="tech-tool">
+  {{ tech.name }}
+</div>
+
+<!-- Drop zone workbench -->
+<div class="workbench" @drop="onDrop" @dragover.prevent>
+  <button v-if="canCraft" @click="craftProject">
+    ⚒️ Forge Project
+  </button>
+</div>
+```
+
+#### The Forge - Skills Display
+**Skill Mixing Cauldron**
+- Drag two skills into cauldron
+- See outcomes from skill combinations
+- Particle effects reveal results
+- Example: Rust + Trading = High-performance trading bots
+
+**Battle Stats Toggle**
+- RPG character sheet style display
+- Switch between modes:
+  - Combat Mode: AWS (Defense), Docker (Attack)
+  - Magic Mode: TypeScript (Spell Power), Python (Mana)
+  - Crafting Mode: Years XP, Projects completed
+
+#### The Library - Articles/Knowledge
+**Interactive Bookshelf**
+- Books slightly protrude on hover
+- Pull book = Article slides out like scroll
+- Secret passages for hidden content
+- Categorized by visual indicators
+
+**Magic Reading Glass**
+- Drag magnifying glass over shelves
+- Different lenses reveal different content:
+  - Red lens → Technical deep dives
+  - Blue lens → Beginner friendly
+  - Green lens → Code snippets
+
+**Implementation Concept**:
+```vue
+<!-- Book hover effect -->
+<style>
+.book:hover {
+  transform: rotateZ(-5deg) translateX(-10px);
+}
+
+/* Scroll unfurl animation */
+@keyframes unfurl {
+  0% { transform: scaleY(0) rotateX(90deg); }
+  100% { transform: scaleY(1) rotateX(0); }
+}
+</style>
+```
+
+#### The Tavern - About Section
+**Story Fireplace Timeline**
+- Drag year "logs" into fire
+- Fire blazes up, reveals stories in smoke
+- 2017 log → Competition story appears
+- Ember particles float up with memories
+
+**Jukebox Music Interaction**
+- Click to play music snippets
+- Linkin Park, Imagine Dragons tracks
+- Each song reveals different life chapter
+- Visual equalizer responds to content
+
+**Anime Easter Egg Corner**
+- Hidden click sequence activates
+- Reveals favorite anime references
+- Small character animations
+
+#### The Guild Hall - Contact
+**Message Raven System**
+- Write message on parchment textarea
+- Click "Send Raven" button
+- Raven flies away with scroll animation
+- Returns with delivery confirmation
+
+**Guild Board**
+- Pinned "quests" (project interests)
+- Users post collaboration requests
+- Papers flutter in wind on hover
+
+**Implementation Concept**:
+```vue
+<!-- Raven flying animation -->
+<style>
+@keyframes fly-away {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { 
+    transform: translate(500px, -300px) scale(0.2);
+    opacity: 0;
+  }
+}
+</style>
+```
+
+#### Village-Wide Systems
+
+**Mini-Map Navigation**
+- Fixed position corner map
+- Shows current location with pulsing marker
+- Click buildings for fast travel
+- Path trail shows journey
+- Visited buildings marked differently
+
+**Parallax Mouse Interaction**
+- Mouse movement creates depth
+- Multiple layers move at different speeds
+- Creates immersive 3D effect
+- Subtle enough not to distract
+
+**Time-Based Changes**
+- Real-time based village states
+- Morning: Workshop smoke, birds
+- Evening: Tavern lights, fireflies
+- Matches user's actual timezone
+
+**Sound Design (Optional Toggle)**
+- Ambient village sounds
+- Door creaks entering buildings
+- Page flips in library
+- Hammer sounds from workshop
+- Mutable for accessibility
+
+### Animation & User Interaction Strategy
+
+#### Animation Library Selection
+
+**Primary Choice: @vueuse/motion + Native CSS**
+- Lightweight approach without heavy 3D libraries
+- Vue-native integration with Composition API
+- GPU-accelerated CSS transforms for performance
+- Flexible foundation for future upgrades
+
+**Specialized Libraries:**
+- **particles.js** - Fireplace smoke, snow weather, fireflies
+- **lottie-web** - Complex animations like raven flying
+- **howler.js** - Audio management for sound system
+
+#### Core Interaction Patterns
+
+**1. Universal Drag & Drop System**
+```typescript
+// Reusable drag & drop composable
+export function useDragDrop() {
+  const isDragging = ref(false)
+  const startDrag = (event: DragEvent, data: any) => {
+    isDragging.value = true
+    event.dataTransfer?.setData('application/json', JSON.stringify(data))
+  }
+  return { isDragging, startDrag, onDrop }
+}
+```
+
+**2. Parallax Mouse Tracking**
+- Multiple layers with different movement intensities
+- Background: 0.02, Midground: 0.05, Foreground: 0.08
+- Creates natural 3D depth effect
+
+**3. Scene Transition System**
+- Smooth fade/slide transitions between village areas
+- Pre-loading of scene assets for seamless experience
+- Transition states prevent user confusion during changes
+
+#### Specific Animation Implementations
+
+**Day/Night Cycle Animation**
+- CSS filter transitions for atmosphere changes
+- Conditional star field generation at night
+- Building lights toggle automatically
+- Smooth gradient shifts for sky background
+
+**Interactive Fireplace System**
+- Dynamic fire intensity based on dragged timeline logs
+- Particle system for realistic flame effects
+- Story revelation through smoke-like animations
+- GPU-optimized flame flicker animations
+
+**Performance Optimization Strategy**
+- GPU-accelerated properties (transform, opacity, filter)
+- Intersection Observer for scroll-triggered animations
+- Scene-based lazy loading of animation assets
+- RequestAnimationFrame for smooth 60fps animations
+
+### Town Square - Discovery Tutorial Design
+
+#### Core Concept
+Town Square serves as the discovery tutorial area where visitors learn "this village has secrets worth finding."
+
+#### Hidden Clickable Areas
+
+**Flying Birds (Natural Tutorial)**
+- 2-3 birds flying in gentle arcs across sky
+- Hover: Birds slow down, cursor becomes pointing hand
+- Click: Bird lands on building, then flies there with camera pan
+- Purpose: Natural movement catches eye, teaches exploration
+
+**Village Well (Wisdom Discovery)**
+- Classic stone well with wooden bucket
+- Click: Bucket lowers and returns with glowing scroll
+- Reveals personal philosophy: "Invest in myself, then invest in other people"
+- Animation: Water ripples, magical glow, parchment unfurls
+
+**Street Lamp (Time Control)**
+- Cycles through Dawn → Day → Dusk → Night
+- Changes entire village atmosphere
+- Tutorial value: Shows users can change environment
+
+**Village Cat (Guide Character)**
+- Cute cat that responds to clicks
+- Sometimes leads to hidden areas
+- After 5+ clicks: Leads to secret anime reference
+- Represents playful personality
+
+**Flower Pots (Growth Metaphor)**
+- Click to see plant growth stages
+- Each stage = career milestone:
+  - Seedling: 2017 Competition
+  - Sprout: First job at Portofolio
+  - Flower: Becoming CTO
+  - Bloom: Current success
+
+**Weather Vane (Mood Changer)**
+- Click to change weather:
+  - Sunny: "Hot" trending skills
+  - Cloudy: Problem-solving mood
+  - Rain: Creative/introspective
+  - Snow: Cool experimental projects
+
+**Hint System**
+- Subtle tooltip after 10-15 seconds of no interaction
+- Progressive hints guide discovery
+- Visual sparkles near interactive elements
+
+### Storytelling Timeline Puzzle Mechanics
+
+#### Core Concept: "Piece Together Fatih's Story"
+Visitors become detectives uncovering journey through scattered clues and interactive discoveries.
+
+#### Fragment Types
+
+**Achievement Stones (Major Milestones)**
+- Glowing stones embedded in different locations
+- Key career moments:
+  - 2017 Stone (Competition) → Village entrance
+  - 2018 Stone (First Job) → Workshop area
+  - 2020 Stone (Backend Lead) → Forge area
+  - 2022 Stone (CTO) → Guild Hall
+  - 2025 Stone (Current) → Town Square center
+
+**Memory Scrolls (Personal Moments)**
+- Hidden parchments with personal insights
+- Examples: "Learning to lead", "Building tools that help others"
+
+**Music Notes (Personal Touch)**
+- Floating musical notes revealing defining moments
+- Connected to favorite songs (Linkin Park, Imagine Dragons)
+- Multiple notes unlock "soundtrack of journey"
+
+**Code Fragments (Technical Journey)**
+- Evolution from HTML → JavaScript → TypeScript → Rust
+- Shows skill progression visually
+
+#### Discovery Mechanics
+
+**Puzzle Assembly**
+- Ancient stone tablet in Town Square with empty slots
+- Drag found fragments onto tablet
+- Auto-arranges chronologically
+- Wrong placement gives gentle feedback
+
+**Progressive Story Revelation**
+- 0 Fragments: "Seek the scattered memories..."
+- 1-2 Fragments: Basic timeline forms
+- 3-4 Fragments: Connections appear
+- 5-6 Fragments: Personal insights unlock
+- 7+ Fragments: Complete story with personality
+
+#### Completion Rewards
+- "Master Detective" status
+- Special message from Fatih
+- Hidden anime corner unlocks
+- Special contact form: "Want to add your chapter?"
+- Share Your Discovery feature (future development)
+
 ### Component Relationships
 - Hero section leads to RPG portfolio section
 - Portfolio categories contain clickable items
