@@ -6,6 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-Playing Game) theme inspired by Studio Ghibli aesthetics. The site is deployed as a static site to GitHub Pages at `fatihaziz.com`.
 
+## Pre requirement:
+always do "cd "D:\__CODING\03-Personals\__FRONTEND\fatihaziz.github.io" &&" before any command to run
+
 ## Development Commands
 
 ### Essential Commands
@@ -124,7 +127,7 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 
 1. **The Workshop** (Main Development Hub)
    - **What**: Core programming projects and technical achievements
-   - **Content**: 
+   - **Content**:
      - TurnkeyID platform (Forex trading systems)
      - Microservices architecture
      - Trading bots & Expert Advisors
@@ -149,7 +152,7 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 
 4. **The Tavern** (About & Story)
    - **What**: Personal story, journey from competition to CTO
-   - **Content**: 
+   - **Content**:
      - Origin story: 2017 National Competition for Web Development
      - Career progression: Portofolio Indonesia → TurnkeyID CTO
      - Personal interests: Anime lover, music (Linkin Park, Imagine Dragons)
@@ -159,7 +162,7 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 
 5. **The Guild Hall** (Contact & Collaboration)
    - **What**: Professional networking and collaboration opportunities
-   - **Content**: 
+   - **Content**:
      - GitHub (5,572 contributions), LinkedIn (334 followers)
      - TurnkeyID leadership role
      - Open source contributions
@@ -221,7 +224,7 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 **Implementation Concept**:
 ```vue
 <!-- Draggable tech tools -->
-<div v-for="tech in technologies" 
+<div v-for="tech in technologies"
      draggable="true"
      @dragstart="startDrag($event, tech)"
      class="tech-tool">
@@ -316,7 +319,7 @@ This is a Nuxt 3 personal portfolio website for Fatih Al-Aziz with an RPG (Role-
 <style>
 @keyframes fly-away {
   0% { transform: translate(0, 0) scale(1); }
-  100% { 
+  100% {
     transform: translate(500px, -300px) scale(0.2);
     opacity: 0;
   }
