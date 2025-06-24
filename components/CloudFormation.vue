@@ -115,7 +115,7 @@
         <div></div><div></div><div></div><div></div>
       </div>
     </div>
-    
+
     <!-- Right Massive Cloud Formation - Mirror of left! -->
     <div class="massive-formation right-massive-formation">
       <!-- Bottom layer clouds - CLOSER for 1920x1200 -->
@@ -213,7 +213,33 @@
         <div class="cloud-shadow"></div>
       </div>
     </div>
+
+    <!-- Big Composite Cloud - Longer elongated shape -->
+    <div class="big-cloud right-cloud-1-b">
+      <div class="middle-circle">
+        <div class="cloud-shadow"></div>
+      </div>
+      <div class="large-circle circle-2">
+        <div class="cloud-shadow"></div>
+      </div>
+      <div class="middle-circle circle-4">
+        <div class="cloud-shadow"></div>
+      </div>
+      <div class="small-circle circle-3">
+        <div class="cloud-shadow"></div>
+      </div>
+      <div class="small-circle circle-5">
+        <div class="cloud-shadow"></div>
+      </div>
+      <div class="middle-circle circle-6">
+        <div class="cloud-shadow"></div>
+      </div>
+      <div class="small-circle" style="top: 80px; left: 180px;">
+        <div class="cloud-shadow"></div>
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -242,7 +268,7 @@
 
 .background-clouds { z-index: 4; } /* Above massive formations */
 
-/* Simple Floating Clouds - Based on cloud1.html */
+/* Simple Floating Clouds */
 .simple-cloud {
   position: relative;
   margin: 33px 0 0 0;
@@ -253,7 +279,7 @@
   opacity: 0.8;
 }
 
-/* Formation clouds - stationary, no animation */
+/* Formation clouds */
 .formation-cloud {
   animation: none !important;
   margin: 0 !important;
@@ -478,7 +504,17 @@
   top: 20%;
   left: -25%;
   transform: scale(1.8);
-  animation: drift-slow 10s infinite linear;
+  animation: drift-slow 21s infinite linear;
+  animation-delay: 0s;
+  z-index: 2;
+}
+
+.right-cloud-1-b {
+  opacity: 0.81;
+  top: 66%;
+  right: -15%;
+  transform: scale(1.37);
+  animation: drift-reverse-slow 37s infinite linear;
   animation-delay: 0s;
   z-index: 2;
 }
@@ -539,7 +575,7 @@
   .massive-cloud {
     transform: scale(0.6) !important;
   }
-  
+
   .cloud-formation-container {
     z-index: 2; /* Lower z-index on mobile for better performance */
   }

@@ -77,7 +77,7 @@ onMounted(() => {
       clearInterval(progressInterval);
       clearInterval(messageInterval);
     }, 1000);
-  }, 25000);
+  }, 15000);
 });
 </script>
 <style scoped>
