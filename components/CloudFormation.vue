@@ -114,6 +114,26 @@
       <div class="simple-cloud large formation-cloud" style="position: absolute; top: 20%; left: -20%; transform: scale(11); opacity: 0.8;">
         <div></div><div></div><div></div><div></div>
       </div>
+
+      <!-- Additional dense clouds closer to center -->
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 45%; left: 10%; transform: scale(13); opacity: 0.82;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud normal formation-cloud" style="position: absolute; top: 38%; left: 15%; transform: scale(10); opacity: 0.85;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 62%; left: 8%; transform: scale(11); opacity: 0.78;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud normal formation-cloud" style="position: absolute; top: 68%; left: 18%; transform: scale(9); opacity: 0.86;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 32%; left: 5%; transform: scale(14); opacity: 0.73;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud normal formation-cloud" style="position: absolute; top: 55%; left: 12%; transform: scale(8); opacity: 0.89;">
+        <div></div><div></div><div></div><div></div>
+      </div>
     </div>
 
     <!-- Right Massive Cloud Formation - Mirror of left! -->
@@ -188,6 +208,29 @@
         <div></div><div></div><div></div><div></div>
       </div>
       <div class="simple-cloud large formation-cloud" style="position: absolute; top: 20%; right: -20%; transform: scale(11); opacity: 0.8;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+
+      <!-- Additional dense clouds closer to center -->
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 42%; right: 8%; transform: scale(12); opacity: 0.81;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud normal formation-cloud" style="position: absolute; top: 48%; right: 14%; transform: scale(9); opacity: 0.84;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 58%; right: 6%; transform: scale(13); opacity: 0.77;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud normal formation-cloud" style="position: absolute; top: 65%; right: 16%; transform: scale(10); opacity: 0.85;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 36%; right: 4%; transform: scale(11); opacity: 0.79;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud normal formation-cloud" style="position: absolute; top: 52%; right: 12%; transform: scale(8); opacity: 0.87;">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="simple-cloud large formation-cloud" style="position: absolute; top: 28%; right: 18%; transform: scale(14); opacity: 0.72;">
         <div></div><div></div><div></div><div></div>
       </div>
     </div>
