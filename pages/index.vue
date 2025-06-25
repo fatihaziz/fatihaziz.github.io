@@ -1,5 +1,8 @@
 <template>
   <div class='w-screen font-mangiola' v-cloak>
+    <!-- Hidden YouTube Background Music Player -->
+    <div id="youtube-player" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
+    
     <section class='flex flex-col min-h-screen py-12 text-center text-white hero-1 bg-slate-600' v-transition>
       <nav class="relative z-10 mx-10 flex justify-between items-center">
         <a href='/' class="">
@@ -118,6 +121,11 @@
         <div class="absolute inset-0 bg-pattern"></div>
       </div>
 
+      <!-- Floating Decorative Elements -->
+      <div class="floating-cloud floating-cloud-1"></div>
+      <div class="floating-cloud floating-cloud-2"></div>
+      <div class="floating-cloud floating-cloud-3"></div>
+
       <div class="container mx-auto px-4 relative z-10">
         <h2 class="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">About Me</h2>
 
@@ -191,7 +199,12 @@
       </div>
     </section>
 
-    <section id="projects" class="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative">
+    <section id="projects" class="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+      <!-- Floating Decorative Elements -->
+      <div class="floating-lamp"></div>
+      <div class="floating-cloud floating-cloud-4"></div>
+      <div class="floating-cloud floating-cloud-5"></div>
+
       <div class="container mx-auto px-4">
         <h2 class="text-5xl font-bold mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Featured Projects</h2>
         <p class="text-center text-lg text-gray-600 mb-16 max-w-2xl mx-auto">
@@ -263,6 +276,10 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 
+// YouTube player variables
+let player: any = null;
+const playerReady = ref(false);
+
 function redirectToContact() {
   window.open("https://linkedin.com/in/fatih-aziz", "_blank");
 }
@@ -271,6 +288,50 @@ function scrollToProjects() {
   document.getElementById('projects')?.scrollIntoView({
     behavior: 'smooth'
   });
+}
+
+// YouTube player functions
+function onYouTubeIframeAPIReady() {
+  player = new (window as any).YT.Player('youtube-player', {
+    height: '1',
+    width: '1',
+    videoId: '4fyknH5XDQM', // Extract video ID from the URL
+    playerVars: {
+      autoplay: 1,
+      loop: 1,
+      playlist: '4fyknH5XDQM', // Required for looping
+      controls: 0,
+      showinfo: 0,
+      rel: 0,
+      iv_load_policy: 3,
+      modestbranding: 1,
+      start: 0
+    },
+    events: {
+      onReady: (event: any) => {
+        playerReady.value = true;
+        event.target.setVolume(25); // Set volume to 25%
+        event.target.playVideo();
+      },
+      onStateChange: (event: any) => {
+        // Auto-restart if video ends (backup for loop)
+        if (event.data === (window as any).YT.PlayerState.ENDED) {
+          event.target.playVideo();
+        }
+      }
+    }
+  });
+}
+
+function loadYouTubeAPI() {
+  // Load YouTube iframe API
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  const firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
+  
+  // Set global callback
+  (window as any).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 }
 
 onMounted(() => {
@@ -284,6 +345,9 @@ onMounted(() => {
       }
     });
   });
+
+  // Load YouTube background music
+  loadYouTubeAPI();
 });
 </script>
 
@@ -507,6 +571,211 @@ onMounted(() => {
     transform: translateY(-2px);
   }
 
+  /* Floating Decorative Elements */
+  .floating-cloud {
+    position: absolute;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+    border-radius: 50px;
+    opacity: 0.6;
+    z-index: 1;
+  }
+
+  .floating-cloud::before,
+  .floating-cloud::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50px;
+  }
+
+  .floating-cloud-1 {
+    width: 80px;
+    height: 30px;
+    top: 15%;
+    right: 10%;
+    animation: float-drift-1 25s infinite ease-in-out;
+  }
+
+  .floating-cloud-1::before {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: 10px;
+  }
+
+  .floating-cloud-1::after {
+    width: 60px;
+    height: 40px;
+    top: -15px;
+    right: 15px;
+  }
+
+  .floating-cloud-2 {
+    width: 60px;
+    height: 25px;
+    top: 60%;
+    left: 5%;
+    animation: float-drift-2 30s infinite ease-in-out;
+  }
+
+  .floating-cloud-2::before {
+    width: 40px;
+    height: 40px;
+    top: -20px;
+    left: 5px;
+  }
+
+  .floating-cloud-2::after {
+    width: 45px;
+    height: 35px;
+    top: -10px;
+    right: 10px;
+  }
+
+  .floating-cloud-3 {
+    width: 70px;
+    height: 28px;
+    top: 35%;
+    left: 15%;
+    animation: float-drift-3 35s infinite ease-in-out;
+    opacity: 0.4;
+  }
+
+  .floating-cloud-3::before {
+    width: 45px;
+    height: 45px;
+    top: -22px;
+    left: 8px;
+  }
+
+  .floating-cloud-3::after {
+    width: 55px;
+    height: 38px;
+    top: -12px;
+    right: 12px;
+  }
+
+  .floating-cloud-4 {
+    width: 90px;
+    height: 35px;
+    top: 20%;
+    left: 8%;
+    animation: float-drift-4 28s infinite ease-in-out;
+  }
+
+  .floating-cloud-4::before {
+    width: 55px;
+    height: 55px;
+    top: -28px;
+    left: 12px;
+  }
+
+  .floating-cloud-4::after {
+    width: 65px;
+    height: 45px;
+    top: -18px;
+    right: 18px;
+  }
+
+  .floating-cloud-5 {
+    width: 65px;
+    height: 26px;
+    top: 70%;
+    right: 12%;
+    animation: float-drift-5 32s infinite ease-in-out;
+    opacity: 0.5;
+  }
+
+  .floating-cloud-5::before {
+    width: 42px;
+    height: 42px;
+    top: -21px;
+    left: 6px;
+  }
+
+  .floating-cloud-5::after {
+    width: 48px;
+    height: 36px;
+    top: -11px;
+    right: 11px;
+  }
+
+  /* Floating Lamp */
+  .floating-lamp {
+    position: absolute;
+    top: 40%;
+    right: 8%;
+    width: 40px;
+    height: 80px;
+    z-index: 1;
+    opacity: 0.7;
+    animation: lamp-glow 20s infinite ease-in-out;
+  }
+
+  .floating-lamp::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 60px;
+    background: linear-gradient(180deg, #374151 0%, #6b7280 100%);
+    border-radius: 3px;
+  }
+
+  .floating-lamp::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 25px;
+    background: radial-gradient(circle, #fbbf24 0%, #f59e0b 70%, #d97706 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+  }
+
+  /* Float Animations */
+  @keyframes float-drift-1 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(-20px) translateY(-10px); }
+    50% { transform: translateX(15px) translateY(5px); }
+    75% { transform: translateX(-10px) translateY(-8px); }
+  }
+
+  @keyframes float-drift-2 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    33% { transform: translateX(25px) translateY(8px); }
+    66% { transform: translateX(-15px) translateY(-5px); }
+  }
+
+  @keyframes float-drift-3 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    30% { transform: translateX(-18px) translateY(12px); }
+    70% { transform: translateX(22px) translateY(-7px); }
+  }
+
+  @keyframes float-drift-4 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    40% { transform: translateX(30px) translateY(-12px); }
+    80% { transform: translateX(-20px) translateY(8px); }
+  }
+
+  @keyframes float-drift-5 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    35% { transform: translateX(-25px) translateY(10px); }
+    65% { transform: translateX(18px) translateY(-6px); }
+  }
+
+  @keyframes lamp-glow {
+    0%, 100% { opacity: 0.7; transform: translateY(0); }
+    25% { opacity: 0.9; transform: translateY(-5px); }
+    50% { opacity: 0.6; transform: translateY(3px); }
+    75% { opacity: 0.8; transform: translateY(-2px); }
+  }
+
   /* Responsive Styles */
   @media (max-width: 768px) {
     .title-1 {
@@ -527,6 +796,15 @@ onMounted(() => {
       margin: 0 0.5rem;
       padding: 0.4rem 0.8rem;
       font-size: 0.9rem;
+    }
+
+    /* Scale down floating elements on mobile */
+    .floating-cloud {
+      transform: scale(0.7);
+    }
+
+    .floating-lamp {
+      transform: scale(0.8);
     }
   }
 </style>
