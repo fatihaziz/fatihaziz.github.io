@@ -111,51 +111,148 @@
       </footer>
     </section>
 
-    <!-- Enhanced Cloud Transition -->
-    <div class="relative h-40 -mt-20 overflow-hidden cloud-transition">
-      <div class="cloud-layer cloud-1"></div>
-      <div class="cloud-layer cloud-2"></div>
-      <div class="cloud-layer cloud-3"></div>
-    </div>
-
     <!-- Content Sections -->
-    <section id="about" class="py-20 bg-gradient-to-b from-white to-gray-50">
-      <div class="container mx-auto px-4 text-center">
-        <h2 class="text-4xl font-bold mb-8 text-gray-800">About Me</h2>
-        <div class="max-w-3xl mx-auto text-lg text-gray-600 leading-relaxed">
-          <p class="mb-6">
-            Started my journey in 2017 with a national web development competition.
-            Fast forward to today, I'm leading technical innovation as CTO at TurnkeyID,
-            building systems that serve thousands of users daily.
-          </p>
-          <p>
-            My passion lies in creating elegant solutions to complex problems,
-            mentoring incredible developers, and pushing the boundaries of what's possible with code.
-          </p>
+    <section id="about" class="py-20 relative overflow-hidden bg-gradient-to-b from-white to-gray-50">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-5">
+        <div class="absolute inset-0 bg-pattern"></div>
+      </div>
+
+      <div class="container mx-auto px-4 relative z-10">
+        <h2 class="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">About Me</h2>
+
+        <!-- Journey Timeline -->
+        <div class="max-w-5xl mx-auto">
+          <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div class="text-left">
+              <h3 class="text-2xl font-bold mb-4 text-gray-800">The Journey</h3>
+              <p class="text-lg text-gray-600 leading-relaxed mb-4">
+                Started my journey in 2017 with a national web development competition that changed everything.
+                What began as curiosity evolved into a passion for building systems that make a difference.
+              </p>
+              <p class="text-lg text-gray-600 leading-relaxed">
+                Today, as CTO at TurnkeyID, I lead a talented team building solutions that serve thousands daily,
+                always pushing the boundaries of what's possible with code.
+              </p>
+            </div>
+            <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl shadow-xl">
+              <div class="space-y-4">
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">17</div>
+                  <div>
+                    <div class="font-semibold">Competition Winner</div>
+                    <div class="text-sm text-gray-600">National Web Development Competition</div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">18</div>
+                  <div>
+                    <div class="font-semibold">First Developer Role</div>
+                    <div class="text-sm text-gray-600">Started at Portofolio Indonesia</div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">20</div>
+                  <div>
+                    <div class="font-semibold">Backend Lead</div>
+                    <div class="text-sm text-gray-600">Leading technical architecture</div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold">22</div>
+                  <div>
+                    <div class="font-semibold">CTO at TurnkeyID</div>
+                    <div class="text-sm text-gray-600">Leading innovation & 50+ developers</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills & Interests -->
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div class="text-3xl mb-4">💻</div>
+              <h4 class="font-bold text-lg mb-2">Tech Stack</h4>
+              <p class="text-gray-600">Mastering Go, Rust, Python, and TypeScript to build scalable, efficient systems</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div class="text-3xl mb-4">🎮</div>
+              <h4 class="font-bold text-lg mb-2">Interests</h4>
+              <p class="text-gray-600">Anime enthusiast, coffee connoisseur, and eternal learner of new technologies</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div class="text-3xl mb-4">🌏</div>
+              <h4 class="font-bold text-lg mb-2">Global Perspective</h4>
+              <p class="text-gray-600">Working across Indonesia & Dubai, bringing diverse insights to every project</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="contact" class="py-20 bg-gradient-to-b from-gray-100 to-gray-200">
-      <div class="container mx-auto px-4 text-center">
-        <h2 class="text-4xl font-bold mb-8 text-gray-800">Let's Build Something Amazing</h2>
-        <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-          Always excited to collaborate on innovative projects. Whether you have an idea,
-          need technical leadership, or just want to chat about technology.
+    <section id="projects" class="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative">
+      <div class="container mx-auto px-4">
+        <h2 class="text-5xl font-bold mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Featured Projects</h2>
+        <p class="text-center text-lg text-gray-600 mb-16 max-w-2xl mx-auto">
+          From AI-powered trading systems to scalable microservices, each project represents a step forward in innovation
         </p>
+
+        <!-- Project categories -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+          <button class="px-6 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition">All Projects</button>
+          <button class="px-6 py-2 bg-white text-gray-600 rounded-full font-medium hover:bg-gray-100 transition">AI & ML</button>
+          <button class="px-6 py-2 bg-white text-gray-600 rounded-full font-medium hover:bg-gray-100 transition">Trading Bots</button>
+          <button class="px-6 py-2 bg-white text-gray-600 rounded-full font-medium hover:bg-gray-100 transition">Open Source</button>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="contact" class="py-20 relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-600">
+      <!-- Decorative circles -->
+      <div class="absolute top-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -translate-x-32 -translate-y-32"></div>
+      <div class="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full translate-x-48 translate-y-48"></div>
+
+      <div class="container mx-auto px-4 text-center relative z-10">
+        <h2 class="text-5xl font-bold mb-8 text-white">Let's Build Something Amazing</h2>
+        <p class="text-xl text-blue-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+          Whether you have a groundbreaking idea, need technical leadership, or want to discuss the latest in AI and blockchain,
+          I'm always excited to connect with fellow innovators.
+        </p>
+
+        <!-- Contact options -->
+        <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+          <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+            <div class="text-3xl mb-3">📧</div>
+            <h3 class="text-white font-semibold mb-2">Email</h3>
+            <p class="text-blue-100 text-sm">For detailed discussions</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+            <div class="text-3xl mb-3">💼</div>
+            <h3 class="text-white font-semibold mb-2">LinkedIn</h3>
+            <p class="text-blue-100 text-sm">Professional networking</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+            <div class="text-3xl mb-3">🐙</div>
+            <h3 class="text-white font-semibold mb-2">GitHub</h3>
+            <p class="text-blue-100 text-sm">Check out my code</p>
+          </div>
+        </div>
+
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href="mailto:m.fatihalaziz@gmail.com"
-            class="contact-btn-primary"
+            class="contact-btn-white"
           >
-            Send Email
+            <span class="mr-2">✉️</span> Send Email
           </a>
           <a
             href="https://linkedin.com/in/fatih-aziz"
             target="_blank"
-            class="contact-btn-secondary"
+            class="contact-btn-outline"
           >
-            Connect on LinkedIn
+            <span class="mr-2">💼</span> Connect on LinkedIn
           </a>
         </div>
       </div>
@@ -165,7 +262,6 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import RpgPortfolioSection from '~/components/rpg_portfolio_section.vue';
 
 function redirectToContact() {
   window.open("https://linkedin.com/in/fatih-aziz", "_blank");
@@ -218,6 +314,13 @@ onMounted(() => {
     background-attachment: fixed;
     background-position: center center;
     position: relative;
+    margin-bottom: 50px;
+  }
+
+  /* Background Pattern */
+  .bg-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
   }
 
   /* Enhanced CTA Buttons */
@@ -363,6 +466,44 @@ onMounted(() => {
   .contact-btn-secondary:hover {
     background: #6b7280;
     color: white;
+    transform: translateY(-2px);
+  }
+
+  /* New Contact Section Buttons */
+  .contact-btn-white {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: white;
+    color: #3b82f6;
+    border-radius: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .contact-btn-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .contact-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .contact-btn-outline:hover {
+    background: white;
+    color: #3b82f6;
     transform: translateY(-2px);
   }
 
