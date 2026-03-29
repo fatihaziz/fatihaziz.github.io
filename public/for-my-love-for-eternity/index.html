@@ -9,8 +9,8 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
-  --bg: #b5aDA4;
-  --paper: #fffefa;
+  --bg: #a89f95;
+  --paper: #fdfbf7;
   --ink: #2c2420;
   --gold: #8b6914;
   --gold-soft: #a07d2e;
@@ -48,19 +48,21 @@ html, body {
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   -webkit-overflow-scrolling: touch;
-  padding: 24px;
+  padding: 40px 24px 60px;
 }
 
 /* ===== PAPER CONTAINER ===== */
-.paper {
-  background: var(--paper);
+.paper-wrap {
+  position: relative;
   max-width: 520px;
   width: 100%;
-  min-height: 70vh;
-  max-height: 90vh;
-  overflow-y: auto;
+}
+
+.paper {
+  background: var(--paper);
+  width: 100%;
   position: relative;
   padding: 48px 40px 60px;
   box-shadow:
@@ -70,6 +72,7 @@ html, body {
   border-radius: 2px;
   display: flex;
   flex-direction: column;
+  z-index: 2;
 }
 
 /* subtle paper grain */
@@ -114,7 +117,10 @@ html, body {
   justify-content: center;
   align-items: center;
   text-align: center;
+  min-height: 70vh;
 }
+
+.cover .page { align-items: center; }
 
 .cover-content {
   position: relative;
@@ -279,94 +285,85 @@ html, body {
   font-weight: 500;
 }
 
-/* ===== PHOTOS: forced to bottom of paper ===== */
+/* ===== PHOTOS: OUTSIDE the paper, on the background ===== */
 .photos-section {
-  margin-top: auto;
-  padding-top: 20px;
-  position: relative;
+  position: absolute;
+  bottom: -30px;
+  left: -40px;
+  right: -40px;
   z-index: 3;
-  order: 99;
+  pointer-events: none;
 }
 
 .photo-stack {
   position: relative;
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  height: auto;
-  min-height: 180px;
-  margin: 0 auto;
-  max-width: 100%;
+  width: 100%;
+  height: 300px;
 }
 
 .photo-frame {
   position: absolute;
-  background: #fffef8;
-  padding: 6px 6px 24px 6px;
-  box-shadow: 0 3px 12px rgba(80,60,30,0.12), 0 1px 3px rgba(80,60,30,0.08);
+  background: #fffdf6;
+  padding: 7px 7px 28px 7px;
+  box-shadow:
+    0 4px 16px rgba(40,30,10,0.18),
+    0 1px 4px rgba(40,30,10,0.1);
+  pointer-events: auto;
 }
 
-/* masking tape - diagonal across corner */
+/* masking tape - top, angled */
 .photo-frame::before {
   content: '';
   position: absolute;
-  top: -6px;
+  top: -8px;
   left: 50%;
   transform: translateX(-50%) rotate(-3deg);
-  width: 50px;
-  height: 16px;
-  background: linear-gradient(135deg,
-    rgba(215, 200, 165, 0.72),
-    rgba(195, 175, 140, 0.5));
+  width: 56px;
+  height: 18px;
+  background: linear-gradient(160deg,
+    rgba(218, 200, 165, 0.8) 0%,
+    rgba(205, 188, 150, 0.55) 100%);
   z-index: 10;
   border-radius: 1px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
-/* second tape strip - bottom corner, diagonal */
+/* masking tape - bottom corner, diagonal */
 .photo-frame::after {
   content: '';
   position: absolute;
-  bottom: 8px;
-  right: -8px;
-  width: 46px;
-  height: 14px;
-  background: linear-gradient(135deg,
-    rgba(220, 205, 170, 0.65),
-    rgba(200, 180, 145, 0.45));
+  bottom: 10px;
+  right: -10px;
+  width: 52px;
+  height: 16px;
+  background: linear-gradient(160deg,
+    rgba(218, 200, 165, 0.75) 0%,
+    rgba(205, 188, 150, 0.5) 100%);
   z-index: 10;
   border-radius: 1px;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.03);
-  transform: rotate(-38deg);
+  transform: rotate(-40deg);
 }
 
-/* vary tape per photo */
+/* vary tape angles per photo */
 .photo-frame:nth-child(1)::before {
-  transform: translateX(-50%) rotate(4deg);
-  left: 35%;
+  transform: translateX(-40%) rotate(5deg);
 }
 .photo-frame:nth-child(1)::after {
-  transform: rotate(-42deg);
-  right: -6px;
-  bottom: 10px;
+  transform: rotate(-44deg);
+  bottom: 12px; right: -8px;
 }
 .photo-frame:nth-child(2)::before {
-  transform: translateX(-50%) rotate(-5deg);
-  left: 60%;
+  transform: translateX(-60%) rotate(-4deg);
 }
 .photo-frame:nth-child(2)::after {
-  transform: rotate(-35deg);
-  right: -10px;
-  bottom: 6px;
+  transform: rotate(-36deg);
+  bottom: 8px; right: -12px;
 }
 .photo-frame:nth-child(3)::before {
-  transform: translateX(-50%) rotate(2deg);
-  left: 45%;
+  transform: translateX(-45%) rotate(3deg);
 }
 .photo-frame:nth-child(3)::after {
-  transform: rotate(-45deg);
-  right: -5px;
-  bottom: 12px;
+  transform: rotate(-42deg);
+  bottom: 14px; right: -6px;
 }
 
 .photo-frame img {
@@ -381,72 +378,74 @@ html, body {
   font-size: 8px;
   color: #7a6e60;
   text-align: center;
-  margin-top: 5px;
-  letter-spacing: 1px;
+  margin-top: 6px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
-/* Stack layouts - diagonal staircase, top-left to bottom-right */
-.stack-1 { height: 360px; }
+/* 2 photos: diagonal left-to-right */
+.stack-1 { height: 320px; }
 .stack-1 .photo-frame:nth-child(1) {
-  width: 200px;
-  top: 0;
+  width: 210px;
+  top: 20px;
   left: 0;
-  transform: rotate(-4deg);
+  transform: rotate(-5deg);
   z-index: 2;
 }
 .stack-1 .photo-frame:nth-child(2) {
-  width: 200px;
-  top: 80px;
+  width: 210px;
+  top: 60px;
   right: 0;
-  transform: rotate(3deg);
+  transform: rotate(4deg);
   z-index: 1;
 }
 
-.stack-2 { height: 480px; }
+/* 3 photos: staircase diagonal */
+.stack-2 { height: 340px; }
 .stack-2 .photo-frame:nth-child(1) {
   width: 190px;
   top: 0;
-  left: 0;
-  transform: rotate(3deg);
-  z-index: 2;
+  left: -10px;
+  transform: rotate(4deg);
+  z-index: 3;
 }
 .stack-2 .photo-frame:nth-child(2) {
   width: 180px;
-  top: 100px;
+  top: 40px;
   left: 50%;
-  transform: translateX(-50%) rotate(-4deg);
-  z-index: 3;
+  transform: translateX(-50%) rotate(-3deg);
+  z-index: 2;
 }
 .stack-2 .photo-frame:nth-child(3) {
   width: 200px;
-  top: 220px;
-  right: 0;
-  transform: rotate(2.5deg);
+  top: 80px;
+  right: -10px;
+  transform: rotate(3deg);
   z-index: 1;
 }
 
-.stack-3 { height: 480px; }
+/* 3 photos: staircase diagonal */
+.stack-3 { height: 340px; }
 .stack-3 .photo-frame:nth-child(1) {
-  width: 200px;
+  width: 190px;
   top: 0;
-  left: 0;
+  left: -10px;
   transform: rotate(-3deg);
   z-index: 2;
 }
 .stack-3 .photo-frame:nth-child(2) {
   width: 180px;
-  top: 110px;
+  top: 50px;
   left: 50%;
-  transform: translateX(-50%) rotate(4deg);
-  z-index: 1;
+  transform: translateX(-50%) rotate(5deg);
+  z-index: 3;
 }
 .stack-3 .photo-frame:nth-child(3) {
   width: 200px;
-  top: 230px;
-  right: 0;
-  transform: rotate(-3.5deg);
-  z-index: 3;
+  top: 90px;
+  right: -10px;
+  transform: rotate(-4deg);
+  z-index: 1;
 }
 
 /* ===== CLOSING PAGE ===== */
@@ -458,7 +457,10 @@ html, body {
   justify-content: center;
   align-items: center;
   text-align: center;
+  min-height: 70vh;
 }
+
+.closing .page { align-items: center; }
 
 .closing-text {
   font-family: 'Playfair Display', serif;
@@ -551,20 +553,17 @@ html, body {
 
 /* Responsive */
 @media (max-width: 540px) {
-  .page { padding: 16px; }
-  .paper { padding: 32px 24px 48px; min-height: 75vh; }
+  .page { padding: 20px 12px 50px; }
+  .paper { padding: 32px 24px 48px; }
   .cover h1 { font-size: 24px; }
   .cover h1 span { font-size: 30px; }
   .page-title { font-size: 28px; }
   .essay-text { font-size: 15px; }
-  .stack-1 .photo-frame:nth-child(1) { width: 160px; }
-  .stack-1 .photo-frame:nth-child(2) { width: 160px; }
-  .stack-2 .photo-frame:nth-child(1) { width: 150px; }
-  .stack-2 .photo-frame:nth-child(2) { width: 140px; }
-  .stack-2 .photo-frame:nth-child(3) { width: 160px; }
-  .stack-3 .photo-frame:nth-child(1) { width: 160px; }
-  .stack-3 .photo-frame:nth-child(2) { width: 140px; }
-  .stack-3 .photo-frame:nth-child(3) { width: 160px; }
+  .photos-section { left: -20px; right: -20px; bottom: -20px; }
+  .photo-frame { padding: 5px 5px 22px 5px; }
+  .stack-1 .photo-frame { width: 170px !important; }
+  .stack-2 .photo-frame { width: 155px !important; }
+  .stack-3 .photo-frame { width: 155px !important; }
 }
 
 @media (max-width: 380px) {
@@ -573,6 +572,9 @@ html, body {
   .cover h1 span { font-size: 26px; }
   .page-title { font-size: 24px; }
   .essay-text { font-size: 14px; }
+  .stack-1 .photo-frame { width: 140px !important; }
+  .stack-2 .photo-frame { width: 125px !important; }
+  .stack-3 .photo-frame { width: 125px !important; }
 }
 </style>
 </head>
@@ -604,6 +606,7 @@ html, body {
 
   <!-- ===== PAGE 1: GRATITUDE ===== -->
   <div class="page content-page" id="page-1">
+    <div class="paper-wrap">
     <div class="paper">
     <div class="page-inner">
       <div class="page-number">Page One</div>
@@ -647,6 +650,7 @@ html, body {
 
   <!-- ===== PAGE 2: LOVE ===== -->
   <div class="page content-page" id="page-2">
+    <div class="paper-wrap">
     <div class="paper">
     <div class="page-inner">
       <div class="page-number">Page Two</div>
@@ -694,6 +698,7 @@ html, body {
 
   <!-- ===== PAGE 3: COMMITMENT ===== -->
   <div class="page content-page" id="page-3">
+    <div class="paper-wrap">
     <div class="paper">
     <div class="page-inner">
       <div class="page-number">Page Three</div>
