@@ -12,7 +12,9 @@
       "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && echo 'shamefully-hoist=true' > .npmrc && rm -rf node_modules pnpm-lock.yaml && pnpm install 2>&1 | tail -10)",
       "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm install 2>&1 | tail -20)",
       "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm build 2>&1 | tail -20)",
-      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm install 2>&1 | tail -5)"
+      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm install 2>&1 | tail -5)",
+      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm config list 2>&1 | grep -i lock)",
+      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm install --lockfile-only 2>&1 | tail -5 && ls pnpm-lock.yaml)"
     ],
     "deny": []
   }
