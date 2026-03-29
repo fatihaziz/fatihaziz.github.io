@@ -9,14 +9,14 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
-  --bg: #a89f95;
-  --paper: #fdfbf7;
+  --bg: #9e958b;
+  --paper: #faf7f2;
   --ink: #2c2420;
-  --gold: #8b6914;
-  --gold-soft: #a07d2e;
-  --rose: #9e4a4a;
-  --rose-soft: #b05555;
-  --text: #3d3530;
+  --gold: #96751a;
+  --gold-soft: #b08a2e;
+  --rose: #a85050;
+  --rose-soft: #c06868;
+  --text: #3a332d;
   --text-muted: #8a7e72;
 }
 
@@ -31,7 +31,6 @@ html, body {
   touch-action: pan-y;
 }
 
-/* SLIDER */
 .slider {
   display: flex;
   height: 100%;
@@ -40,6 +39,7 @@ html, body {
   will-change: transform;
 }
 
+/* Each page: grey bg, centers a paper card */
 .page {
   min-width: 100vw;
   height: 100vh;
@@ -48,85 +48,32 @@ html, body {
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
   -webkit-overflow-scrolling: touch;
-  padding: 40px 24px 60px;
+  padding: 28px;
 }
 
-/* ===== PAPER CONTAINER ===== */
-.paper-wrap {
-  position: relative;
-  max-width: 520px;
-  width: 100%;
-}
-
-.paper {
-  background: var(--paper);
-  width: 100%;
-  position: relative;
-  overflow: visible;
-  padding: 48px 40px 60px;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,0.1),
-    0 12px 40px rgba(0,0,0,0.14),
-    inset 0 0 80px rgba(0,0,0,0.01);
-  border-radius: 2px;
-  display: flex;
-  flex-direction: column;
-  z-index: 2;
-}
-
-/* subtle paper grain */
-.paper::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 26px,
-      rgba(180, 160, 130, 0.04) 26px,
-      rgba(180, 160, 130, 0.04) 27px
-    );
-  pointer-events: none;
-  border-radius: 2px;
-}
-
-/* left page edge / book spine feel */
-.paper::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 28px;
-  background: linear-gradient(90deg,
-    rgba(0,0,0,0.04) 0%,
-    rgba(0,0,0,0.015) 40%,
-    transparent 100%);
-  pointer-events: none;
-  border-radius: 2px 0 0 2px;
-}
-
-/* ===== COVER PAGE ===== */
+/* ===== COVER ===== */
 .cover {
   background: var(--bg);
-}
-
-.cover .paper {
-  justify-content: center;
   align-items: center;
   text-align: center;
-  min-height: 70vh;
 }
 
-.cover .page { align-items: center; }
-
 .cover-content {
+  background: var(--paper);
+  padding: 60px 44px;
+  width: 460px;
+  max-width: 100%;
+  border-radius: 3px;
   position: relative;
   z-index: 2;
   animation: fadeUp 1.2s ease-out;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 12px 40px rgba(0,0,0,0.13);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
 }
 
 .cover-ornament {
@@ -141,7 +88,7 @@ html, body {
 
 .cover h1 {
   font-family: 'Playfair Display', serif;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 400;
   font-style: italic;
   line-height: 1.3;
@@ -151,7 +98,7 @@ html, body {
 
 .cover h1 span {
   display: block;
-  font-size: 36px;
+  font-size: 38px;
   font-style: normal;
   font-weight: 700;
   color: var(--gold);
@@ -164,7 +111,7 @@ html, body {
   color: var(--rose-soft);
   line-height: 1.6;
   max-width: 280px;
-  margin: 16px auto 32px;
+  margin: 16px auto 36px;
   font-weight: 300;
 }
 
@@ -172,7 +119,7 @@ html, body {
   width: 50px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 0 auto 18px;
+  margin: 0 auto 24px;
 }
 
 .cover-date {
@@ -183,9 +130,11 @@ html, body {
   text-transform: uppercase;
 }
 
+.cover::before { display: none; }
+
 .swipe-hint {
   position: absolute;
-  bottom: 20px;
+  bottom: 36px;
   left: 50%;
   transform: translateX(-50%);
   font-family: 'Quicksand', sans-serif;
@@ -212,22 +161,41 @@ html, body {
 /* ===== CONTENT PAGES ===== */
 .content-page {
   background: var(--bg);
+  padding: 0;
 }
 
-.content-page .paper {
-  justify-content: flex-start;
-  padding-bottom: 100px;
-  margin-bottom: 300px;
-}
-
-/* Text section: centered in the paper */
+/* The paper card */
 .page-inner {
+  background: var(--paper);
+  width: 460px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 48px 40px 56px;
+  border-radius: 3px;
   position: relative;
-  z-index: 2;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 12px 40px rgba(0,0,0,0.13);
+}
+
+/* paper texture lines */
+.page-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: repeating-linear-gradient(0deg,
+    transparent, transparent 27px,
+    rgba(170,150,120,0.03) 27px, rgba(170,150,120,0.03) 28px);
+  pointer-events: none;
+}
+
+/* book spine shadow */
+.page-inner::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 22px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.03), transparent);
+  pointer-events: none;
 }
 
 .page-number {
@@ -270,6 +238,8 @@ html, body {
   line-height: 1.85;
   color: var(--text);
   font-weight: 300;
+  position: relative;
+  z-index: 2;
 }
 
 .essay-text p {
@@ -288,91 +258,67 @@ html, body {
   font-weight: 500;
 }
 
-/* ===== PHOTOS: positioned at bottom, spilling outside paper ===== */
+/* ===== PHOTOS: scattered on the paper, between text ===== */
 .photos-section {
-  position: absolute;
-  bottom: -80px;
-  left: -50px;
-  right: -50px;
-  z-index: 10;
-  pointer-events: none;
+  margin: 28px -8px;
+  position: relative;
+  z-index: 3;
 }
 
 .photo-stack {
   position: relative;
-  width: 100%;
-  height: 300px;
+  margin: 0 auto;
+  max-width: 380px;
 }
+
+/* Stack heights */
+.stack-1 { height: 340px; }
+.stack-2 { height: 400px; }
+.stack-3 { height: 440px; }
 
 .photo-frame {
   position: absolute;
-  background: #fffdf6;
-  padding: 7px 7px 28px 7px;
-  box-shadow:
-    0 4px 16px rgba(40,30,10,0.18),
-    0 1px 4px rgba(40,30,10,0.1);
-  pointer-events: auto;
+  background: #fffdf5;
+  padding: 6px 6px 26px 6px;
+  box-shadow: 0 3px 10px rgba(40,30,10,0.13), 0 1px 3px rgba(40,30,10,0.08);
 }
 
-/* masking tape - top, angled */
+/* TAPE - top strip */
 .photo-frame::before {
   content: '';
   position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-3deg);
-  width: 56px;
-  height: 18px;
-  background: linear-gradient(160deg,
-    rgba(218, 200, 165, 0.8) 0%,
-    rgba(205, 188, 150, 0.55) 100%);
+  width: 52px;
+  height: 16px;
+  background: linear-gradient(155deg,
+    rgba(215,198,162,0.8), rgba(200,183,147,0.5));
   z-index: 10;
   border-radius: 1px;
 }
 
-/* masking tape - bottom corner, diagonal */
+/* TAPE - bottom corner diagonal */
 .photo-frame::after {
   content: '';
   position: absolute;
-  bottom: 10px;
-  right: -10px;
-  width: 52px;
-  height: 16px;
-  background: linear-gradient(160deg,
-    rgba(218, 200, 165, 0.75) 0%,
-    rgba(205, 188, 150, 0.5) 100%);
+  width: 46px;
+  height: 14px;
+  background: linear-gradient(155deg,
+    rgba(215,198,162,0.72), rgba(200,183,147,0.45));
   z-index: 10;
   border-radius: 1px;
-  transform: rotate(-40deg);
 }
 
-/* vary tape angles per photo */
-.photo-frame:nth-child(1)::before {
-  transform: translateX(-40%) rotate(5deg);
-}
-.photo-frame:nth-child(1)::after {
-  transform: rotate(-44deg);
-  bottom: 12px; right: -8px;
-}
-.photo-frame:nth-child(2)::before {
-  transform: translateX(-60%) rotate(-4deg);
-}
-.photo-frame:nth-child(2)::after {
-  transform: rotate(-36deg);
-  bottom: 8px; right: -12px;
-}
-.photo-frame:nth-child(3)::before {
-  transform: translateX(-45%) rotate(3deg);
-}
-.photo-frame:nth-child(3)::after {
-  transform: rotate(-42deg);
-  bottom: 14px; right: -6px;
-}
+/* Tape positions per photo */
+.photo-frame:nth-child(1)::before { top: -7px; left: 15%; transform: rotate(5deg); }
+.photo-frame:nth-child(1)::after  { bottom: 10px; right: -8px; transform: rotate(-42deg); }
+.photo-frame:nth-child(2)::before { top: -7px; right: 15%; left: auto; transform: rotate(-4deg); }
+.photo-frame:nth-child(2)::after  { bottom: 8px; right: -10px; transform: rotate(-36deg); }
+.photo-frame:nth-child(3)::before { top: -7px; left: 25%; transform: rotate(2deg); }
+.photo-frame:nth-child(3)::after  { bottom: 12px; right: -6px; transform: rotate(-44deg); }
 
 .photo-frame img {
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 
@@ -381,98 +327,87 @@ html, body {
   font-size: 8px;
   color: #7a6e60;
   text-align: center;
-  margin-top: 6px;
+  margin-top: 5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
-/* 2 photos: diagonal left-to-right */
-.stack-1 { height: 320px; }
+/* --- Stack 1: 2 photos diagonal --- */
 .stack-1 .photo-frame:nth-child(1) {
-  width: 210px;
-  top: 20px;
-  left: 0;
+  width: 190px; height: 260px;
+  top: 10px; left: 0;
   transform: rotate(-5deg);
   z-index: 2;
 }
 .stack-1 .photo-frame:nth-child(2) {
-  width: 210px;
-  top: 60px;
-  right: 0;
+  width: 180px; height: 240px;
+  top: 50px; right: 0;
   transform: rotate(4deg);
   z-index: 1;
 }
 
-/* 3 photos: staircase diagonal */
-.stack-2 { height: 340px; }
+/* --- Stack 2: 3 photos scattered --- */
 .stack-2 .photo-frame:nth-child(1) {
-  width: 190px;
-  top: 0;
-  left: -10px;
-  transform: rotate(4deg);
-  z-index: 3;
-}
-.stack-2 .photo-frame:nth-child(2) {
-  width: 180px;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-3deg);
+  width: 160px; height: 210px;
+  top: 0; left: 0;
+  transform: rotate(3deg);
   z-index: 2;
 }
-.stack-2 .photo-frame:nth-child(3) {
-  width: 200px;
-  top: 80px;
-  right: -10px;
-  transform: rotate(3deg);
+.stack-2 .photo-frame:nth-child(2) {
+  width: 155px; height: 200px;
+  top: 20px; right: 0;
+  transform: rotate(-3deg);
   z-index: 1;
 }
+.stack-2 .photo-frame:nth-child(3) {
+  width: 200px; height: 150px;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%) rotate(2deg);
+  z-index: 3;
+}
 
-/* 3 photos: staircase diagonal */
-.stack-3 { height: 340px; }
+/* --- Stack 3: 3 photos scattered --- */
 .stack-3 .photo-frame:nth-child(1) {
-  width: 190px;
-  top: 0;
-  left: -10px;
-  transform: rotate(-3deg);
+  width: 190px; height: 150px;
+  top: 0; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
   z-index: 2;
 }
 .stack-3 .photo-frame:nth-child(2) {
-  width: 180px;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%) rotate(5deg);
-  z-index: 3;
-}
-.stack-3 .photo-frame:nth-child(3) {
-  width: 200px;
-  top: 90px;
-  right: -10px;
-  transform: rotate(-4deg);
+  width: 160px; height: 220px;
+  top: 130px; left: 0;
+  transform: rotate(4deg);
   z-index: 1;
 }
+.stack-3 .photo-frame:nth-child(3) {
+  width: 170px; height: 230px;
+  top: 150px; right: 0;
+  transform: rotate(-3deg);
+  z-index: 3;
+}
 
-/* ===== CLOSING PAGE ===== */
+/* ===== CLOSING ===== */
 .closing {
   background: var(--bg);
-}
-
-.closing .paper {
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
-  min-height: 70vh;
+  padding: 28px;
 }
 
-.closing .page { align-items: center; }
+.closing .cover-content {
+  min-height: auto;
+  padding: 60px 44px;
+}
 
 .closing-text {
   font-family: 'Playfair Display', serif;
-  font-size: 20px;
+  font-size: 21px;
   font-style: italic;
   color: var(--ink);
   line-height: 1.6;
   max-width: 300px;
-  margin: 0 auto 24px;
+  margin: 0 auto 28px;
 }
 
 .closing-sig {
@@ -492,7 +427,7 @@ html, body {
   text-transform: uppercase;
 }
 
-/* ===== DOT NAVIGATION ===== */
+/* ===== DOTS ===== */
 .dots {
   position: fixed;
   bottom: 12px;
@@ -502,7 +437,7 @@ html, body {
   gap: 8px;
   z-index: 100;
   padding: 6px 14px;
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.6);
   border-radius: 20px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -510,15 +445,13 @@ html, body {
 }
 
 .dot {
-  width: 6px;
-  height: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: #b0a898;
   opacity: 0.5;
   transition: all 0.3s ease;
   cursor: pointer;
 }
-
 .dot.active {
   background: var(--gold);
   opacity: 1;
@@ -530,54 +463,40 @@ html, body {
   from { opacity:0; transform: translateY(20px); }
   to { opacity:1; transform: translateY(0); }
 }
-
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; }
+  0%,100% { opacity: 0.4; }
   50% { opacity: 1; }
 }
-
 @keyframes slideRight {
-  0%, 100% { transform: rotate(-45deg) translate(0,0); }
+  0%,100% { transform: rotate(-45deg) translate(0,0); }
   50% { transform: rotate(-45deg) translate(3px,3px); }
 }
 
-.page.active .page-title {
-  animation: fadeUp 0.6s ease-out 0.1s both;
-}
-.page.active .essay-text {
-  animation: fadeUp 0.6s ease-out 0.3s both;
-}
-.page.active .photo-frame {
-  animation: fadeUp 0.5s ease-out both;
-}
+.page.active .page-title { animation: fadeUp 0.6s ease-out 0.1s both; }
+.page.active .essay-text { animation: fadeUp 0.6s ease-out 0.3s both; }
+.page.active .photo-frame { animation: fadeUp 0.5s ease-out both; }
 .page.active .photo-frame:nth-child(1) { animation-delay: 0.2s; }
 .page.active .photo-frame:nth-child(2) { animation-delay: 0.35s; }
 .page.active .photo-frame:nth-child(3) { animation-delay: 0.5s; }
 
-/* Responsive */
-@media (max-width: 540px) {
-  .page { padding: 20px 12px 50px; }
-  .paper { padding: 32px 24px 48px; }
-  .cover h1 { font-size: 24px; }
-  .cover h1 span { font-size: 30px; }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 520px) {
+  .page { padding: 16px; }
+  .page-inner, .cover-content { padding: 36px 26px 44px; }
+  .cover h1 { font-size: 26px; }
+  .cover h1 span { font-size: 32px; }
   .page-title { font-size: 28px; }
   .essay-text { font-size: 15px; }
-  .photos-section { left: -20px; right: -20px; bottom: -20px; }
-  .photo-frame { padding: 5px 5px 22px 5px; }
-  .stack-1 .photo-frame { width: 170px !important; }
-  .stack-2 .photo-frame { width: 155px !important; }
-  .stack-3 .photo-frame { width: 155px !important; }
+  .photo-stack { max-width: 300px; }
 }
 
 @media (max-width: 380px) {
-  .paper { padding: 24px 18px 40px; }
+  .page-inner, .cover-content { padding: 28px 20px 36px; }
   .cover h1 { font-size: 22px; }
-  .cover h1 span { font-size: 26px; }
+  .cover h1 span { font-size: 28px; }
   .page-title { font-size: 24px; }
   .essay-text { font-size: 14px; }
-  .stack-1 .photo-frame { width: 140px !important; }
-  .stack-2 .photo-frame { width: 125px !important; }
-  .stack-3 .photo-frame { width: 125px !important; }
+  .photo-stack { max-width: 260px; }
 }
 </style>
 </head>
@@ -587,7 +506,6 @@ html, body {
 
   <!-- ===== COVER ===== -->
   <div class="page cover active" id="page-0">
-    <div class="paper">
     <div class="cover-content">
       <div class="cover-ornament">A Letter For You</div>
       <div class="cover-line"></div>
@@ -604,13 +522,10 @@ html, body {
       <p class="cover-date">December 2025 &mdash; March 2026</p>
     </div>
     <div class="swipe-hint">Swipe</div>
-    </div>
   </div>
 
   <!-- ===== PAGE 1: GRATITUDE ===== -->
   <div class="page content-page" id="page-1">
-    <div class="paper-wrap">
-    <div class="paper">
     <div class="page-inner">
       <div class="page-number">Page One</div>
       <h2 class="page-title">Gratitude</h2>
@@ -648,13 +563,10 @@ html, body {
         <p>You are my unexpected surprise.<br>You are my answered prayer.<br>And I will spend every day proving that I&rsquo;m grateful you chose me too.</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- ===== PAGE 2: LOVE ===== -->
   <div class="page content-page" id="page-2">
-    <div class="paper-wrap">
-    <div class="paper">
     <div class="page-inner">
       <div class="page-number">Page Two</div>
       <h2 class="page-title">Love</h2>
@@ -696,13 +608,10 @@ html, body {
         <p>You are not just someone I love.<br><span class="accent">You are someone I chose to build with.</span></p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- ===== PAGE 3: COMMITMENT ===== -->
   <div class="page content-page" id="page-3">
-    <div class="paper-wrap">
-    <div class="paper">
     <div class="page-inner">
       <div class="page-number">Page Three</div>
       <h2 class="page-title">Commitment</h2>
@@ -748,12 +657,10 @@ html, body {
         And this &mdash; us &mdash; <span class="accent">is the most real thing I&rsquo;ve ever known.</span></p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- ===== CLOSING ===== -->
   <div class="page closing" id="page-4">
-    <div class="paper">
     <div class="cover-content">
       <div class="cover-ornament">&hearts;</div>
       <div class="closing-text">
@@ -766,7 +673,6 @@ html, body {
       <div class="cover-line"></div>
       <p class="closing-sig">Forever yours, Fatih</p>
       <p class="closing-date">Written with everything I have<br>March 2026 &mdash; Three months in. A lifetime to go.</p>
-    </div>
     </div>
   </div>
 
