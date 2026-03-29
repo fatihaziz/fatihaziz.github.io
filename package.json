@@ -13,7 +13,6 @@
     "cross-env": "^7.0.3",
     "env-cmd": "^10.1.0",
     "eol-converter-cli": "^1.1.0",
-    "ignore": "^7.0.5",
     "nuxt": "^3.13.2",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10"
@@ -34,5 +33,10 @@
     "preview": "nuxt preview",
     "start": "nuxt start"
   },
-  "type": "module"
+  "type": "module",
+  "pnpm": {
+    "overrides": {
+      "ignore": "5.3.2"
+    }
+  }
 }
