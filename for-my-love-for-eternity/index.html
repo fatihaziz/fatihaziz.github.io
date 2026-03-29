@@ -9,8 +9,8 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
-  --bg: #e8e2da;
-  --paper: #faf8f4;
+  --bg: #b5aDA4;
+  --paper: #fffefa;
   --ink: #2c2420;
   --gold: #8b6914;
   --gold-soft: #a07d2e;
@@ -64,8 +64,8 @@ html, body {
   position: relative;
   padding: 48px 40px 60px;
   box-shadow:
-    0 2px 8px rgba(0,0,0,0.06),
-    0 8px 32px rgba(0,0,0,0.08),
+    0 2px 8px rgba(0,0,0,0.1),
+    0 12px 40px rgba(0,0,0,0.14),
     inset 0 0 80px rgba(0,0,0,0.01);
   border-radius: 2px;
   display: flex;
@@ -218,7 +218,7 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .page-number {
@@ -279,11 +279,13 @@ html, body {
   font-weight: 500;
 }
 
-/* ===== PHOTOS: bottom of paper, diagonal tape ===== */
+/* ===== PHOTOS: forced to bottom of paper ===== */
 .photos-section {
-  margin-top: 20px;
+  margin-top: auto;
+  padding-top: 20px;
   position: relative;
   z-index: 3;
+  order: 99;
 }
 
 .photo-stack {
