@@ -3,7 +3,8 @@
     "allow": [
       "Bash(find:*)",
       "mcp__pdf-mcp-server__extract_text_from_file",
-      "mcp__sequentialthinking__sequentialthinking"
+      "mcp__sequentialthinking__sequentialthinking",
+      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm add -D ignore)"
     ],
     "deny": []
   }
