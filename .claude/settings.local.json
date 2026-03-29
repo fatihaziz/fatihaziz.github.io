@@ -11,7 +11,8 @@
       "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && node -e \"const fs=require\\('fs'\\);console.log\\(fs.readFileSync\\('node_modules/.pnpm/nuxt@3.21.2_@emnapi+core@1.9.1_@emnapi+runtime@1.9.1_@parcel+watcher@2.5.6_@types+node@25.5.0_@vue+compiler-sfc@3.5.31_cac@6.7.14_db0@0.3.4_ioredis@5.10.1_magicast@0.5.2_rollup-plugin-visualizer@7.0.1_rollup@4.60.0__rollup_fa1f9ea016aab43a86fd748f0a46f09f/node_modules/ignore/package.json','utf8'\\)\\)\" | grep -E '\"main\"|\"exports\"|\"type\"')",
       "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && echo 'shamefully-hoist=true' > .npmrc && rm -rf node_modules pnpm-lock.yaml && pnpm install 2>&1 | tail -10)",
       "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm install 2>&1 | tail -20)",
-      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm build 2>&1 | tail -20)"
+      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm build 2>&1 | tail -20)",
+      "Bash(cd \"D:\\\\__CODING\\\\03-Personals\\\\__FRONTEND\\\\fatihaziz.github.io\" && pnpm install 2>&1 | tail -5)"
     ],
     "deny": []
   }
