@@ -35,7 +35,7 @@ import { ref, onMounted, computed } from 'vue';
 import CloudFormation from './CloudFormation.vue';
 
 const route = useRoute();
-const isLovePage = computed(() => route.path === '/fatih-love-dian');
+const isLovePage = computed(() => route.path === '/i-love-you-dian');
 
 const loading = ref(true);
 const progress = ref(0);

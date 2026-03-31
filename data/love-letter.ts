@@ -88,8 +88,8 @@ export const pages: PageData[] = [
     id: 'gratitude',
     type: 'content',
     pageNumber: 'Page One',
-    title: 'Gratitude',
-    subtitle: 'The day everything changed',
+    title: 'How many thanks, Will not suffice to explain',
+    subtitle: 'I find you - someone i really longed for!',
     textBlocks: [
       // Block 1 — before photos
       '<p>This all started on 28 December, when Fatih met Dian for the first time. I\u2019m glad to have met you \u2014 more than you will ever know.</p><p>I wasn\u2019t looking. I wasn\u2019t ready. I had walls up that I thought no one could climb. But then you showed up \u2014 not with force, not with pressure \u2014 just with <span class="highlight">you being you.</span> And that was enough to change everything.</p>',
@@ -138,7 +138,7 @@ export const pages: PageData[] = [
     id: 'love',
     type: 'content',
     pageNumber: 'Page Two',
-    title: 'Love',
+    title: 'I really love You, Every version of You',
     subtitle: 'The things I can never let go',
     textBlocks: [
       // Block 1 — before photos
