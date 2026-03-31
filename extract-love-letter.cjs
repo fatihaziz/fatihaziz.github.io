@@ -8,7 +8,7 @@ const html = fs.readFileSync(
 );
 
 // Extract base64 images
-const imgRegex = /src="data:image\/jpeg;base64,([^"]+)"/g;
+const imgRegex = /src="data:image\/(?:jpeg|png);base64,([^"]+)"/g;
 const photoNames = [
   'photo-01-the-day-we-met.jpg',
   'photo-02-first-flowers.jpg',

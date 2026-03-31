@@ -30,6 +30,9 @@ const config: Config = {
         "space-grotesk": ['SpaceGrotesk', 'sans-serif'],
         "supreme": ['Supreme-Variable', 'Supreme-Regular', 'sans-serif'], // Corrected mapping
         "switzer": ['Switzer', 'sans-serif'],
+        "playfair": ['Playfair Display', 'serif'],
+        "cormorant": ['Cormorant Garamond', 'serif'],
+        "quicksand": ['Quicksand', 'sans-serif'],
       },
     },
   },
