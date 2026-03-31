@@ -8,7 +8,9 @@
       "Bash(mv \"D:/__CODING/03-Personals/__FRONTEND/fatihaziz.github.io/extract-love-letter.js\" \"D:/__CODING/03-Personals/__FRONTEND/fatihaziz.github.io/extract-love-letter.cjs\")",
       "Bash(node extract-love-letter.cjs)",
       "Bash(npx nuxi:*)",
-      "Bash(curl -s http://localhost:3000/fatih-love-dian)"
+      "Bash(curl -s http://localhost:3000/fatih-love-dian)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/love-letter/photo-01-the-day-we-met.jpg)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/love-letter/photo-08-first-dinner.jpg)"
     ],
     "deny": []
   }

@@ -26,7 +26,7 @@
       </div>
 
       <!-- Photos at corners (absolutely positioned, overflow visible) -->
-      <TapedPhoto
+      <LoveLetterTapedPhoto
         v-for="(photo, idx) in pageData.photos"
         :key="photo.src"
         :src="photo.src"
