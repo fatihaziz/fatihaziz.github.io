@@ -197,13 +197,13 @@ export const pages: PageData[] = [
     id: 'commitment',
     type: 'content',
     pageNumber: 'Page Three',
-    title: 'Commitment',
-    subtitle: 'My oath to you',
+    title: 'My Oath to you my darling, princess, and future wife',
+    subtitle: 'None of my word will matter if i cannot commit on my word',
     textBlocks: [
       // Block 1 — before photos
       '<p>Dian, I want you to hear this \u2014 not as sweet words, but as an oath.</p><p>I will be <span class="accent">steady, consistent, and intentional</span> \u2014 because you taught me that a man sets the tone of a relationship, and a woman reflects what he gives. I heard you. I will never make you beg for reassurance. You will feel it in how I show up. Daily. Without exception.</p><p>I will never stop trying. Not a perfect man \u2014 but <span class="highlight">a man who tries.</span> A man who is hardworking, who will go above and beyond, who is imperfect but working towards being better. For you. Because of you.</p>',
       // Block 2 — after photos
-      '<p>When you\u2019re difficult, I stay. When you push me away because you\u2019re scared, I stay. When the world is getting mean to you \u2014 <span class="accent">run to me.</span> I will be there.</p><p>I will speak up about what hurts me, and I will listen when you speak up about what hurts you \u2014 because that\u2019s what real communication is. I will not cross the lines you\u2019ve drawn. I will not make you question whether I was ever planning to stay.</p><p><span class="highlight">I\u2019ll take care of me for you, if you\u2019ll take care of you for me. That\u2019s all I ask.</span></p><p>You once wrote that I was the first person who made you feel both wildly unsure and unwaveringly certain. I want you to know \u2014 I felt the exact same way. I had no idea what I was doing. But I knew exactly why I had to.</p><p>Deep soul connections never go away.<br>If it\u2019s real, it will never be over.<br>And this \u2014 us \u2014 <span class="accent">is the most real thing I\u2019ve ever known.</span></p>',
+      '<p>When you\u2019re difficult, I stay. When you push me away because you\u2019re scared, I stay. When the world is getting mean to you \u2014 <span class="accent">lean your back to me. Trust me, </span> I will be there.</p><p>I will speak up about what hurts me, and I will listen when you speak up about what hurts you \u2014 because that\u2019s what real communication is. I will not cross the lines you\u2019ve drawn. I will not make you question whether I was ever planning to stay.</p><p><span class="highlight">I\u2019ll take care of me for you, if you\u2019ll take care of you for me. </span></p><p>You once wrote that I was the first person who made you feel both wildly unsure and unwaveringly certain. I want you to know \u2014 I felt the exact same way. I had no idea what I was doing. But I knew exactly why I had to.</p><p>Deep soul connections never go away.<br>If it\u2019s real, it will never be over.<br>And this \u2014 us \u2014 <span class="accent">is the most real thing I\u2019ve ever known.</span></p>',
     ],
     photos: [
       {

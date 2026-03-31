@@ -147,15 +147,15 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
 
 <style scoped>
 .content-page {
-  padding: 50px 0;
+  padding: 80px 0;
 }
 
-/* Paper card - wider to create gutter zones for corner photos */
+/* Paper card - wider with gutter zones for corner photos */
 .page-inner {
   width: 640px;
   max-width: 100%;
   margin: 0 auto;
-  padding: 75px 90px 80px;
+  padding: 120px 90px 120px;
   border-radius: 3px;
   position: relative;
   overflow: visible;

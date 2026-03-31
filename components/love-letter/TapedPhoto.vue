@@ -43,25 +43,25 @@ const positionClass = computed(() => `pos-${props.position}`)
   margin: 0;
 }
 
-/* Photos sit at corners, mostly in the gutter/outside */
+/* Photos hang off paper corners -- ~half visible on paper */
 .pos-top-left {
-  top: -55px;
-  left: -55px;
+  top: -100px;
+  left: -70px;
 }
 
 .pos-top-right {
-  top: -55px;
-  right: -55px;
+  top: -100px;
+  right: -70px;
 }
 
 .pos-bottom-left {
-  bottom: -55px;
-  left: -55px;
+  bottom: -100px;
+  left: -70px;
 }
 
 .pos-bottom-right {
-  bottom: -55px;
-  right: -55px;
+  bottom: -100px;
+  right: -70px;
 }
 
 /* -- Photo area -- */
@@ -135,23 +135,23 @@ const positionClass = computed(() => `pos-${props.position}`)
   }
 
   .pos-top-left {
-    top: -40px;
-    left: -30px;
+    top: -70px;
+    left: -40px;
   }
 
   .pos-top-right {
-    top: -40px;
-    right: -30px;
+    top: -70px;
+    right: -40px;
   }
 
   .pos-bottom-left {
-    bottom: -40px;
-    left: -30px;
+    bottom: -70px;
+    left: -40px;
   }
 
   .pos-bottom-right {
-    bottom: -40px;
-    right: -30px;
+    bottom: -70px;
+    right: -40px;
   }
 
   .taped-photo::before {
