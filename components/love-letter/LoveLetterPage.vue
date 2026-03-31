@@ -317,8 +317,13 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
   animation: fadeUp 0.6s ease-out 0.3s both;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .animate-photo {
-  animation: fadeUp 0.5s ease-out both;
+  animation: fadeIn 0.5s ease-out both;
 }
 
 /* Responsive */
