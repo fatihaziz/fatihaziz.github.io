@@ -2,9 +2,8 @@
   <div class="love-letter-root">
     <!-- Slider container -->
     <div
-      ref="sliderRef"
       class="slider"
-      :style="sliderStyle"
+      :style="{ transform: sliderTransform, transition: sliderTransition }"
       @touchstart.passive="onTouchStart"
       @touchmove.passive="onTouchMove"
       @touchend="onTouchEnd"
@@ -15,15 +14,14 @@
           class="cover-content"
           :style="{ background: coverTheme.paperColor }"
         >
-          <!-- Closing stickers for cover (none defined, but structure ready) -->
           <div class="stickers-layer" aria-hidden="true">
             <template v-for="(sticker, idx) in coverTheme.stickers" :key="idx">
               <span
                 v-if="sticker.type === 'confetti'"
                 class="sticker sticker-confetti"
-                :style="stickerStyle(sticker)"
+                :style="stickerStyleObj(sticker)"
               />
-              <span v-else class="sticker sticker-char" :style="stickerStyle(sticker)">
+              <span v-else class="sticker sticker-char" :style="stickerStyleObj(sticker)">
                 {{ stickerChar(sticker.type) }}
               </span>
             </template>
@@ -67,15 +65,14 @@
           class="cover-content closing-card"
           :style="{ background: closingTheme.paperColor }"
         >
-          <!-- Closing stickers -->
           <div class="stickers-layer" aria-hidden="true">
             <template v-for="(sticker, idx) in closingTheme.stickers" :key="idx">
               <span
                 v-if="sticker.type === 'confetti'"
                 class="sticker sticker-confetti"
-                :style="stickerStyle(sticker)"
+                :style="stickerStyleObj(sticker)"
               />
-              <span v-else class="sticker sticker-char" :style="stickerStyle(sticker)">
+              <span v-else class="sticker sticker-char" :style="stickerStyleObj(sticker)">
                 {{ stickerChar(sticker.type) }}
               </span>
             </template>
@@ -108,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { pages, letterTitle } from '~/data/love-letter'
 import type { StickerData } from '~/data/love-letter'
 
@@ -121,15 +118,15 @@ useHead({
 })
 
 // Data
-const contentPages = computed(() => pages.filter(p => p.type === 'content'))
-const coverTheme = computed(() => pages.find(p => p.type === 'cover')!.theme)
-const closingTheme = computed(() => pages.find(p => p.type === 'closing')!.theme)
+const contentPages = pages.filter(p => p.type === 'content')
+const coverTheme = pages.find(p => p.type === 'cover')!.theme
+const closingTheme = pages.find(p => p.type === 'closing')!.theme
 const totalPages = pages.length
 
-// Carousel state
+// Carousel state -- all reactive, no direct DOM manipulation
 const currentPage = ref(0)
-const sliderRef = ref<HTMLElement | null>(null)
-const isTransitioning = ref(true)
+const sliderTransform = ref('translateX(0px)')
+const sliderTransition = ref('transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94)')
 
 // Touch tracking
 let startX = 0
@@ -137,25 +134,24 @@ let startY = 0
 let isDragging = false
 let diff = 0
 
-const sliderStyle = computed(() => ({
-  transform: `translateX(${-currentPage.value * 100}vw)`,
-  transition: isTransitioning.value
-    ? 'transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    : 'none',
-}))
+function getPageWidth(): number {
+  // Use clientWidth of the root element (excludes scrollbar, always accurate)
+  return document.documentElement.clientWidth
+}
 
 function goTo(index: number) {
   if (index < 0) index = 0
   if (index >= totalPages) index = totalPages - 1
   currentPage.value = index
+  sliderTransform.value = `translateX(${-index * getPageWidth()}px)`
 }
 
-// Touch handlers
+// Touch handlers -- all through reactive refs
 function onTouchStart(e: TouchEvent) {
   startX = e.touches[0].clientX
   startY = e.touches[0].clientY
   isDragging = true
-  isTransitioning.value = false
+  sliderTransition.value = 'none'
 }
 
 function onTouchMove(e: TouchEvent) {
@@ -164,15 +160,13 @@ function onTouchMove(e: TouchEvent) {
   const diffY = Math.abs(e.touches[0].clientY - startY)
   if (diffY > Math.abs(diff) && Math.abs(diff) < 30) return
 
-  if (sliderRef.value) {
-    const offset = -currentPage.value * window.innerWidth + diff
-    sliderRef.value.style.transform = `translateX(${offset}px)`
-  }
+  const offset = -currentPage.value * getPageWidth() + diff
+  sliderTransform.value = `translateX(${offset}px)`
 }
 
 function onTouchEnd() {
   isDragging = false
-  isTransitioning.value = true
+  sliderTransition.value = 'transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
 
   if (Math.abs(diff) > 60) {
     if (diff < 0) goTo(currentPage.value + 1)
@@ -189,15 +183,36 @@ function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowLeft') goTo(currentPage.value - 1)
 }
 
+// Recalculate position on resize
+function handleResize() {
+  sliderTransform.value = `translateX(${-currentPage.value * getPageWidth()}px)`
+}
+
 onMounted(() => {
+  // Lock html/body to prevent scrollbar (critical for vw/px alignment)
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.height = '100%'
+  document.body.style.height = '100%'
+
   document.addEventListener('keydown', handleKeydown)
+  window.addEventListener('resize', handleResize)
+
+  // Set initial position
+  goTo(0)
 })
 
 onUnmounted(() => {
+  document.documentElement.style.overflow = ''
+  document.body.style.overflow = ''
+  document.documentElement.style.height = ''
+  document.body.style.height = ''
+
   document.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('resize', handleResize)
 })
 
-// Sticker helpers (shared with cover/closing inline rendering)
+// Sticker helpers
 const STICKER_CHARS: Record<string, string> = {
   heart: '\u2665',
   star: '\u2605',
@@ -211,7 +226,7 @@ function stickerChar(type: string): string {
   return STICKER_CHARS[type] || ''
 }
 
-function stickerStyle(sticker: StickerData): Record<string, string> {
+function stickerStyleObj(sticker: StickerData): Record<string, string> {
   const style: Record<string, string> = {
     transform: `rotate(${sticker.rotation}deg)`,
     opacity: String(sticker.opacity),
@@ -241,7 +256,7 @@ function stickerStyle(sticker: StickerData): Record<string, string> {
 .love-letter-root {
   overflow: hidden;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: #9e958b;
   -webkit-font-smoothing: antialiased;
   touch-action: pan-y;
@@ -251,13 +266,14 @@ function stickerStyle(sticker: StickerData): Record<string, string> {
 .slider {
   display: flex;
   height: 100%;
-  width: 100%;
   will-change: transform;
 }
 
 /* ===== PAGE ===== */
 .page {
+  width: 100vw;
   min-width: 100vw;
+  flex-shrink: 0;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -266,6 +282,12 @@ function stickerStyle(sticker: StickerData): Record<string, string> {
   justify-content: center;
   -webkit-overflow-scrolling: touch;
   padding: 28px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
 }
 
 /* ===== COVER ===== */
@@ -380,9 +402,7 @@ function stickerStyle(sticker: StickerData): Record<string, string> {
 /* ===== CONTENT PAGE WRAPPER ===== */
 .content-page-wrapper {
   background: #9e958b;
-  padding: 28px;
   align-items: flex-start;
-  padding-top: 28px;
 }
 
 /* ===== CLOSING ===== */
@@ -391,7 +411,6 @@ function stickerStyle(sticker: StickerData): Record<string, string> {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 28px;
 }
 
 .closing-card {

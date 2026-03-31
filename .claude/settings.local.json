@@ -10,7 +10,8 @@
       "Bash(npx nuxi:*)",
       "Bash(curl -s http://localhost:3000/fatih-love-dian)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/love-letter/photo-01-the-day-we-met.jpg)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/love-letter/photo-08-first-dinner.jpg)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/love-letter/photo-08-first-dinner.jpg)",
+      "Bash(pnpm build:*)"
     ],
     "deny": []
   }

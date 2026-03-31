@@ -94,7 +94,7 @@ export const pages: PageData[] = [
       // Block 1 — before photos
       '<p>This all started on 28 December, when Fatih met Dian for the first time. I\u2019m glad to have met you \u2014 more than you will ever know.</p><p>I wasn\u2019t looking. I wasn\u2019t ready. I had walls up that I thought no one could climb. But then you showed up \u2014 not with force, not with pressure \u2014 just with <span class="highlight">you being you.</span> And that was enough to change everything.</p>',
       // Block 2 — after photos
-      '<p><span class="accent">You are the best thing I never planned.</span></p><p>Before you, I didn\u2019t know what it felt like to be truly seen. I walked through life carrying things alone, convincing myself that\u2019s just how it was supposed to be. But then you looked at me \u2014 really looked at me \u2014 and suddenly I didn\u2019t want to carry it alone anymore.</p><p>I thank God every single day for putting you in my path. Not because my life was empty before you \u2014 but because you made me realize how much fuller it could be. You opened my eyes to a kind of love I didn\u2019t think I deserved. You showed me that being vulnerable isn\u2019t weakness \u2014 it\u2019s the bravest thing a man can do.</p><p>And now that I\u2019ve found you, the desire to have you \u2014 to keep you, to protect what we have \u2014 <span class="highlight">it burns in me louder than anything I\u2019ve ever felt.</span></p><p>You are my unexpected surprise.<br>You are my answered prayer.<br>And I will spend every day proving that I\u2019m grateful you chose me too.</p>',
+      '<p><span class="accent">You are the best thing in my life.</span></p><p>Before you, I didn\u2019t know what it felt like to be truly seen. I walked through life carrying things alone, convincing myself that\u2019s just how it was supposed to be. But then you looked at me \u2014 really looked at me \u2014 and suddenly I didn\u2019t want to carry it alone anymore.</p><p>I thank God every single day for putting you in my path. Not because my life was empty before you \u2014 but because you made me realize how much fuller it could be. You opened my eyes to a kind of love I didn\u2019t think I deserved. You showed me that being vulnerable isn\u2019t weakness \u2014 it\u2019s the bravest thing a man can do.</p><p>And now that I\u2019ve found you, the desire to have you \u2014 to keep you, to protect what we have \u2014 <span class="highlight">it burns in me louder than anything I\u2019ve ever felt.</span></p><p>You are my unexpected surprise.<br>You are my answered prayer.<br>And I will spend every day proving that I\u2019m grateful you chose me too.</p>',
     ],
     photos: [
       {
@@ -102,14 +102,14 @@ export const pages: PageData[] = [
         alt: 'First meeting',
         caption: '28 Dec \u2014 The day we met',
         position: 'top-right',
-        rotation: 4,
+        rotation: 12,
       },
       {
         src: '/love-letter/photo-02-first-flowers.jpg',
         alt: 'First flowers',
         caption: '2 Jan \u2014 Your first flowers',
         position: 'bottom-left',
-        rotation: -3,
+        rotation: -10,
       },
     ],
     theme: {
@@ -152,21 +152,21 @@ export const pages: PageData[] = [
         alt: 'Her flirting',
         caption: '26 Jan \u2014 That look',
         position: 'top-left',
-        rotation: -4,
+        rotation: -14,
       },
       {
         src: '/love-letter/photo-04-cosplay-day.jpg',
         alt: 'Cosplay Kobo',
         caption: '1 Feb \u2014 Cosplay day',
         position: 'top-right',
-        rotation: 3,
+        rotation: 11,
       },
       {
         src: '/love-letter/photo-05-from-dubai.jpg',
         alt: 'Cosplay pro',
         caption: 'Always present, even from Dubai',
         position: 'bottom-right',
-        rotation: -5,
+        rotation: -13,
       },
     ],
     theme: {
@@ -211,21 +211,21 @@ export const pages: PageData[] = [
         alt: 'Train reunion',
         caption: '15 Feb \u2014 You came to find me',
         position: 'top-right',
-        rotation: 5,
+        rotation: 13,
       },
       {
         src: '/love-letter/photo-07-valentines-day.jpg',
         alt: 'Valentine bouquet',
         caption: "14 Feb \u2014 Valentine's Day",
         position: 'bottom-left',
-        rotation: -4,
+        rotation: -11,
       },
       {
         src: '/love-letter/photo-08-first-dinner.jpg',
         alt: 'Fine dinner',
         caption: '22 Mar \u2014 Our first dinner',
         position: 'bottom-right',
-        rotation: 3,
+        rotation: 10,
       },
     ],
     theme: {
