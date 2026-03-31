@@ -290,9 +290,19 @@ function stickerStyleObj(sticker: StickerData): Record<string, string> {
   display: none;
 }
 
+/* ===== SHARED BG TEXTURE ===== */
+.cover,
+.content-page-wrapper,
+.closing {
+  background:
+    radial-gradient(ellipse at center, rgba(250,247,242,0.25) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.008) 3px, rgba(0,0,0,0.008) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,0.006) 3px, rgba(0,0,0,0.006) 4px),
+    #9e958b;
+}
+
 /* ===== COVER ===== */
 .cover {
-  background: #9e958b;
   align-items: center;
   text-align: center;
 }

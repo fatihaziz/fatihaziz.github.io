@@ -1,5 +1,10 @@
 <template>
-  <div class="content-page">
+  <div class="content-page" :style="bgStyle">
+    <!-- Background hearts (faint, scattered) -->
+    <div class="bg-hearts" aria-hidden="true">
+      <span v-for="i in 8" :key="i" class="bg-heart" :class="`bh-${i}`"></span>
+    </div>
+
     <div
       class="page-inner"
       :style="paperStyle"
@@ -110,6 +115,12 @@ const paperStyle = computed(() => ({
   '--line-color': props.pageData.theme.lineColor,
 }))
 
+// Tinted radial glow behind the paper + heart color for bg decorations
+const bgStyle = computed(() => ({
+  '--bg-glow': props.pageData.theme.paperColor,
+  '--bg-heart-color': props.pageData.theme.roseColor,
+}))
+
 const textStyle = computed(() => ({
   color: props.pageData.theme.inkColor,
   '--highlight-color': props.pageData.theme.accentColor,
@@ -148,6 +159,90 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
 <style scoped>
 .content-page {
   padding: 80px 0;
+  position: relative;
+  /* Soft radial glow behind the paper */
+  background:
+    radial-gradient(ellipse at center, var(--bg-glow, rgba(250,247,242,0.3)) 0%, transparent 55%),
+    /* Subtle linen texture */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.008) 3px,
+      rgba(0,0,0,0.008) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.006) 3px,
+      rgba(0,0,0,0.006) 4px
+    );
+}
+
+/* ===== BACKGROUND HEARTS ===== */
+.bg-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-heart {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  color: var(--bg-heart-color, rgba(200,100,100,0.15));
+  animation: bg-float 12s ease-in-out infinite;
+}
+
+.bg-heart::before,
+.bg-heart::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50% 50% 0 0;
+  background: currentColor;
+}
+
+.bg-heart::before {
+  left: -30%;
+  transform: rotate(-45deg);
+  transform-origin: 100% 100%;
+}
+
+.bg-heart::after {
+  left: 30%;
+  transform: rotate(45deg);
+  transform-origin: 0 100%;
+}
+
+/* 8 scattered hearts with staggered positions */
+.bh-1 { width: 18px; height: 18px; top: 8%;  left: 6%;  animation-delay: 0s;   animation-duration: 10s; }
+.bh-2 { width: 12px; height: 12px; top: 25%; right: 8%; animation-delay: 2s;   animation-duration: 13s; }
+.bh-3 { width: 22px; height: 22px; top: 45%; left: 4%;  animation-delay: 4s;   animation-duration: 11s; }
+.bh-4 { width: 10px; height: 10px; top: 60%; right: 5%; animation-delay: 1s;   animation-duration: 14s; }
+.bh-5 { width: 16px; height: 16px; top: 75%; left: 8%;  animation-delay: 3s;   animation-duration: 12s; }
+.bh-6 { width: 14px; height: 14px; top: 15%; right: 4%; animation-delay: 5s;   animation-duration: 10s; }
+.bh-7 { width: 20px; height: 20px; top: 85%; right: 7%; animation-delay: 2.5s; animation-duration: 15s; }
+.bh-8 { width: 11px; height: 11px; top: 35%; left: 3%;  animation-delay: 6s;   animation-duration: 11s; }
+
+@keyframes bg-float {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  15% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.18;
+    transform: translateY(-15px) scale(1);
+  }
+  85% {
+    opacity: 0.12;
+  }
 }
 
 /* Paper card - wider with gutter zones for corner photos */
