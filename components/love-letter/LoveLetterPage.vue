@@ -137,20 +137,24 @@ const bgStyle = computed(() => ({
 // Origami shapes taped to the sides -- different per page
 const origamiLayouts: Record<string, Array<{ shape: string; style: Record<string, string> }>> = {
   gratitude: [
-    { shape: 'ori-heart', style: { top: '18%', left: '-18px', transform: 'rotate(-8deg)', '--ori-color': '#e8b0b0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
-    { shape: 'ori-heart', style: { top: '65%', right: '-15px', transform: 'rotate(12deg)', '--ori-color': '#d4a0a0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
-    { shape: 'ori-star', style: { top: '40%', left: '-12px', transform: 'rotate(15deg)', '--ori-color': '#e8d090', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-heart',     style: { top: '18%', left: '-18px', transform: 'rotate(-8deg)',  '--ori-color': '#e8b0b0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-butterfly', style: { top: '45%', right: '-16px', transform: 'rotate(10deg)', '--ori-color': '#e8d090', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-star',      style: { top: '70%', left: '-12px', transform: 'rotate(15deg)',  '--ori-color': '#d4c090', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-crane',     style: { top: '85%', right: '-18px', transform: 'rotate(-6deg)', '--ori-color': '#d8c8b0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
   ],
   love: [
-    { shape: 'ori-heart', style: { top: '12%', right: '-20px', transform: 'rotate(-10deg)', '--ori-color': '#e89898', '--ori-fold': 'rgba(0,0,0,0.07)' } },
-    { shape: 'ori-heart', style: { top: '50%', left: '-16px', transform: 'rotate(6deg)', '--ori-color': '#f0b0b8', '--ori-fold': 'rgba(0,0,0,0.05)' } },
-    { shape: 'ori-star', style: { top: '78%', right: '-14px', transform: 'rotate(-18deg)', '--ori-color': '#f0c8a0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
-    { shape: 'ori-heart', style: { top: '85%', left: '-10px', transform: 'rotate(14deg)', '--ori-color': '#d8a0b0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-heart',  style: { top: '12%', right: '-20px', transform: 'rotate(-10deg)', '--ori-color': '#e89898', '--ori-fold': 'rgba(0,0,0,0.07)' } },
+    { shape: 'ori-cat',    style: { top: '35%', left: '-14px', transform: 'rotate(8deg)',     '--ori-color': '#f0b8c0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-heart',  style: { top: '55%', left: '-16px', transform: 'rotate(6deg)',     '--ori-color': '#f0b0b8', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-rabbit', style: { top: '68%', right: '-14px', transform: 'rotate(-12deg)',  '--ori-color': '#f0c8a0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-star',   style: { top: '85%', right: '-12px', transform: 'rotate(14deg)',   '--ori-color': '#d8a0b0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
   ],
   commitment: [
-    { shape: 'ori-heart', style: { top: '20%', left: '-18px', transform: 'rotate(10deg)', '--ori-color': '#c0a8d0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
-    { shape: 'ori-star', style: { top: '45%', right: '-16px', transform: 'rotate(-12deg)', '--ori-color': '#b8c0e0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
-    { shape: 'ori-heart', style: { top: '72%', left: '-14px', transform: 'rotate(-8deg)', '--ori-color': '#d0b0d8', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-crane',     style: { top: '15%', left: '-18px', transform: 'rotate(10deg)',  '--ori-color': '#c0a8d0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-heart',     style: { top: '42%', left: '-14px', transform: 'rotate(-8deg)',  '--ori-color': '#d0b0d8', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-butterfly', style: { top: '55%', right: '-16px', transform: 'rotate(-12deg)','--ori-color': '#b8c0e0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-star',      style: { top: '75%', right: '-14px', transform: 'rotate(16deg)', '--ori-color': '#b0b8d0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-rabbit',    style: { top: '88%', left: '-12px', transform: 'rotate(6deg)',   '--ori-color': '#c8b0d8', '--ori-fold': 'rgba(0,0,0,0.06)' } },
   ],
 }
 
@@ -390,9 +394,107 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
   background: var(--ori-fold, rgba(0,0,0,0.06));
 }
 
+/* ---- Origami Crane ---- */
+.ori-crane {
+  width: 42px;
+  height: 36px;
+  position: relative;
+  background: var(--ori-color, #d0c8b8);
+  clip-path: polygon(
+    0% 20%, 30% 45%, 5% 65%, 25% 55%, 35% 55%,
+    50% 80%, 65% 55%, 75% 55%, 95% 65%, 70% 45%,
+    100% 20%, 50% 40%
+  );
+}
+
+.ori-crane::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  background: var(--ori-fold, rgba(0,0,0,0.06));
+}
+
+/* ---- Origami Butterfly ---- */
+.ori-butterfly {
+  width: 38px;
+  height: 34px;
+  position: relative;
+  background: var(--ori-color, #c8b0d8);
+  clip-path: polygon(
+    50% 0%, 75% 5%, 100% 15%, 95% 40%, 58% 50%,
+    95% 55%, 100% 75%, 80% 95%, 55% 75%, 50% 100%,
+    45% 75%, 20% 95%, 0% 75%, 5% 55%, 42% 50%,
+    5% 40%, 0% 15%, 25% 5%
+  );
+}
+
+.ori-butterfly::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  background: var(--ori-fold, rgba(0,0,0,0.06));
+}
+
+/* ---- Origami Rabbit ---- */
+.ori-rabbit {
+  width: 32px;
+  height: 42px;
+  position: relative;
+  background: var(--ori-color, #e0d0c0);
+  clip-path: polygon(
+    25% 0%, 18% 30%, 30% 35%, 20% 40%, 8% 60%,
+    15% 85%, 25% 100%, 50% 95%, 75% 100%, 85% 85%,
+    92% 60%, 80% 40%, 70% 35%, 82% 30%, 75% 0%,
+    65% 25%, 50% 32%, 35% 25%
+  );
+}
+
+.ori-rabbit::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  background: var(--ori-fold, rgba(0,0,0,0.06));
+}
+
+/* ---- Origami Cat ---- */
+.ori-cat {
+  width: 34px;
+  height: 36px;
+  position: relative;
+  background: var(--ori-color, #d8c8b0);
+  clip-path: polygon(
+    12% 0%, 5% 30%, 2% 55%, 15% 85%, 30% 97%,
+    50% 100%, 70% 97%, 85% 85%, 98% 55%, 95% 30%,
+    88% 0%, 72% 25%, 62% 28%, 50% 25%, 38% 28%, 28% 25%
+  );
+}
+
+.ori-cat::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  background: var(--ori-fold, rgba(0,0,0,0.06));
+}
+
 /* Shadow for all origami to look like paper */
 .ori-heart,
-.ori-star {
+.ori-star,
+.ori-crane,
+.ori-butterfly,
+.ori-rabbit,
+.ori-cat {
   filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.1));
 }
 

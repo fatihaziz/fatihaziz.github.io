@@ -10,8 +10,17 @@
     >
       <!-- PAGE 0: COVER -->
       <div class="page cover" :class="{ active: currentPage === 0 }">
+        <!-- SVG heart clip path (responsive via objectBoundingBox) -->
+        <svg width="0" height="0" style="position:absolute">
+          <defs>
+            <clipPath id="heart-clip" clipPathUnits="objectBoundingBox">
+              <path d="M0.5,0.92 C0.28,0.92 0,0.72 0,0.44 C0,0.22 0.16,0.06 0.32,0.06 C0.41,0.06 0.46,0.11 0.5,0.18 C0.54,0.11 0.59,0.06 0.68,0.06 C0.84,0.06 1,0.22 1,0.44 C1,0.72 0.72,0.92 0.5,0.92 Z"/>
+            </clipPath>
+          </defs>
+        </svg>
+
         <div
-          class="cover-content"
+          class="cover-content heart-card"
           :style="{ background: coverTheme.paperColor }"
         >
           <div class="stickers-layer" aria-hidden="true">
@@ -325,6 +334,20 @@ function stickerStyleObj(sticker: StickerData): Record<string, string> {
   min-height: 70vh;
 }
 
+/* Heart-shaped cover card */
+.heart-card {
+  clip-path: url(#heart-clip);
+  width: 560px;
+  aspect-ratio: 14 / 15;
+  min-height: unset;
+  padding: 160px 120px 80px;
+  border-radius: 0;
+  box-shadow: none;
+  filter:
+    drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08))
+    drop-shadow(0 12px 30px rgba(0, 0, 0, 0.12));
+}
+
 .cover-ornament {
   font-size: 10px;
   letter-spacing: 6px;
@@ -524,6 +547,10 @@ function stickerStyleObj(sticker: StickerData): Record<string, string> {
     padding: 36px 26px 44px;
   }
 
+  .heart-card {
+    padding: 110px 80px 60px;
+  }
+
   .cover h1 {
     font-size: 26px;
   }
@@ -537,6 +564,10 @@ function stickerStyleObj(sticker: StickerData): Record<string, string> {
   .cover-content,
   .closing-card {
     padding: 28px 20px 36px;
+  }
+
+  .heart-card {
+    padding: 80px 55px 45px;
   }
 
   .cover h1 {
