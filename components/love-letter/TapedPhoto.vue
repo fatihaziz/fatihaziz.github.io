@@ -33,9 +33,9 @@ const positionClass = computed(() => `pos-${props.position}`)
 .taped-photo {
   position: absolute;
   z-index: 10;
-  width: 130px;
+  width: 150px;
   background: #fffdf5;
-  padding: 5px 5px 24px;
+  padding: 6px 6px 28px;
   border-radius: 1px;
   box-shadow:
     0 3px 10px rgba(40, 30, 10, 0.13),
@@ -43,25 +43,25 @@ const positionClass = computed(() => `pos-${props.position}`)
   margin: 0;
 }
 
-/* Photos pushed mostly OUTSIDE the paper -- large negative offsets */
+/* Photos sit at corners, mostly in the gutter/outside */
 .pos-top-left {
-  top: -60px;
-  left: -45px;
+  top: -55px;
+  left: -55px;
 }
 
 .pos-top-right {
-  top: -60px;
-  right: -45px;
+  top: -55px;
+  right: -55px;
 }
 
 .pos-bottom-left {
-  bottom: -60px;
-  left: -45px;
+  bottom: -55px;
+  left: -55px;
 }
 
 .pos-bottom-right {
-  bottom: -60px;
-  right: -45px;
+  bottom: -55px;
+  right: -55px;
 }
 
 /* -- Photo area -- */
@@ -82,10 +82,10 @@ const positionClass = computed(() => `pos-${props.position}`)
 /* -- Caption -- */
 .caption {
   font-family: 'Quicksand', sans-serif;
-  font-size: 7px;
+  font-size: 8px;
   color: #7a6e60;
   text-align: center;
-  margin-top: 4px;
+  margin-top: 5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   line-height: 1.3;
@@ -95,8 +95,8 @@ const positionClass = computed(() => `pos-${props.position}`)
 .taped-photo::before {
   content: '';
   position: absolute;
-  width: 48px;
-  height: 15px;
+  width: 52px;
+  height: 16px;
   background: linear-gradient(
     155deg,
     rgba(215, 198, 162, 0.8),
@@ -104,17 +104,17 @@ const positionClass = computed(() => `pos-${props.position}`)
   );
   z-index: 10;
   border-radius: 1px;
-  top: -6px;
+  top: -7px;
   left: 50%;
-  margin-left: -18px;
+  margin-left: -20px;
   transform: rotate(5deg);
 }
 
 .taped-photo::after {
   content: '';
   position: absolute;
-  width: 42px;
-  height: 13px;
+  width: 46px;
+  height: 14px;
   background: linear-gradient(
     155deg,
     rgba(215, 198, 162, 0.72),
@@ -122,76 +122,77 @@ const positionClass = computed(() => `pos-${props.position}`)
   );
   z-index: 10;
   border-radius: 1px;
-  bottom: 8px;
-  right: -7px;
+  bottom: 10px;
+  right: -8px;
   transform: rotate(-40deg);
 }
 
 /* -- Responsive: mobile -- */
 @media (max-width: 520px) {
   .taped-photo {
-    width: 100px;
+    width: 110px;
+    padding: 5px 5px 22px;
   }
 
   .pos-top-left {
-    top: -45px;
+    top: -40px;
     left: -30px;
   }
 
   .pos-top-right {
-    top: -45px;
+    top: -40px;
     right: -30px;
   }
 
   .pos-bottom-left {
-    bottom: -45px;
+    bottom: -40px;
     left: -30px;
   }
 
   .pos-bottom-right {
-    bottom: -45px;
+    bottom: -40px;
     right: -30px;
   }
 
   .taped-photo::before {
-    width: 38px;
-    height: 12px;
-    margin-left: -15px;
+    width: 40px;
+    height: 13px;
+    margin-left: -16px;
   }
 
   .taped-photo::after {
-    width: 34px;
-    height: 10px;
-    bottom: 7px;
-    right: -5px;
+    width: 36px;
+    height: 11px;
+    bottom: 8px;
+    right: -6px;
   }
 }
 
 /* -- Responsive: very small phones -- */
 @media (max-width: 380px) {
   .taped-photo {
-    width: 80px;
+    width: 90px;
     padding: 4px 4px 20px;
   }
 
   .pos-top-left {
-    top: -35px;
-    left: -20px;
+    top: -30px;
+    left: -15px;
   }
 
   .pos-top-right {
-    top: -35px;
-    right: -20px;
+    top: -30px;
+    right: -15px;
   }
 
   .pos-bottom-left {
-    bottom: -35px;
-    left: -20px;
+    bottom: -30px;
+    left: -15px;
   }
 
   .pos-bottom-right {
-    bottom: -35px;
-    right: -20px;
+    bottom: -30px;
+    right: -15px;
   }
 
   .caption {
@@ -200,15 +201,15 @@ const positionClass = computed(() => `pos-${props.position}`)
   }
 
   .taped-photo::before {
-    width: 30px;
-    height: 10px;
-    margin-left: -12px;
+    width: 34px;
+    height: 11px;
+    margin-left: -14px;
   }
 
   .taped-photo::after {
-    width: 26px;
-    height: 9px;
-    bottom: 5px;
+    width: 30px;
+    height: 10px;
+    bottom: 6px;
     right: -4px;
   }
 }

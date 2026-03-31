@@ -83,7 +83,7 @@
             I'm not going anywhere.<br><br>
             I'm choosing you today, tomorrow, and every day after.<br><br>
             Not because you need me to.<br>
-            But because you deserve someone who will &mdash;<br>
+            But because you deserve someone like me who will in front of you to stay, hold, and forever with you.<br>
             and I refuse to let that someone be anyone else.
           </div>
           <div class="cover-line"></div>
@@ -298,8 +298,8 @@ function stickerStyleObj(sticker: StickerData): Record<string, string> {
 }
 
 .cover-content {
-  padding: 60px 44px;
-  width: 460px;
+  padding: 60px 90px;
+  width: 640px;
   max-width: 100%;
   border-radius: 3px;
   position: relative;

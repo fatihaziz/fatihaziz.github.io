@@ -147,15 +147,15 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
 
 <style scoped>
 .content-page {
-  padding: 0;
+  padding: 50px 0;
 }
 
-/* Paper card - overflow visible so corner photos extend beyond */
+/* Paper card - wider to create gutter zones for corner photos */
 .page-inner {
-  width: 460px;
+  width: 640px;
   max-width: 100%;
   margin: 0 auto;
-  padding: 48px 40px 56px;
+  padding: 75px 90px 80px;
   border-radius: 3px;
   position: relative;
   overflow: visible;
@@ -322,9 +322,13 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
 }
 
 /* Responsive */
-@media (max-width: 520px) {
+@media (max-width: 680px) {
+  .content-page {
+    padding: 40px 0;
+  }
+
   .page-inner {
-    padding: 36px 26px 44px;
+    padding: 60px 50px 65px;
   }
 
   .page-title {
@@ -336,9 +340,13 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
+  .content-page {
+    padding: 30px 0;
+  }
+
   .page-inner {
-    padding: 28px 20px 36px;
+    padding: 50px 30px 55px;
   }
 
   .page-title {
