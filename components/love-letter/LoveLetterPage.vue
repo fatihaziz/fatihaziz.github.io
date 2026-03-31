@@ -30,6 +30,19 @@
         </template>
       </div>
 
+      <!-- Origami shapes taped to sides of paper -->
+      <div class="origami-layer" aria-hidden="true">
+        <div
+          v-for="(ori, idx) in origamiShapes"
+          :key="idx"
+          class="origami-piece"
+          :class="ori.shape"
+          :style="ori.style"
+        >
+          <div class="origami-tape"></div>
+        </div>
+      </div>
+
       <!-- Photos at corners (absolutely positioned, overflow visible) -->
       <LoveLetterTapedPhoto
         v-for="(photo, idx) in pageData.photos"
@@ -121,6 +134,28 @@ const bgStyle = computed(() => ({
   '--bg-heart-color': props.pageData.theme.roseColor,
 }))
 
+// Origami shapes taped to the sides -- different per page
+const origamiLayouts: Record<string, Array<{ shape: string; style: Record<string, string> }>> = {
+  gratitude: [
+    { shape: 'ori-heart', style: { top: '18%', left: '-18px', transform: 'rotate(-8deg)', '--ori-color': '#e8b0b0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-heart', style: { top: '65%', right: '-15px', transform: 'rotate(12deg)', '--ori-color': '#d4a0a0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-star', style: { top: '40%', left: '-12px', transform: 'rotate(15deg)', '--ori-color': '#e8d090', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+  ],
+  love: [
+    { shape: 'ori-heart', style: { top: '12%', right: '-20px', transform: 'rotate(-10deg)', '--ori-color': '#e89898', '--ori-fold': 'rgba(0,0,0,0.07)' } },
+    { shape: 'ori-heart', style: { top: '50%', left: '-16px', transform: 'rotate(6deg)', '--ori-color': '#f0b0b8', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-star', style: { top: '78%', right: '-14px', transform: 'rotate(-18deg)', '--ori-color': '#f0c8a0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-heart', style: { top: '85%', left: '-10px', transform: 'rotate(14deg)', '--ori-color': '#d8a0b0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+  ],
+  commitment: [
+    { shape: 'ori-heart', style: { top: '20%', left: '-18px', transform: 'rotate(10deg)', '--ori-color': '#c0a8d0', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+    { shape: 'ori-star', style: { top: '45%', right: '-16px', transform: 'rotate(-12deg)', '--ori-color': '#b8c0e0', '--ori-fold': 'rgba(0,0,0,0.05)' } },
+    { shape: 'ori-heart', style: { top: '72%', left: '-14px', transform: 'rotate(-8deg)', '--ori-color': '#d0b0d8', '--ori-fold': 'rgba(0,0,0,0.06)' } },
+  ],
+}
+
+const origamiShapes = computed(() => origamiLayouts[props.pageData.id] || [])
+
 const textStyle = computed(() => ({
   color: props.pageData.theme.inkColor,
   '--highlight-color': props.pageData.theme.accentColor,
@@ -200,22 +235,36 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
 .bg-heart::after {
   content: '';
   position: absolute;
-  width: 100%;
+  width: 50%;
   height: 100%;
-  border-radius: 50% 50% 0 0;
-  background: currentColor;
+  top: 0;
 }
 
+/* Left half - lighter (origami fold effect) */
 .bg-heart::before {
-  left: -30%;
-  transform: rotate(-45deg);
-  transform-origin: 100% 100%;
+  left: 0;
+  background:
+    linear-gradient(135deg, currentColor 50%, transparent 50%),
+    linear-gradient(225deg, currentColor 50%, transparent 50%);
+  background-size: 100% 50%, 100% 50%;
+  background-position: top, bottom;
+  background-repeat: no-repeat;
+  border-radius: 50% 0 0 0;
+  opacity: 0.9;
 }
 
+/* Right half - darker (origami fold shadow) */
 .bg-heart::after {
-  left: 30%;
-  transform: rotate(45deg);
-  transform-origin: 0 100%;
+  right: 0;
+  background:
+    linear-gradient(45deg, currentColor 50%, transparent 50%),
+    linear-gradient(315deg, currentColor 50%, transparent 50%);
+  background-size: 100% 50%, 100% 50%;
+  background-position: top, bottom;
+  background-repeat: no-repeat;
+  border-radius: 0 50% 0 0;
+  opacity: 0.7;
+  border-left: 1px solid rgba(0,0,0,0.04);
 }
 
 /* 8 scattered hearts with staggered positions */
@@ -243,6 +292,108 @@ function stickerPositionStyle(sticker: StickerData): Record<string, string> {
   85% {
     opacity: 0.12;
   }
+}
+
+/* ===== ORIGAMI SHAPES TAPED TO SIDES ===== */
+.origami-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.origami-piece {
+  position: absolute;
+}
+
+/* Tape strip on origami -- horizontal tape on the side */
+.origami-tape {
+  position: absolute;
+  width: 50px;
+  height: 14px;
+  background: linear-gradient(
+    155deg,
+    rgba(215, 198, 162, 0.75),
+    rgba(200, 183, 147, 0.45)
+  );
+  border-radius: 1px;
+  top: 8px;
+  left: 50%;
+  margin-left: -25px;
+  transform: rotate(2deg);
+  z-index: 2;
+}
+
+/* ---- Origami Heart ---- */
+.ori-heart {
+  width: 38px;
+  height: 38px;
+  position: relative;
+}
+
+/* Two halves with fold effect */
+.ori-heart::before {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background:
+    linear-gradient(135deg, var(--ori-color, #e8b0b0) 50%, transparent 50%) no-repeat,
+    linear-gradient(225deg, var(--ori-color, #e8b0b0) 50%, transparent 50%) no-repeat;
+  background-size: 100% 50%, 100% 50%;
+  background-position: top, bottom;
+  border-radius: 50% 0 0 0;
+  filter: brightness(1.05);
+}
+
+.ori-heart::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 0;
+  top: 0;
+  background:
+    linear-gradient(45deg, var(--ori-color, #e8b0b0) 50%, transparent 50%) no-repeat,
+    linear-gradient(315deg, var(--ori-color, #e8b0b0) 50%, transparent 50%) no-repeat;
+  background-size: 100% 50%, 100% 50%;
+  background-position: top, bottom;
+  border-radius: 0 50% 0 0;
+  filter: brightness(0.95);
+  border-left: 1px solid var(--ori-fold, rgba(0,0,0,0.06));
+}
+
+/* ---- Origami Star ---- */
+.ori-star {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  background: var(--ori-color, #e8d090);
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%,
+    68% 57%, 79% 91%,
+    50% 70%, 21% 91%,
+    32% 57%, 2% 35%, 39% 35%
+  );
+}
+
+/* Fold line on star */
+.ori-star::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  background: var(--ori-fold, rgba(0,0,0,0.06));
+}
+
+/* Shadow for all origami to look like paper */
+.ori-heart,
+.ori-star {
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.1));
 }
 
 /* Paper card - wider with gutter zones for corner photos */

@@ -411,13 +411,11 @@ function stickerStyleObj(sticker: StickerData): Record<string, string> {
 
 /* ===== CONTENT PAGE WRAPPER ===== */
 .content-page-wrapper {
-  background: #9e958b;
   align-items: flex-start;
 }
 
 /* ===== CLOSING ===== */
 .closing {
-  background: #9e958b;
   align-items: center;
   justify-content: center;
   text-align: center;
