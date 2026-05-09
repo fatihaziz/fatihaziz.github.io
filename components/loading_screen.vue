@@ -1,11 +1,32 @@
 <template>
   <transition name="fade-slide">
-    <div v-if="loading" class="loading-screen" :class="{ 'love-mode': isLovePage }">
+    <div
+      v-if="loading"
+      class="loading-screen"
+      :class="{ 'love-mode': isLovePage, 'novel-mode': isNovelPage }"
+    >
       <!-- Sky Gradient Background -->
       <div class="sky-gradient"></div>
 
-      <!-- Cloud Formations Component -->
-      <CloudFormation />
+      <!-- Cloud Formations Component (skip on novel page) -->
+      <CloudFormation v-if="!isNovelPage" />
+
+      <!-- Novel-mode ambient: stars + waves + moon -->
+      <div v-if="isNovelPage" class="novel-ambient" aria-hidden="true">
+        <div class="novel-stars">
+          <span v-for="i in 30" :key="i" class="nov-star" :class="`ns-${i}`"></span>
+        </div>
+        <div class="novel-moon"></div>
+        <div class="novel-moon-reflection"></div>
+        <svg class="novel-waves" viewBox="0 0 1600 400" preserveAspectRatio="none">
+          <path d="M 0 120 Q 200 80 400 120 T 800 120 T 1200 120 T 1600 120 L 1600 400 L 0 400 Z"
+            fill="rgba(10, 28, 44, 0.55)" class="nv-wave nv-w1" />
+          <path d="M 0 200 Q 200 160 400 200 T 800 200 T 1200 200 T 1600 200 L 1600 400 L 0 400 Z"
+            fill="rgba(8, 20, 32, 0.75)" class="nv-wave nv-w2" />
+          <path d="M 0 280 Q 200 240 400 280 T 800 280 T 1200 280 T 1600 280 L 1600 400 L 0 400 Z"
+            fill="rgba(5, 12, 20, 0.95)" />
+        </svg>
+      </div>
 
       <!-- Floating Hearts (love mode only) -->
       <div v-if="isLovePage" class="floating-hearts" aria-hidden="true">
@@ -17,7 +38,9 @@
         <div class="village-portal">
           <div class="portal-ring"></div>
           <div class="portal-center">
-            <img src="~/assets/img/logo_1.jpeg" class="logo">
+            <!-- Novel-mode: book glyph instead of logo -->
+            <div v-if="isNovelPage" class="novel-book-glyph">&#10086;</div>
+            <img v-else src="~/assets/img/logo_1.jpeg" class="logo">
           </div>
         </div>
         <div class="loading-messages">
@@ -36,6 +59,7 @@ import CloudFormation from './CloudFormation.vue';
 
 const route = useRoute();
 const isLovePage = computed(() => route.path === '/i-love-you-dian');
+const isNovelPage = computed(() => route.path === '/laut');
 
 const loading = ref(true);
 const progress = ref(0);
@@ -62,13 +86,39 @@ const loveMessages = [
   "For you, my love..."
 ];
 
+const novelMessages = [
+  "Membuka sampul...",
+  "Menyalakan lentera...",
+  "Mendengarkan ombak...",
+  "Menunggu bulan terbit...",
+  "Laut sudah tahu lebih dulu..."
+];
+
 let messageIndex = 0;
 let progressInterval: NodeJS.Timeout;
 let messageInterval: NodeJS.Timeout;
 
+function pickMessages() {
+  if (isNovelPage.value) return novelMessages;
+  if (isLovePage.value) return loveMessages;
+  return rpgMessages;
+}
+
+function pickDuration() {
+  if (isNovelPage.value) return 3500;
+  if (isLovePage.value) return 6000;
+  return 15000;
+}
+
+function pickMessageInterval() {
+  if (isNovelPage.value) return 600;
+  if (isLovePage.value) return 700;
+  return 800;
+}
+
 onMounted(() => {
-  const messages = isLovePage.value ? loveMessages : rpgMessages;
-  const duration = isLovePage.value ? 6000 : 15000;
+  const messages = pickMessages();
+  const duration = pickDuration();
 
   currentMessage.value = messages[0];
 
@@ -84,7 +134,7 @@ onMounted(() => {
       messageIndex++;
       currentMessage.value = messages[messageIndex];
     }
-  }, isLovePage.value ? 700 : 800);
+  }, pickMessageInterval());
 
   setTimeout(() => {
     progress.value = 100;
@@ -402,5 +452,189 @@ onMounted(() => {
   .progress-bar {
     width: 200px;
   }
+}
+
+/* ====================================================================
+   NOVEL MODE -- /laut
+   ==================================================================== */
+.novel-mode .sky-gradient {
+  background: linear-gradient(180deg,
+    #0a1218 0%,
+    #0e1a26 30%,
+    #13283a 65%,
+    #050a10 100%
+  );
+}
+
+/* Portal ring: gold, slower spin */
+.novel-mode .portal-ring {
+  border-color: rgba(232, 212, 168, 0.25);
+  border-top-color: #e8d4a8;
+  animation-duration: 4s;
+  width: 130px;
+  height: 130px;
+  border-width: 2px;
+  top: -5px;
+  left: -5px;
+}
+
+.novel-mode .portal-center {
+  background: rgba(232, 212, 168, 0.08);
+  box-shadow: 0 0 35px rgba(232, 212, 168, 0.25);
+  width: 120px;
+  height: 120px;
+  border: 1px solid rgba(232, 212, 168, 0.3);
+}
+
+/* Book glyph in center of portal */
+.novel-book-glyph {
+  font-size: 48px;
+  color: #e8d4a8;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(232, 212, 168, 0.6);
+  animation: novel-glyph-pulse 3s ease-in-out infinite;
+}
+
+@keyframes novel-glyph-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Loading text styling */
+.novel-mode .loading-text {
+  font-family: 'Cormorant Garamond', 'Juliett', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.3rem;
+  color: #e8d4a8;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+/* Progress bar: gold accent */
+.novel-mode .progress-bar {
+  background: rgba(232, 212, 168, 0.12);
+  border: 1px solid rgba(232, 212, 168, 0.18);
+}
+
+.novel-mode .progress-fill {
+  background: linear-gradient(90deg,
+    rgba(232, 212, 168, 0.5),
+    rgba(232, 212, 168, 0.95));
+  box-shadow: 0 0 8px rgba(232, 212, 168, 0.4);
+}
+
+/* ===== Ambient: stars + moon + waves ===== */
+.novel-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.novel-stars {
+  position: absolute;
+  inset: 0;
+}
+
+.nov-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #d8e0e8;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: nov-star-twinkle 3.5s ease-in-out infinite;
+}
+
+@keyframes nov-star-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.9; }
+}
+
+.ns-1  { top: 5%;  left: 6%;  animation-delay: 0s;   }
+.ns-2  { top: 8%;  left: 18%; animation-delay: 0.4s; }
+.ns-3  { top: 12%; left: 28%; animation-delay: 1.2s; }
+.ns-4  { top: 4%;  left: 38%; animation-delay: 2.0s; }
+.ns-5  { top: 15%; left: 48%; animation-delay: 0.8s; }
+.ns-6  { top: 7%;  left: 58%; animation-delay: 1.6s; }
+.ns-7  { top: 11%; left: 68%; animation-delay: 2.4s; }
+.ns-8  { top: 6%;  left: 78%; animation-delay: 0.2s; }
+.ns-9  { top: 14%; left: 88%; animation-delay: 1.0s; width: 3px; height: 3px; }
+.ns-10 { top: 18%; left: 95%; animation-delay: 1.8s; }
+.ns-11 { top: 22%; left: 4%;  animation-delay: 2.6s; }
+.ns-12 { top: 25%; left: 13%; animation-delay: 0.6s; }
+.ns-13 { top: 28%; left: 24%; animation-delay: 1.4s; }
+.ns-14 { top: 30%; left: 36%; animation-delay: 2.2s; }
+.ns-15 { top: 24%; left: 46%; animation-delay: 0.0s; width: 1.5px; height: 1.5px; }
+.ns-16 { top: 32%; left: 56%; animation-delay: 0.7s; }
+.ns-17 { top: 26%; left: 66%; animation-delay: 1.5s; }
+.ns-18 { top: 34%; left: 76%; animation-delay: 2.3s; width: 2.5px; height: 2.5px; }
+.ns-19 { top: 22%; left: 86%; animation-delay: 0.3s; }
+.ns-20 { top: 38%; left: 8%;  animation-delay: 1.1s; }
+.ns-21 { top: 42%; left: 22%; animation-delay: 1.9s; }
+.ns-22 { top: 36%; left: 33%; animation-delay: 2.7s; }
+.ns-23 { top: 44%; left: 44%; animation-delay: 0.5s; }
+.ns-24 { top: 40%; left: 55%; animation-delay: 1.3s; }
+.ns-25 { top: 46%; left: 67%; animation-delay: 2.1s; }
+.ns-26 { top: 38%; left: 80%; animation-delay: 0.9s; }
+.ns-27 { top: 48%; left: 92%; animation-delay: 1.7s; }
+.ns-28 { top: 8%;  left: 50%; animation-delay: 2.5s; width: 1.5px; height: 1.5px; }
+.ns-29 { top: 16%; left: 73%; animation-delay: 0.1s; }
+.ns-30 { top: 28%; left: 90%; animation-delay: 1.6s; }
+
+.novel-moon {
+  position: absolute;
+  top: 14%;
+  right: 12%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle at center,
+    #e8d4a8 0%,
+    #d8c498 40%,
+    rgba(216, 196, 152, 0) 75%);
+  border-radius: 50%;
+  animation: nov-moon-glow 5s ease-in-out infinite;
+}
+
+@keyframes nov-moon-glow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+.novel-moon-reflection {
+  position: absolute;
+  top: 60%;
+  right: 14%;
+  width: 60px;
+  height: 4px;
+  background: radial-gradient(ellipse at center,
+    rgba(232, 212, 168, 0.4) 0%,
+    transparent 80%);
+  filter: blur(3px);
+  animation: nov-moon-glow 5s ease-in-out infinite;
+}
+
+.novel-waves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 35%;
+}
+
+@keyframes nov-wave-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-25px); }
+}
+.nv-wave {
+  animation: nov-wave-drift 11s ease-in-out infinite;
+}
+.nv-w2 {
+  animation-duration: 14s;
+  animation-delay: -2s;
 }
 </style>

@@ -526,18 +526,18 @@
 }
 
 .large-circle .cloud-shadow {
-  background: radial-gradient(48% 64%, circle, rgba(204, 0, 0, 0) 110px, #9BBBC4 50px);
+  background: radial-gradient(circle at 48% 64%, rgba(204, 0, 0, 0) 110px, #9BBBC4 50px);
   top: 2px;
   z-index: 3;
 }
 
 .middle-circle .cloud-shadow {
-  background: radial-gradient(58% 61%, circle, rgba(204, 0, 0, 0) 82px, #9BBBC4 50px);
+  background: radial-gradient(circle at 58% 61%, rgba(204, 0, 0, 0) 82px, #9BBBC4 50px);
   top: 0px;
 }
 
 .small-circle .cloud-shadow {
-  background: radial-gradient(57% 61%, circle, rgba(204, 0, 0, 0) 53px, #9BBBC4 40px);
+  background: radial-gradient(circle at 57% 61%, rgba(204, 0, 0, 0) 53px, #9BBBC4 40px);
   top: 0px;
 }
 

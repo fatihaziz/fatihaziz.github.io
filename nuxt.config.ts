@@ -17,6 +17,12 @@ export default defineNuxtConfig({
   ssr: false,
   plugins: [],
   components: true,
+  experimental: {
+    // Explicitly enable so Nuxt registers the #app-manifest virtual module.
+    // Without this, Vite import-analysis fails on the dead-code import in
+    // node_modules/nuxt/dist/app/composables/manifest.js. See nuxt#33606.
+    appManifest: true,
+  },
   app:{
     head: {
       title: 'FatihAziz.com - Backend & Server Nerd',
