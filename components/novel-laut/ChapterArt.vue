@@ -20,8 +20,8 @@
           <stop offset="100%" :stop-color="theme.artGlow" stop-opacity="0" />
         </radialGradient>
       </defs>
-      <circle cx="100" cy="110" r="60" fill="url(#sun-i)" />
-      <circle cx="100" cy="110" r="32" :fill="theme.artGlow" opacity="0.85" />
+      <circle cx="100" cy="110" r="60" fill="url(#sun-i)" class="sun-pulse" />
+      <circle cx="100" cy="110" r="32" :fill="theme.artGlow" opacity="0.85" class="sun-disc" />
 
       <!-- wind streams -->
       <g :stroke="theme.artInk" fill="none" stroke-linecap="round">
@@ -37,8 +37,18 @@
           class="wind-line" style="animation-delay: 0.45s" />
       </g>
 
+      <!-- floating dust particles drifting on the wind -->
+      <g :fill="theme.artInk">
+        <ellipse cx="40"  cy="240" rx="3" ry="1.5" opacity="0.6" class="dust" style="animation-delay: 0s" />
+        <ellipse cx="80"  cy="310" rx="2.5" ry="1.3" opacity="0.5" class="dust" style="animation-delay: 1.2s" />
+        <ellipse cx="60"  cy="380" rx="3.5" ry="1.6" opacity="0.55" class="dust" style="animation-delay: 0.6s" />
+        <ellipse cx="120" cy="270" rx="2" ry="1" opacity="0.45" class="dust" style="animation-delay: 2.4s" />
+        <ellipse cx="40"  cy="430" rx="3" ry="1.5" opacity="0.6" class="dust" style="animation-delay: 1.8s" />
+        <ellipse cx="100" cy="500" rx="2.5" ry="1.3" opacity="0.5" class="dust" style="animation-delay: 3.0s" />
+      </g>
+
       <!-- running figure silhouette -->
-      <g :fill="theme.artInk" opacity="0.85">
+      <g :fill="theme.artInk" opacity="0.85" class="runner">
         <ellipse cx="320" cy="528" rx="42" ry="3" opacity="0.3" />
         <path d="M 296 488 q 4 -10 14 -10 q 6 0 8 6 q 10 -2 14 4 q 4 6 -2 12 l -8 8 l 4 14 l 6 18 l -2 4 l -10 -2 l -8 -22 l -10 6 l -2 12 l -8 0 l 0 -10 l 6 -16 l -8 -14 q -2 -8 6 -10 z" />
         <circle cx="312" cy="478" r="6" />
@@ -67,27 +77,38 @@
       </defs>
       <rect width="400" height="600" fill="url(#bgglow-ii)" />
 
-      <!-- Two overlapping faces, oval-mask style -->
+      <!-- Two overlapping faces, oval-mask style. Each face breathes. -->
       <g :stroke="theme.artInk" fill="none" stroke-width="1.4">
-        <!-- back face -->
-        <ellipse cx="220" cy="280" rx="78" ry="100" opacity="0.55" />
-        <ellipse cx="220" cy="240" rx="14" ry="6" opacity="0.4" />
-        <ellipse cx="220" cy="280" rx="14" ry="6" opacity="0.4" />
-        <path d="M 200 320 Q 220 332 240 320" opacity="0.4" />
+        <!-- back face (slow breath, slight shift) -->
+        <g class="mask-back">
+          <ellipse cx="220" cy="280" rx="78" ry="100" opacity="0.55" />
+          <ellipse cx="220" cy="240" rx="14" ry="6" opacity="0.4" />
+          <ellipse cx="220" cy="280" rx="14" ry="6" opacity="0.4" />
+          <path d="M 200 320 Q 220 332 240 320" opacity="0.4" />
+        </g>
 
-        <!-- front face -->
-        <ellipse cx="170" cy="320" rx="78" ry="100" :fill="theme.artGlow" fill-opacity="0.18" />
-        <ellipse cx="148" cy="290" rx="10" ry="4" :fill="theme.artInk" />
-        <ellipse cx="192" cy="290" rx="10" ry="4" :fill="theme.artInk" />
-        <path d="M 152 350 Q 170 358 188 350" />
+        <!-- front face (faster breath, opacity pulse) -->
+        <g class="mask-front">
+          <ellipse cx="170" cy="320" rx="78" ry="100" :fill="theme.artGlow" fill-opacity="0.18" />
+          <ellipse cx="148" cy="290" rx="10" ry="4" :fill="theme.artInk" />
+          <ellipse cx="192" cy="290" rx="10" ry="4" :fill="theme.artInk" />
+          <path d="M 152 350 Q 170 358 188 350" />
+        </g>
       </g>
 
-      <!-- vertical silence bars -->
-      <g :stroke="theme.artInk" stroke-width="1" opacity="0.18">
-        <line x1="40" y1="60" x2="40" y2="540" />
-        <line x1="60" y1="80" x2="60" y2="520" />
-        <line x1="340" y1="80" x2="340" y2="520" />
-        <line x1="360" y1="60" x2="360" y2="540" />
+      <!-- whisper traveling between the masks -->
+      <g :stroke="theme.artGlow" fill="none" stroke-width="0.8" stroke-linecap="round">
+        <path d="M 220 280 Q 195 300 170 320" opacity="0.5" class="whisper" style="animation-delay: 0s" />
+        <path d="M 220 280 Q 200 305 180 330" opacity="0.4" class="whisper" style="animation-delay: 1.5s" />
+        <path d="M 220 280 Q 190 295 160 310" opacity="0.45" class="whisper" style="animation-delay: 3.0s" />
+      </g>
+
+      <!-- vertical silence bars (opacity wave) -->
+      <g :stroke="theme.artInk" stroke-width="1">
+        <line x1="40"  y1="60" x2="40"  y2="540" opacity="0.18" class="silence-bar" style="animation-delay: 0s"   />
+        <line x1="60"  y1="80" x2="60"  y2="520" opacity="0.18" class="silence-bar" style="animation-delay: 0.6s" />
+        <line x1="340" y1="80" x2="340" y2="520" opacity="0.18" class="silence-bar" style="animation-delay: 1.2s" />
+        <line x1="360" y1="60" x2="360" y2="540" opacity="0.18" class="silence-bar" style="animation-delay: 1.8s" />
       </g>
 
       <text x="200" y="560" text-anchor="middle"
@@ -161,39 +182,50 @@
         </linearGradient>
       </defs>
 
-      <!-- Stacked boxes -->
-      <!-- bottom large box -->
-      <rect x="100" y="360" width="200" height="90" :fill="theme.artInk" opacity="0.92" />
-      <rect x="100" y="360" width="200" height="14" :fill="theme.artGlow" opacity="0.55" />
-      <rect x="190" y="360" width="20" height="90" :fill="theme.artGlow" opacity="0.55" />
+      <!-- Stacked boxes (subtle breathing) -->
+      <g class="gift-stack">
+        <!-- bottom large box -->
+        <rect x="100" y="360" width="200" height="90" :fill="theme.artInk" opacity="0.92" />
+        <rect x="100" y="360" width="200" height="14" :fill="theme.artGlow" opacity="0.55" />
+        <rect x="190" y="360" width="20" height="90" :fill="theme.artGlow" opacity="0.55" />
 
-      <!-- middle box -->
-      <rect x="135" y="270" width="130" height="90" :fill="theme.artInk" opacity="0.85" />
-      <rect x="135" y="270" width="130" height="12" :fill="theme.artGlow" opacity="0.5" />
-      <rect x="195" y="270" width="14" height="90" :fill="theme.artGlow" opacity="0.5" />
+        <!-- middle box -->
+        <rect x="135" y="270" width="130" height="90" :fill="theme.artInk" opacity="0.85" />
+        <rect x="135" y="270" width="130" height="12" :fill="theme.artGlow" opacity="0.5" />
+        <rect x="195" y="270" width="14" height="90" :fill="theme.artGlow" opacity="0.5" />
 
-      <!-- top small box -->
-      <rect x="170" y="200" width="60" height="70" :fill="theme.artInk" opacity="0.95" />
-      <rect x="170" y="200" width="60" height="10" :fill="theme.artGlow" opacity="0.6" />
-      <rect x="195" y="200" width="10" height="70" :fill="theme.artGlow" opacity="0.6" />
+        <!-- top small box -->
+        <rect x="170" y="200" width="60" height="70" :fill="theme.artInk" opacity="0.95" />
+        <rect x="170" y="200" width="60" height="10" :fill="theme.artGlow" opacity="0.6" />
+        <rect x="195" y="200" width="10" height="70" :fill="theme.artGlow" opacity="0.6" />
+      </g>
 
-      <!-- ribbon bow on top -->
-      <g :fill="theme.artGlow" opacity="0.85">
+      <!-- ribbon bow on top (rocking) -->
+      <g :fill="theme.artGlow" opacity="0.85" class="ribbon-bow">
         <ellipse cx="190" cy="200" rx="14" ry="10" />
         <ellipse cx="210" cy="200" rx="14" ry="10" />
         <rect x="196" y="194" width="8" height="14" />
       </g>
 
-      <!-- petals falling (subtle wilt motif) -->
-      <g :fill="theme.artInk" opacity="0.5">
-        <ellipse cx="80" cy="180" rx="6" ry="3" transform="rotate(20 80 180)" class="petal"
-          style="animation-delay: 0s" />
-        <ellipse cx="320" cy="160" rx="6" ry="3" transform="rotate(-15 320 160)" class="petal"
-          style="animation-delay: 1.2s" />
-        <ellipse cx="60" cy="280" rx="5" ry="2" transform="rotate(35 60 280)" class="petal"
-          style="animation-delay: 0.6s" />
-        <ellipse cx="340" cy="320" rx="5" ry="2" transform="rotate(-25 340 320)" class="petal"
-          style="animation-delay: 1.8s" />
+      <!-- ribbon trailing off the side (flutter) -->
+      <g :stroke="theme.artGlow" fill="none" stroke-width="3" stroke-linecap="round" opacity="0.7">
+        <path d="M 196 208 Q 240 240 220 290 Q 200 340 250 380" class="ribbon-trail" />
+      </g>
+
+      <!-- continuous falling petals (more, varied trajectories) -->
+      <g :fill="theme.artInk">
+        <ellipse cx="60"  cy="-10" rx="6" ry="3" transform="rotate(20 60 -10)" opacity="0.55"
+          class="petal-fall pf-1" style="animation-delay: 0s" />
+        <ellipse cx="120" cy="-10" rx="5" ry="2.5" transform="rotate(-10 120 -10)" opacity="0.5"
+          class="petal-fall pf-2" style="animation-delay: 1.5s" />
+        <ellipse cx="180" cy="-10" rx="6" ry="3" transform="rotate(35 180 -10)" opacity="0.6"
+          class="petal-fall pf-3" style="animation-delay: 3.0s" />
+        <ellipse cx="260" cy="-10" rx="5" ry="2.5" transform="rotate(-25 260 -10)" opacity="0.5"
+          class="petal-fall pf-1" style="animation-delay: 4.5s" />
+        <ellipse cx="320" cy="-10" rx="6" ry="3" transform="rotate(15 320 -10)" opacity="0.55"
+          class="petal-fall pf-2" style="animation-delay: 6.0s" />
+        <ellipse cx="370" cy="-10" rx="4" ry="2" transform="rotate(-20 370 -10)" opacity="0.45"
+          class="petal-fall pf-3" style="animation-delay: 2.2s" />
       </g>
 
       <text x="200" y="560" text-anchor="middle"
@@ -210,7 +242,7 @@
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
     >
-      <!-- faded clock face behind -->
+      <!-- faded clock face behind (slow rotating hand) -->
       <g :stroke="theme.artInk" fill="none" stroke-width="1" opacity="0.18">
         <circle cx="200" cy="300" r="160" />
         <circle cx="200" cy="300" r="140" />
@@ -218,6 +250,12 @@
         <line x1="200" y1="430" x2="200" y2="440" />
         <line x1="60" y1="300" x2="70" y2="300" />
         <line x1="330" y1="300" x2="340" y2="300" />
+      </g>
+      <!-- slow-sweeping clock hand -->
+      <g class="clock-hand" style="transform-origin: 200px 300px;">
+        <line x1="200" y1="300" x2="200" y2="180"
+          :stroke="theme.artInk" stroke-width="1.2" opacity="0.22" stroke-linecap="round" />
+        <circle cx="200" cy="300" r="3" :fill="theme.artInk" opacity="0.35" />
       </g>
 
       <!-- hourglass frame -->
@@ -239,10 +277,17 @@
       <path d="M 165 408 L 235 408 L 220 350 Q 200 340 180 350 Z"
         :fill="theme.artInk" opacity="0.85" />
 
-      <!-- falling sand stream -->
+      <!-- falling sand: continuous stream (always-on line) + 5 staggered grains -->
       <line x1="200" y1="298" x2="200" y2="350"
         :stroke="theme.artInk" stroke-width="2" opacity="0.85"
         class="sand-fall" />
+      <g :fill="theme.artInk">
+        <circle cx="200" cy="298" r="1.6" opacity="0.95" class="sand-grain" style="animation-delay: 0s" />
+        <circle cx="200" cy="298" r="1.4" opacity="0.9" class="sand-grain" style="animation-delay: 0.3s" />
+        <circle cx="200" cy="298" r="1.8" opacity="0.95" class="sand-grain" style="animation-delay: 0.6s" />
+        <circle cx="200" cy="298" r="1.5" opacity="0.9" class="sand-grain" style="animation-delay: 0.9s" />
+        <circle cx="200" cy="298" r="1.7" opacity="0.95" class="sand-grain" style="animation-delay: 1.2s" />
+      </g>
 
       <text x="200" y="560" text-anchor="middle"
         :fill="theme.artInk" opacity="0.18"
@@ -264,34 +309,38 @@
       <rect x="135" y="135" width="130" height="290" rx="65"
         fill="none" :stroke="theme.artInk" stroke-width="1" opacity="0.25" />
 
-      <!-- chain hanging from top -->
-      <line x1="200" y1="60" x2="200" y2="180"
-        :stroke="theme.artInk" stroke-width="1.5" opacity="0.7" />
+      <!-- chain hanging from top (sway with the keys) -->
+      <g class="key-sway" style="transform-origin: 200px 60px;">
+        <line x1="200" y1="60" x2="200" y2="180"
+          :stroke="theme.artInk" stroke-width="1.5" opacity="0.7" />
 
-      <!-- key 1 (large) hanging -->
-      <g :fill="theme.artInk" transform="translate(180 180) rotate(8)">
-        <circle cx="20" cy="20" r="20" />
-        <circle cx="20" cy="20" r="9" :fill="theme.artGlow" />
-        <rect x="17" y="40" width="6" height="80" />
-        <rect x="17" y="100" width="14" height="5" />
-        <rect x="17" y="115" width="10" height="5" />
+        <!-- key 1 (large) hanging -->
+        <g :fill="theme.artInk" transform="translate(180 180) rotate(8)">
+          <circle cx="20" cy="20" r="20" />
+          <circle cx="20" cy="20" r="9" :fill="theme.artGlow" />
+          <rect x="17" y="40" width="6" height="80" />
+          <rect x="17" y="100" width="14" height="5" />
+          <rect x="17" y="115" width="10" height="5" />
+        </g>
+
+        <!-- key 2 (smaller) hanging -->
+        <g :fill="theme.artInk" transform="translate(220 200) rotate(-12)">
+          <circle cx="14" cy="14" r="14" />
+          <circle cx="14" cy="14" r="6" :fill="theme.artGlow" />
+          <rect x="12" y="28" width="4" height="60" />
+          <rect x="12" y="76" width="10" height="3" />
+          <rect x="12" y="84" width="8" height="3" />
+        </g>
       </g>
 
-      <!-- key 2 (smaller) hanging -->
-      <g :fill="theme.artInk" transform="translate(220 200) rotate(-12)">
-        <circle cx="14" cy="14" r="14" />
-        <circle cx="14" cy="14" r="6" :fill="theme.artGlow" />
-        <rect x="12" y="28" width="4" height="60" />
-        <rect x="12" y="76" width="10" height="3" />
-        <rect x="12" y="84" width="8" height="3" />
-      </g>
-
-      <!-- dropped key on floor -->
+      <!-- dropped key on floor (glint sweep) -->
       <g :fill="theme.artInk" opacity="0.85" transform="translate(80 470) rotate(-25)">
         <circle cx="14" cy="14" r="14" />
         <circle cx="14" cy="14" r="6" :fill="theme.artGlow" />
         <rect x="12" y="28" width="4" height="55" />
         <rect x="12" y="74" width="10" height="3" />
+        <!-- glint highlight that sweeps across -->
+        <circle cx="14" cy="14" r="3" :fill="theme.artGlow" class="key-glint" />
       </g>
 
       <!-- floor line -->
@@ -324,9 +373,23 @@
         </linearGradient>
       </defs>
 
-      <!-- sun glow -->
-      <circle cx="200" cy="280" r="180" fill="url(#sun-vii)" />
-      <circle cx="200" cy="280" r="55" :fill="theme.artGlow" opacity="0.95" />
+      <!-- light rays radiating from sun (rotating) -->
+      <g class="sun-rays" style="transform-origin: 200px 280px;"
+        :stroke="theme.artGlow" stroke-width="1" opacity="0.35">
+        <line x1="200" y1="280" x2="200" y2="60" />
+        <line x1="200" y1="280" x2="380" y2="100" />
+        <line x1="200" y1="280" x2="40" y2="120" />
+        <line x1="200" y1="280" x2="380" y2="240" />
+        <line x1="200" y1="280" x2="40" y2="240" />
+        <line x1="200" y1="280" x2="320" y2="60" />
+        <line x1="200" y1="280" x2="80" y2="60" />
+      </g>
+
+      <!-- sun glow + disc (rising motion) -->
+      <g class="sun-rise" style="transform-origin: 200px 280px;">
+        <circle cx="200" cy="280" r="180" fill="url(#sun-vii)" />
+        <circle cx="200" cy="280" r="55" :fill="theme.artGlow" opacity="0.95" class="sun-disc" />
+      </g>
 
       <!-- horizon line -->
       <line x1="0" y1="320" x2="400" y2="320"
@@ -335,13 +398,13 @@
       <!-- water -->
       <rect x="0" y="320" width="400" height="280" fill="url(#water-vii)" />
 
-      <!-- sun reflection on water -->
+      <!-- sun reflection on water (each ellipse ripples scaleX with stagger) -->
       <g :fill="theme.artGlow" opacity="0.6">
-        <ellipse cx="200" cy="335" rx="50" ry="3" />
-        <ellipse cx="200" cy="350" rx="60" ry="2" />
-        <ellipse cx="200" cy="370" rx="40" ry="2" />
-        <ellipse cx="200" cy="395" rx="55" ry="2" />
-        <ellipse cx="200" cy="425" rx="35" ry="1.5" />
+        <ellipse cx="200" cy="335" rx="50" ry="3"  class="ripple" style="animation-delay: 0s; transform-origin: 200px 335px;" />
+        <ellipse cx="200" cy="350" rx="60" ry="2"  class="ripple" style="animation-delay: 0.4s; transform-origin: 200px 350px;" />
+        <ellipse cx="200" cy="370" rx="40" ry="2"  class="ripple" style="animation-delay: 0.8s; transform-origin: 200px 370px;" />
+        <ellipse cx="200" cy="395" rx="55" ry="2"  class="ripple" style="animation-delay: 1.2s; transform-origin: 200px 395px;" />
+        <ellipse cx="200" cy="425" rx="35" ry="1.5" class="ripple" style="animation-delay: 1.6s; transform-origin: 200px 425px;" />
       </g>
 
       <!-- two chairs silhouette -->
@@ -394,21 +457,28 @@
         <circle cx="80" cy="180" r="1.0" opacity="0.6" class="star" style="animation-delay: 1.0s" />
       </g>
 
-      <!-- moon glow -->
-      <circle cx="290" cy="170" r="100" fill="url(#moon-viii)" />
-      <circle cx="290" cy="170" r="42" :fill="theme.artGlow" opacity="0.95" />
+      <!-- shooting star (occasional traversal across sky) -->
+      <g class="shooting-star">
+        <line x1="0" y1="0" x2="42" y2="14"
+          :stroke="theme.artGlow" stroke-width="1.4" stroke-linecap="round" opacity="0.85" />
+        <circle cx="42" cy="14" r="2" :fill="theme.artGlow" />
+      </g>
+
+      <!-- moon glow (halo pulse) -->
+      <circle cx="290" cy="170" r="100" fill="url(#moon-viii)" class="moon-halo" />
+      <circle cx="290" cy="170" r="42" :fill="theme.artGlow" opacity="0.95" class="moon-disc" />
 
       <!-- sea horizon -->
       <line x1="0" y1="280" x2="400" y2="280"
         :stroke="theme.artInk" stroke-width="0.5" opacity="0.4" />
 
-      <!-- moon reflection on sea -->
+      <!-- moon reflection on sea (ripple scaleX stagger) -->
       <g :fill="theme.artGlow" opacity="0.5">
-        <ellipse cx="290" cy="300" rx="32" ry="2" />
-        <ellipse cx="290" cy="320" rx="42" ry="2" />
-        <ellipse cx="290" cy="345" rx="28" ry="1.5" />
-        <ellipse cx="290" cy="375" rx="36" ry="1.5" />
-        <ellipse cx="290" cy="410" rx="22" ry="1" />
+        <ellipse cx="290" cy="300" rx="32" ry="2"  class="ripple" style="animation-delay: 0s;   transform-origin: 290px 300px;" />
+        <ellipse cx="290" cy="320" rx="42" ry="2"  class="ripple" style="animation-delay: 0.5s; transform-origin: 290px 320px;" />
+        <ellipse cx="290" cy="345" rx="28" ry="1.5" class="ripple" style="animation-delay: 1.0s; transform-origin: 290px 345px;" />
+        <ellipse cx="290" cy="375" rx="36" ry="1.5" class="ripple" style="animation-delay: 1.5s; transform-origin: 290px 375px;" />
+        <ellipse cx="290" cy="410" rx="22" ry="1"   class="ripple" style="animation-delay: 2.0s; transform-origin: 290px 410px;" />
       </g>
 
       <!-- layered waves -->
@@ -543,6 +613,212 @@ const bgStyle = computed(() => ({
 }
 .wave {
   animation: wave-drift 9s ease-in-out infinite;
+}
+
+/* ====== I. WIND -- dust + sun-pulse ====== */
+@keyframes dust-drift {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.8); }
+  20%  { opacity: 0.7; }
+  100% { opacity: 0; transform: translate(80px, -10px) scale(1.1); }
+}
+.dust {
+  animation: dust-drift 6s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes sun-glow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+.sun-pulse {
+  animation: sun-glow-pulse 5s ease-in-out infinite;
+}
+.sun-disc {
+  animation: sun-glow-pulse 5s ease-in-out infinite;
+}
+
+/* tiny stride-bob on the running silhouette */
+@keyframes runner-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.runner {
+  animation: runner-bob 1.4s ease-in-out infinite;
+  transform-origin: bottom center;
+  transform-box: fill-box;
+}
+
+/* ====== II. MASK -- breath + whisper + silence-bars ====== */
+@keyframes mask-breath {
+  0%, 100% { opacity: 1; transform: translate(0, 0); }
+  50% { opacity: 0.7; transform: translate(0, 2px); }
+}
+.mask-front {
+  animation: mask-breath 4s ease-in-out infinite;
+  transform-origin: 170px 320px;
+  transform-box: fill-box;
+}
+.mask-back {
+  animation: mask-breath 5.5s ease-in-out infinite;
+  animation-delay: -1.5s;
+  transform-origin: 220px 280px;
+  transform-box: fill-box;
+}
+
+@keyframes whisper-trail {
+  0%   { opacity: 0; stroke-dasharray: 0 100; }
+  30%  { opacity: 0.7; }
+  100% { opacity: 0; stroke-dasharray: 100 0; }
+}
+.whisper {
+  stroke-dasharray: 0 100;
+  animation: whisper-trail 4.5s ease-out infinite;
+}
+
+@keyframes bar-pulse {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.3; }
+}
+.silence-bar {
+  animation: bar-pulse 4s ease-in-out infinite;
+}
+
+/* ====== IV. GIFT -- ribbon flutter + petal stream + stack breath ====== */
+@keyframes stack-breath {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+.gift-stack {
+  animation: stack-breath 5s ease-in-out infinite;
+  transform-origin: bottom center;
+  transform-box: fill-box;
+}
+
+@keyframes bow-rock {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+.ribbon-bow {
+  animation: bow-rock 3.5s ease-in-out infinite;
+  transform-origin: 200px 200px;
+  transform-box: fill-box;
+}
+
+@keyframes ribbon-wave {
+  0%, 100% { stroke-dashoffset: 0; opacity: 0.7; }
+  50% { stroke-dashoffset: 6; opacity: 0.85; }
+}
+.ribbon-trail {
+  stroke-dasharray: 12 4;
+  animation: ribbon-wave 3s ease-in-out infinite;
+}
+
+@keyframes petal-stream {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  10%  { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(var(--px, 20px), 620px) rotate(540deg); }
+}
+.petal-fall {
+  animation: petal-stream 9s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.pf-1 { --px: 20px; }
+.pf-2 { --px: -30px; }
+.pf-3 { --px: 40px; animation-duration: 11s; }
+
+/* ====== V. HOURGLASS -- sand grains + clock hand ====== */
+@keyframes sand-drop {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 0.95; }
+  90%  { opacity: 0.95; }
+  100% { transform: translateY(60px); opacity: 0; }
+}
+.sand-grain {
+  animation: sand-drop 1.2s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes clock-sweep {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.clock-hand {
+  animation: clock-sweep 30s linear infinite;
+}
+
+/* ====== VI. KEYS -- pendulum + glint ====== */
+@keyframes key-pendulum {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+.key-sway {
+  animation: key-pendulum 4s ease-in-out infinite;
+}
+
+@keyframes key-glint {
+  0%, 100% { opacity: 0.4; transform: translate(0, 0) scale(1); }
+  50% { opacity: 1; transform: translate(2px, 0) scale(1.4); }
+}
+.key-glint {
+  animation: key-glint 3s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+/* ====== VII. DAWN -- rays rotate + sun rise + ripple ====== */
+@keyframes ray-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.sun-rays {
+  animation: ray-rotate 60s linear infinite;
+  opacity: 0.35;
+}
+
+@keyframes sun-rise {
+  0%, 100% { transform: translateY(8px); }
+  50% { transform: translateY(-4px); }
+}
+.sun-rise {
+  animation: sun-rise 8s ease-in-out infinite;
+}
+
+@keyframes ripple {
+  0%, 100% { transform: scaleX(1); opacity: 0.6; }
+  50% { transform: scaleX(1.15); opacity: 0.85; }
+}
+.ripple {
+  animation: ripple 4s ease-in-out infinite;
+}
+
+/* ====== VIII. SEA -- shooting star + moon halo ====== */
+@keyframes shoot {
+  0%   { transform: translate(-60px, 80px) rotate(20deg); opacity: 0; }
+  4%   { opacity: 1; }
+  16%  { opacity: 1; }
+  20%  { transform: translate(440px, 230px) rotate(20deg); opacity: 0; }
+  100% { transform: translate(440px, 230px) rotate(20deg); opacity: 0; }
+}
+.shooting-star {
+  animation: shoot 9s ease-in infinite;
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+.moon-halo {
+  animation: halo-pulse 6s ease-in-out infinite;
+  transform-origin: 290px 170px;
+  transform-box: fill-box;
+}
+.moon-disc {
+  animation: halo-pulse 6s ease-in-out infinite;
+  transform-origin: 290px 170px;
+  transform-box: fill-box;
 }
 
 /* ====== Mood label ====== */

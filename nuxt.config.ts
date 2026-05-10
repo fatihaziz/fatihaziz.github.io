@@ -18,10 +18,22 @@ export default defineNuxtConfig({
   plugins: [],
   components: true,
   experimental: {
-    // Explicitly enable so Nuxt registers the #app-manifest virtual module.
-    // Without this, Vite import-analysis fails on the dead-code import in
-    // node_modules/nuxt/dist/app/composables/manifest.js. See nuxt#33606.
     appManifest: true,
+  },
+  // Workaround for nuxt#30461 / nuxt#33606: Vite optimizer pre-transforms the
+  // dead-code `import("#app-manifest")` in node_modules/nuxt/dist/app/composables/manifest.js
+  // and fails to resolve it. Mirror the official Nuxt fix from PR nuxt/nuxt#30587:
+  // alias to an empty stub so Vite resolves the import even though it's never executed.
+  vite: {
+    resolve: {
+      alias: {
+        '#app-manifest': 'unenv/dist/runtime/mock/empty.mjs',
+      },
+    },
+    optimizeDeps: {
+      // Don't pre-bundle the manifest module -- it has the dead import that breaks resolution.
+      exclude: ['nuxt/dist/app/composables/manifest.js'],
+    },
   },
   app:{
     head: {
