@@ -7,6 +7,7 @@
     "@vueuse/core": "^13.4.0",
     "defu": "^6.1.4",
     "nuxt": "3.19.2",
+    "phaser": "^3.90.0",
     "three": "^0.184.0",
     "vue": "latest"
   },
@@ -25,9 +26,10 @@
   "name": "nuxt-app",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
-    "build-github": "npx nuxt build --preset github_pages",
-    "dev": "nuxt dev",
+    "build": "pnpm ensure-atlases && cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build",
+    "build-github": "pnpm ensure-atlases && cross-env NODE_OPTIONS=--max-old-space-size=4096 npx nuxt build --preset github_pages",
+    "dev": "pnpm ensure-atlases && nuxt dev",
+    "ensure-atlases": "python scripts/ensure_atlases.py",
     "generate": "nuxt generate",
     "gh-publish": "pnpm build-github && gh-pages --dotfiles -d .output/public --cname fatihaziz.com",
     "nuxt-serve": "pnpm build-github && pnpm generate && browser-sync .output/public/",

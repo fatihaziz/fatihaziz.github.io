@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   plugins: [],
   components: true,
   experimental: {
-    appManifest: true,
+    appManifest: false,
   },
   // Workaround for nuxt#30461 / nuxt#33606: Vite optimizer pre-transforms the
   // dead-code `import("#app-manifest")` in node_modules/nuxt/dist/app/composables/manifest.js

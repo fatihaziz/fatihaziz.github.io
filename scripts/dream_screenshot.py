@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Headless screenshot + console-log dump for /dream.
+"""Headless screenshot + console-log dump for any local route.
 
-Usage: python scripts/dream_screenshot.py [out_png]
+Usage: python scripts/dream_screenshot.py [out_png] [route]
 Default out: test-results/dream-iter.png
+Default route: /aetherveil
 """
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ OUT.mkdir(exist_ok=True)
 
 def main() -> int:
     out_name = sys.argv[1] if len(sys.argv) > 1 else "dream-iter.png"
+    route = sys.argv[2] if len(sys.argv) > 2 else "/aetherveil"
     out_path = OUT / out_name
 
     with sync_playwright() as p:
@@ -30,14 +32,21 @@ def main() -> int:
         page.on("console", lambda m: console_msgs.append(f"[{m.type}] {m.text}"))
         page.on("pageerror", lambda e: page_errors.append(str(e)))
 
-        page.goto("http://localhost:3000/dream", wait_until="networkidle", timeout=60_000)
+        route = route if route.startswith("/") else "/" + route
+        page.goto(f"http://localhost:3000{route}", wait_until="networkidle", timeout=60_000)
         # Wait for loading_screen overlay to fully detach (it runs 15s + 800ms + 1.5s transition)
         try:
             page.wait_for_selector(".loading-screen", state="detached", timeout=25_000)
         except Exception as exc:
             print(f"!! loading-screen never detached: {exc}")
-        # Let TresJS bind + render after loading screen gone
-        page.wait_for_timeout(1500)
+        # Let game engine bind + render after loading screen gone
+        page.wait_for_timeout(5000)
+        # Also wait specifically for a Phaser canvas to appear (best-effort)
+        try:
+            page.wait_for_selector("canvas", state="attached", timeout=15_000)
+            page.wait_for_timeout(1500)  # extra frames
+        except Exception:
+            pass
         page.screenshot(path=str(out_path), full_page=False)
 
         def safe(s: str) -> str:
