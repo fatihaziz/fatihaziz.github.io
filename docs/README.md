@@ -1,31 +1,34 @@
 # Documentation Index
 
-Personal portfolio at **fatihaziz.com** — a 3D interactive village built with Nuxt 3 + TresJS + Quaternius low-poly assets. Cinematic on-rails camera, Studio-Ghibli-adjacent mood.
+Personal portfolio at **fatihaziz.com** — **Aetherveil**, a 2D pixel-art town-square RPG built with Nuxt 3 + Phaser 3. Mayor Halden greets every visitor; five themed buildings hold the craftsman's work in fully in-world RPG language.
 
 ## Structure
 
 | Path | Purpose |
 |------|---------|
-| [spec/dream-village-3d.md](./spec/dream-village-3d.md) | **Source of truth.** Complete design + implementation spec for the 3D village. Read this first. |
+| [spec/town-square-rpg.md](./spec/town-square-rpg.md) | **Source of truth.** Full design + implementation spec: vision, town map, NPC dialog, building aliases, sprite atlas list, asset sources, phase plan. Read this before any work. |
 | [technical/project-setup.md](./technical/project-setup.md) | Local dev commands, dependencies, configuration |
 | [technical/deployment.md](./technical/deployment.md) | GitHub Pages deploy pipeline |
 | [development/guidelines.md](./development/guidelines.md) | Vue 3 / TypeScript / styling conventions |
 
-## Active deliverable
+## Active build
 
-3D village at `/` with 5 routable building scenes:
+**Aetherveil** — top-down pixel-art town. Visitor enters, Mayor Halden delivers a 5-beat welcome dialog tour, then visitor freely explores:
 
-- `/` Hero panorama (village from elevated path, golden-hour mood)
-- `/workbench` Projects
-- `/armory` Skills
-- `/codex` Writings
-- `/hearth` About / journey
-- `/beacon` Contact
+- **The Atelier** — workshop of ongoing crafts
+- **Vaults of Whisperleaf** — library of bound scrolls
+- **Embers' Forge** — weapon rack of practiced arts
+- **The Hearthlight Inn** — mantel of chapter trophies
+- **Beacon of Distant Roads** — four signal-flames to wake
 
-All scenes built with TresJS declarative components. Asset source: Quaternius CC0 low-poly packs.
+All in-world. The owner's name never appears.
 
-See [spec/dream-village-3d.md](./spec/dream-village-3d.md) for full architecture, scene specs, camera narrative, asset list, perf plan, and implementation phases.
+See [spec/town-square-rpg.md](./spec/town-square-rpg.md) §I for the implementation phase plan (J.0 → J.7).
 
 ## History
 
-Prior RPG-village iteration (parallax SVG / emoji approach) was scrapped — see git history before commit `26b74f7` if needed. Spec is the new ground truth; do not reference deleted docs.
+Two prior iterations scrapped before Aetherveil committed:
+1. CSS/SVG parallax village (visual quality low)
+2. 3D TresJS golden-hour village (compositionally empty, not game-like)
+
+See git history before commit `7a38020` for prior 3D direction. Do not reference deleted spec or 3D components.
