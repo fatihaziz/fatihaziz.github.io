@@ -23,7 +23,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "spec" / "assets" / "aetherveil-map.png"
-W, H = 1400, 1000
+W, H = 1600, 1100
 
 RNG = random.Random(1729)
 
@@ -95,6 +95,33 @@ C = {
     "npc_ochre": (180, 138, 72),
     "skin_light": (245, 216, 176),
     "skin_warm": (212, 168, 124),
+    # Mountains + sky
+    "sky_top": (188, 216, 240),
+    "sky_horizon": (228, 236, 232),
+    "mountain_far": (132, 144, 152),
+    "mountain_mid": (104, 120, 132),
+    "mountain_near": (84, 100, 112),
+    "snow": (240, 244, 248),
+    # Castle
+    "castle_stone": (210, 204, 192),
+    "castle_stone_dark": (148, 142, 130),
+    "castle_roof": (140, 56, 56),
+    "castle_roof_dark": (96, 30, 30),
+    "banner": (180, 50, 50),
+    "banner_gold": (218, 180, 90),
+    # Wall
+    "wall_stone": (172, 162, 144),
+    "wall_stone_dark": (118, 108, 92),
+    # Cathedral
+    "cathedral_stone": (224, 218, 206),
+    "stained_glass": (140, 90, 188),
+    # Misc
+    "wheat": (228, 198, 88),
+    "wheat_dark": (172, 138, 48),
+    "grave": (148, 144, 138),
+    "iron": (60, 60, 64),
+    "horse_brown": (134, 88, 56),
+    "horse_white": (236, 226, 200),
 }
 
 
@@ -144,13 +171,66 @@ def draw_base_ground(d):
         d.ellipse([cx - r, cy - r // 2, cx + r, cy + r // 2], fill=C["grass_patch"])
 
 
+def draw_mountains_and_sky(d):
+    """Distant mountain range w/ snow caps + soft sky gradient + a dragon
+    silhouette wheeling above. Occupies the top 110 px of the canvas."""
+    # Sky gradient
+    for y in range(0, 110):
+        t = y / 110
+        r = int(C["sky_top"][0] * (1 - t) + C["sky_horizon"][0] * t)
+        g = int(C["sky_top"][1] * (1 - t) + C["sky_horizon"][1] * t)
+        b = int(C["sky_top"][2] * (1 - t) + C["sky_horizon"][2] * t)
+        d.line([(0, y), (W, y)], fill=(r, g, b))
+    # Far mountains
+    far_peaks = [(-20, 80), (80, 28), (180, 60), (260, 18), (360, 50), (460, 30),
+                 (560, 64), (660, 22), (760, 48), (860, 18), (960, 56), (1060, 28),
+                 (1160, 50), (1260, 18), (1360, 56), (1460, 30), (1560, 60), (W + 20, 90)]
+    d.polygon(far_peaks + [(W + 20, 110), (-20, 110)], fill=C["mountain_far"])
+    # Mid mountains
+    mid_peaks = [(-20, 100), (60, 60), (160, 92), (260, 50), (380, 80), (500, 56),
+                 (640, 92), (760, 48), (880, 84), (1000, 58), (1140, 92), (1260, 50),
+                 (1400, 86), (1520, 60), (W + 20, 100)]
+    d.polygon(mid_peaks + [(W + 20, 110), (-20, 110)], fill=C["mountain_mid"])
+    # Snow caps on a few far peaks
+    snow_caps = [(80, 32), (260, 22), (460, 34), (660, 26), (860, 22),
+                 (1060, 32), (1260, 22), (1460, 34)]
+    for px, py in snow_caps:
+        d.polygon([(px - 14, py + 16), (px, py), (px + 14, py + 16)], fill=C["snow"])
+    # Near foothills (richer green) to bridge to forest
+    near = [(-20, 110), (90, 90), (200, 108), (320, 92), (460, 108), (600, 90),
+            (740, 110), (900, 92), (1060, 110), (1220, 88), (1380, 108), (1520, 92),
+            (W + 20, 110)]
+    d.polygon(near + [(W + 20, 130), (-20, 130)], fill=C["mountain_near"])
+    # Dragon silhouette wheeling above the mid-range
+    dx, dy = 980, 50
+    # Body
+    d.ellipse([dx - 10, dy - 3, dx + 10, dy + 3], fill=(46, 38, 30))
+    # Head + tail
+    d.polygon([(dx + 10, dy), (dx + 20, dy - 2), (dx + 16, dy + 2)], fill=(46, 38, 30))
+    d.polygon([(dx - 10, dy), (dx - 22, dy + 3), (dx - 18, dy - 2)], fill=(46, 38, 30))
+    # Wings (spread)
+    d.polygon([(dx - 6, dy - 1), (dx - 20, dy - 14), (dx - 4, dy - 4)], fill=(46, 38, 30))
+    d.polygon([(dx + 6, dy - 1), (dx + 20, dy - 14), (dx + 4, dy - 4)], fill=(46, 38, 30))
+    d.polygon([(dx - 6, dy + 1), (dx - 18, dy + 10), (dx - 4, dy + 4)], fill=(70, 58, 48))
+    d.polygon([(dx + 6, dy + 1), (dx + 18, dy + 10), (dx + 4, dy + 4)], fill=(70, 58, 48))
+    # Tiny flock of birds far below dragon for scale
+    for bx, by in [(420, 72), (440, 76), (460, 70)]:
+        d.line([(bx, by), (bx + 4, by - 3)], fill=(60, 50, 40), width=1)
+        d.line([(bx + 4, by - 3), (bx + 8, by)], fill=(60, 50, 40), width=1)
+
+
 def draw_forest_border(d):
-    d.rectangle([0, 0, W, 56], fill=C["forest"])
-    d.rectangle([0, 0, 46, H - 220], fill=C["forest"])
-    d.rectangle([W - 46, 0, W, H - 220], fill=C["forest"])
+    """Thin forest band beneath the mountains + side forest strips."""
+    # Top forest band (under the mountains)
+    d.rectangle([0, 110, W, 150], fill=C["forest"])
+    # Side strips
+    d.rectangle([0, 0, 46, H - 260], fill=C["forest"])
+    d.rectangle([W - 46, 0, W, H - 260], fill=C["forest"])
+    # Pine triangles along the top forest band
     for x in range(22, W - 22, 36):
-        d.polygon([(x, 14), (x - 10, 50), (x + 10, 50)], fill=C["forest_dark"])
-    for y in range(78, H - 220, 52):
+        d.polygon([(x, 116), (x - 10, 146), (x + 10, 146)], fill=C["forest_dark"])
+    # Side pines
+    for y in range(150, H - 260, 52):
         d.polygon([(16, y), (4, y + 30), (28, y + 30)], fill=C["forest_dark"])
         d.polygon([(W - 16, y), (W - 28, y + 30), (W - 4, y + 30)], fill=C["forest_dark"])
 
@@ -539,7 +619,8 @@ def draw_waterfall_and_river(d):
                 (28, 72, 112), anchor="mm")
     river_path = [
         (1165, 285), (1130, 360), (1085, 440), (1060, 530), (1080, 620),
-        (1120, 700), (1180, 760), (1260, 800), (1340, 820),
+        (1120, 700), (1180, 760), (1260, 820), (1340, 900), (1420, 970),
+        (1520, 1010), (1600, 1030),
     ]
     for i in range(len(river_path) - 1):
         d.line([river_path[i], river_path[i + 1]], fill=C["river"], width=34)
@@ -780,7 +861,7 @@ def draw_clock_tower(d):
 
 
 def draw_beacon(d):
-    bx, by = 1240, 770
+    bx, by = 1380, 870
     d.polygon([(bx, by), (bx + 44, by), (bx + 40, by + 100), (bx + 4, by + 100)],
               fill=(224, 224, 224), outline=C["stone_dark"], width=2)
     d.rectangle([bx + 4, by + 24, bx + 40, by + 40], fill=C["roof_red"])
@@ -1252,15 +1333,16 @@ def draw_player_spawn(d):
 
 
 def draw_beach_and_sea(d):
-    d.rectangle([46, 880, W - 46, 930], fill=C["sand"])
-    d.rectangle([46, 880, W - 46, 892], fill=C["sand_dark"])
+    d.rectangle([46, 980, W - 46, 1030], fill=C["sand"])
+    d.rectangle([46, 980, W - 46, 992], fill=C["sand_dark"])
     for sx, sc in [(140, (245, 182, 196)), (300, (231, 224, 195)), (520, (196, 202, 215)),
-                   (810, (245, 216, 176)), (970, (255, 217, 230)), (1130, (212, 234, 224))]:
-        d.ellipse([sx - 5, 905, sx + 5, 913], fill=sc, outline=C["text"], width=1)
+                   (810, (245, 216, 176)), (970, (255, 217, 230)), (1130, (212, 234, 224)),
+                   (1340, (245, 196, 196)), (1500, (215, 216, 232))]:
+        d.ellipse([sx - 5, 1005, sx + 5, 1013], fill=sc, outline=C["text"], width=1)
     for gx in range(90, W - 80, 86):
-        d.line([(gx, 900), (gx - 3, 893)], fill=(122, 138, 58), width=1)
-        d.line([(gx, 900), (gx + 3, 893)], fill=(122, 138, 58), width=1)
-    dx, dy = 880, 884
+        d.line([(gx, 1000), (gx - 3, 993)], fill=(122, 138, 58), width=1)
+        d.line([(gx, 1000), (gx + 3, 993)], fill=(122, 138, 58), width=1)
+    dx, dy = 880, 984
     d.rectangle([dx, dy, dx + 90, dy + 20], fill=(156, 122, 74), outline=C["wood_dark"], width=2)
     for px in [dx + 10, dx + 35, dx + 60, dx + 84]:
         d.line([(px, dy), (px, dy + 20)], fill=C["wood_dark"], width=1)
@@ -1268,11 +1350,497 @@ def draw_beach_and_sea(d):
     d.line([(dx + 112, dy - 26), (dx + 120, dy + 20)], fill=(255, 255, 255), width=1)
     d.ellipse([dx + 117, dy + 16, dx + 123, dy + 22], fill=(245, 182, 196), outline=C["text"], width=1)
     d.text((dx + 45, dy + 38), "Fishing Dock", font=load_font(12, bold=True), fill=C["text"], anchor="mm")
-    d.rectangle([46, 930, W - 46, H], fill=C["sea"])
-    d.rectangle([46, 930, W - 46, 938], fill=C["sea_light"])
-    for ry in [950, 962, 974]:
+    d.rectangle([46, 1030, W - 46, H], fill=C["sea"])
+    d.rectangle([46, 1030, W - 46, 1038], fill=C["sea_light"])
+    for ry in [1050, 1062, 1074]:
         for rx in range(60, W - 60, 24):
             d.arc([rx, ry - 2, rx + 12, ry + 2], 180, 360, fill=(255, 255, 255), width=1)
+
+
+# ============================================================================
+# CASTLE — large keep on a NE hill (no, sorry, NW would conflict with mountains).
+# Sit it on a hill in the east edge above the bridge.
+# ============================================================================
+
+def draw_castle(d):
+    """Huge stone castle on an elevated rise east of the valley.
+    Square keep + 4 corner towers + curtain walls + gatehouse + banners."""
+    # Hill platform (light green oval beneath the castle)
+    d.ellipse([1280, 200, 1600, 380], fill=(132, 168, 96), outline=(96, 130, 64), width=2)
+    d.ellipse([1290, 220, 1590, 360], fill=(148, 184, 110))
+
+    # Curtain wall (the outer fortification)
+    wall_x1, wall_y1, wall_x2, wall_y2 = 1310, 240, 1580, 350
+    d.rectangle([wall_x1, wall_y1, wall_x2, wall_y2],
+                fill=C["castle_stone"], outline=C["castle_stone_dark"], width=2)
+    # Crenellations along the top of the curtain wall
+    for cx in range(wall_x1, wall_x2 - 4, 10):
+        d.rectangle([cx, wall_y1 - 6, cx + 6, wall_y1], fill=C["castle_stone"], outline=C["castle_stone_dark"], width=1)
+
+    # 4 corner towers (taller than walls, pointed roofs)
+    corners = [(wall_x1, wall_y1), (wall_x2, wall_y1),
+               (wall_x1, wall_y2), (wall_x2, wall_y2)]
+    for cx, cy in corners:
+        # Tower base
+        d.rectangle([cx - 14, cy - 36, cx + 14, cy + 14],
+                    fill=C["castle_stone"], outline=C["castle_stone_dark"], width=2)
+        # Slim arrow-slit window
+        d.rectangle([cx - 2, cy - 28, cx + 2, cy - 16], fill=C["stone_dark"])
+        # Pointed roof
+        d.polygon([(cx - 16, cy - 36), (cx, cy - 64), (cx + 16, cy - 36)],
+                  fill=C["castle_roof"], outline=C["castle_roof_dark"], width=2)
+        # Banner pole + banner
+        d.line([(cx, cy - 64), (cx, cy - 86)], fill=C["wood_dark"], width=2)
+        d.polygon([(cx, cy - 84), (cx + 14, cy - 80), (cx, cy - 74)],
+                  fill=C["banner"], outline=C["castle_roof_dark"], width=1)
+
+    # Central keep (taller, larger)
+    keep_x, keep_y, keep_w, keep_h = 1410, 230, 80, 100
+    d.rectangle([keep_x, keep_y, keep_x + keep_w, keep_y + keep_h],
+                fill=C["castle_stone"], outline=C["castle_stone_dark"], width=2)
+    # Crenellations on keep
+    for cx in range(keep_x, keep_x + keep_w - 4, 9):
+        d.rectangle([cx, keep_y - 6, cx + 5, keep_y], fill=C["castle_stone"], outline=C["castle_stone_dark"], width=1)
+    # Big arched window
+    d.chord([keep_x + 30, keep_y + 26, keep_x + 50, keep_y + 60], 180, 360,
+            fill=C["stained_glass"], outline=C["castle_stone_dark"], width=1)
+    d.rectangle([keep_x + 30, keep_y + 43, keep_x + 50, keep_y + 60],
+                fill=C["stained_glass"], outline=C["castle_stone_dark"], width=1)
+    # Cross frame
+    d.line([(keep_x + 40, keep_y + 26), (keep_x + 40, keep_y + 60)], fill=C["castle_stone_dark"], width=1)
+    d.line([(keep_x + 30, keep_y + 43), (keep_x + 50, keep_y + 43)], fill=C["castle_stone_dark"], width=1)
+    # Smaller side windows
+    d.rectangle([keep_x + 10, keep_y + 36, keep_x + 20, keep_y + 54], fill=C["window"], outline=C["castle_stone_dark"], width=1)
+    d.rectangle([keep_x + 60, keep_y + 36, keep_x + 70, keep_y + 54], fill=C["window"], outline=C["castle_stone_dark"], width=1)
+    # Keep roof (taller pointed)
+    d.polygon([(keep_x - 4, keep_y), (keep_x + keep_w // 2, keep_y - 44),
+               (keep_x + keep_w + 4, keep_y)],
+              fill=C["castle_roof"], outline=C["castle_roof_dark"], width=2)
+    # Central banner (gold) on keep
+    d.line([(keep_x + keep_w // 2, keep_y - 44), (keep_x + keep_w // 2, keep_y - 70)],
+           fill=C["wood_dark"], width=2)
+    d.polygon([(keep_x + keep_w // 2, keep_y - 68),
+               (keep_x + keep_w // 2 + 22, keep_y - 62),
+               (keep_x + keep_w // 2, keep_y - 56)],
+              fill=C["banner_gold"], outline=C["castle_roof_dark"], width=1)
+
+    # Gatehouse on south wall (toward the town)
+    gh_x = 1440
+    gh_y = wall_y2 - 4
+    d.rectangle([gh_x - 18, gh_y - 30, gh_x + 18, gh_y + 22],
+                fill=C["castle_stone"], outline=C["castle_stone_dark"], width=2)
+    # Portcullis arched opening
+    d.chord([gh_x - 12, gh_y - 8, gh_x + 12, gh_y + 22], 180, 360,
+            fill=C["wood_dark"], outline=C["castle_stone_dark"], width=2)
+    d.rectangle([gh_x - 12, gh_y + 6, gh_x + 12, gh_y + 22], fill=C["wood_dark"])
+    # Portcullis bars
+    for bx in range(-10, 11, 4):
+        d.line([(gh_x + bx, gh_y - 4), (gh_x + bx, gh_y + 20)], fill=(110, 110, 110), width=1)
+    # Drawbridge (lowered down the hill)
+    d.polygon([(gh_x - 12, gh_y + 22), (gh_x + 12, gh_y + 22),
+               (gh_x + 6, gh_y + 56), (gh_x - 6, gh_y + 56)],
+              fill=C["wood"], outline=C["wood_dark"], width=1)
+    # Two flanking gate-towers (smaller than corners but flanking arch)
+    for tx in [gh_x - 26, gh_x + 26]:
+        d.rectangle([tx - 6, gh_y - 36, tx + 6, gh_y + 22],
+                    fill=C["castle_stone"], outline=C["castle_stone_dark"], width=1)
+        d.polygon([(tx - 8, gh_y - 36), (tx, gh_y - 50), (tx + 8, gh_y - 36)],
+                  fill=C["castle_roof"], outline=C["castle_roof_dark"], width=1)
+
+    # Castle approach path winding from town to the drawbridge
+    pts = [(1200, 460), (1260, 420), (1330, 400), (1400, 390), (1440, 410)]
+    for i in range(len(pts) - 1):
+        d.line([pts[i], pts[i + 1]], fill=C["path_dark"], width=14)
+    for i in range(len(pts) - 1):
+        d.line([pts[i], pts[i + 1]], fill=C["path"], width=10)
+
+    # Label
+    text_shadow(d, (1440, 180), "Aetherveil Keep",
+                load_font(16, bold=True), C["text_light"], anchor="mm")
+    text_shadow(d, (1440, 200), "ancestral seat", load_font(10), C["text_light"], anchor="mm")
+
+
+# ============================================================================
+# TOWN WALL — encircles the central built-up area. Crenellations + gate + towers.
+# ============================================================================
+
+# Wall corners (rough rectangle around: cherry grove + town + residential)
+WALL = (55, 360, 1100, 880)  # x1, y1, x2, y2
+
+
+def draw_town_wall(d):
+    """Stone wall with crenellations around the town. Has a south main gate
+    with portcullis + flanking gate towers, a small west postern gate, and
+    4 corner watchtowers."""
+    x1, y1, x2, y2 = WALL
+
+    # Wall segments (outer band). Top, bottom, left, right. Leave gaps for gates.
+    wall_thickness = 10
+    # Top wall (one continuous, no gate)
+    d.rectangle([x1, y1 - wall_thickness, x2, y1],
+                fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+    # Bottom wall: leave a gap for main gate centered around x=600 (width 80)
+    gate_cx = 620
+    gate_w = 80
+    # Bottom wall left of gate
+    d.rectangle([x1, y2, gate_cx - gate_w // 2, y2 + wall_thickness],
+                fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+    # Bottom wall right of gate
+    d.rectangle([gate_cx + gate_w // 2, y2, x2, y2 + wall_thickness],
+                fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+    # Left wall: leave small postern gap around y=720 (width 50)
+    post_cy = 720
+    post_w = 50
+    d.rectangle([x1 - wall_thickness, y1, x1, post_cy - post_w // 2],
+                fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+    d.rectangle([x1 - wall_thickness, post_cy + post_w // 2, x1, y2],
+                fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+    # Right wall (continuous; the river acts as the eastern barrier already)
+    d.rectangle([x2, y1, x2 + wall_thickness, y2],
+                fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+
+    # Crenellations -- small notches standing above the outer top edge of each wall segment.
+    def crens_h(xs, xe, top_y):
+        for cx in range(int(xs), int(xe) - 4, 12):
+            d.rectangle([cx, top_y - 6, cx + 6, top_y],
+                        fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+
+    crens_h(x1 + 4, x2, y1 - wall_thickness)
+    crens_h(x1 + 4, gate_cx - gate_w // 2, y2 + wall_thickness)
+    crens_h(gate_cx + gate_w // 2 + 4, x2, y2 + wall_thickness)
+
+    # Corner watchtowers (4)
+    for (cx, cy) in [(x1, y1), (x2, y1), (x1, y2), (x2, y2)]:
+        d.rectangle([cx - 14, cy - 14, cx + 14, cy + 14],
+                    fill=C["wall_stone"], outline=C["wall_stone_dark"], width=2)
+        # Arrow-slit window
+        d.rectangle([cx - 2, cy - 6, cx + 2, cy + 4], fill=C["stone_dark"])
+        # Conical hat-roof
+        d.polygon([(cx - 16, cy - 14), (cx, cy - 34), (cx + 16, cy - 14)],
+                  fill=C["castle_roof"], outline=C["castle_roof_dark"], width=1)
+        # Pennant
+        d.line([(cx, cy - 34), (cx, cy - 46)], fill=C["wood_dark"], width=1)
+        d.polygon([(cx, cy - 44), (cx + 10, cy - 41), (cx, cy - 38)],
+                  fill=C["banner"], outline=C["castle_roof_dark"], width=1)
+
+    # Main south gate (flanked by 2 taller gate-towers, portcullis archway)
+    # Gate towers
+    for tx in [gate_cx - gate_w // 2 - 4, gate_cx + gate_w // 2 + 4]:
+        d.rectangle([tx - 12, y2 - 30, tx + 12, y2 + wall_thickness + 10],
+                    fill=C["wall_stone"], outline=C["wall_stone_dark"], width=2)
+        # Slit
+        d.rectangle([tx - 2, y2 - 22, tx + 2, y2 - 10], fill=C["stone_dark"])
+        # Crenellated top
+        for cx in range(tx - 10, tx + 6, 4):
+            d.rectangle([cx, y2 - 36, cx + 2, y2 - 30], fill=C["wall_stone"], outline=C["wall_stone_dark"], width=1)
+        # Pennant
+        d.line([(tx, y2 - 36), (tx, y2 - 50)], fill=C["wood_dark"], width=1)
+        d.polygon([(tx, y2 - 48), (tx + 11, y2 - 45), (tx, y2 - 42)],
+                  fill=C["banner_gold"], outline=C["castle_roof_dark"], width=1)
+    # Arched gate opening
+    d.chord([gate_cx - gate_w // 2, y2 - 8, gate_cx + gate_w // 2, y2 + wall_thickness + 30],
+            180, 360, fill=(48, 36, 24), outline=C["wall_stone_dark"], width=2)
+    d.rectangle([gate_cx - gate_w // 2, y2 + 14, gate_cx + gate_w // 2, y2 + wall_thickness + 30],
+                fill=(48, 36, 24))
+    # Portcullis bars
+    for bx in range(gate_cx - gate_w // 2 + 6, gate_cx + gate_w // 2, 8):
+        d.line([(bx, y2 - 4), (bx, y2 + wall_thickness + 28)],
+               fill=(140, 140, 140), width=1)
+    for by in [y2 + 6, y2 + 18]:
+        d.line([(gate_cx - gate_w // 2 + 4, by), (gate_cx + gate_w // 2 - 4, by)],
+               fill=(140, 140, 140), width=1)
+    # Gate sign
+    d.rectangle([gate_cx - 50, y2 + 44, gate_cx + 50, y2 + 60],
+                fill=C["label_bg"], outline=C["wood_dark"], width=1)
+    d.text((gate_cx, y2 + 52), "GREAT GATE", font=load_font(10, bold=True),
+           fill=C["text"], anchor="mm")
+
+    # Postern gate (small west door)
+    d.rectangle([x1 - wall_thickness, post_cy - post_w // 2,
+                 x1, post_cy + post_w // 2], fill=(48, 36, 24))
+    d.chord([x1 - wall_thickness, post_cy - post_w // 2,
+             x1 + 6, post_cy + post_w // 2], 90, 270,
+            fill=(48, 36, 24), outline=C["wall_stone_dark"], width=1)
+    d.text((x1 - 30, post_cy), "postern", font=load_font(8),
+           fill=C["text"], anchor="mm")
+
+
+# ============================================================================
+# CATHEDRAL — large stone church inside the walls
+# ============================================================================
+
+def draw_cathedral(d):
+    """Cathedral of Whisperleaf-on-the-Hill. Stone body + tall steeple +
+    rose window + arched stained-glass windows."""
+    x, y, w, h = 770, 250, 130, 180
+    d.rectangle([x, y + 30, x + w, y + h], fill=C["cathedral_stone"],
+                outline=C["castle_stone_dark"], width=2)
+    d.polygon([(x - 6, y + 30), (x + w // 2, y - 10), (x + w + 6, y + 30)],
+              fill=C["castle_roof"], outline=C["castle_roof_dark"], width=2)
+    # Rose window
+    cxw, cyw = x + w // 2, y + 56
+    d.ellipse([cxw - 18, cyw - 18, cxw + 18, cyw + 18],
+              fill=C["stained_glass"], outline=C["castle_stone_dark"], width=2)
+    d.ellipse([cxw - 10, cyw - 10, cxw + 10, cyw + 10], fill=(200, 160, 220))
+    d.line([(cxw - 18, cyw), (cxw + 18, cyw)], fill=C["castle_stone_dark"], width=1)
+    d.line([(cxw, cyw - 18), (cxw, cyw + 18)], fill=C["castle_stone_dark"], width=1)
+    # Tall arched stained-glass windows
+    for wx in [x + 14, x + w - 30]:
+        d.chord([wx, y + 84, wx + 16, y + 130], 180, 360,
+                fill=C["stained_glass"], outline=C["castle_stone_dark"], width=1)
+        d.rectangle([wx, y + 107, wx + 16, y + 130],
+                    fill=C["stained_glass"], outline=C["castle_stone_dark"], width=1)
+    # Arched door
+    d.chord([x + w // 2 - 14, y + h - 50, x + w // 2 + 14, y + h - 4], 180, 360,
+            fill=C["door_dark"], outline=C["castle_stone_dark"], width=2)
+    d.rectangle([x + w // 2 - 14, y + h - 27, x + w // 2 + 14, y + h - 4],
+                fill=C["door_dark"])
+    # Steeple
+    sx, sy, sw, sh = x + w + 8, y + 50, 36, 130
+    d.rectangle([sx, sy, sx + sw, sy + sh], fill=C["cathedral_stone"],
+                outline=C["castle_stone_dark"], width=2)
+    d.chord([sx + 8, sy + 30, sx + sw - 8, sy + 60], 180, 360,
+            fill=C["stained_glass"], outline=C["castle_stone_dark"], width=1)
+    d.rectangle([sx + 8, sy + 45, sx + sw - 8, sy + 60],
+                fill=C["stained_glass"], outline=C["castle_stone_dark"], width=1)
+    d.polygon([(sx - 4, sy), (sx + sw // 2, sy - 60), (sx + sw + 4, sy)],
+              fill=C["castle_roof"], outline=C["castle_roof_dark"], width=2)
+    d.line([(sx + sw // 2, sy - 60), (sx + sw // 2, sy - 76)], fill=C["bell_brass"], width=2)
+    d.line([(sx + sw // 2 - 4, sy - 70), (sx + sw // 2 + 4, sy - 70)], fill=C["bell_brass"], width=2)
+    # Label
+    d.rectangle([x - 4, y + h + 6, x + w + sw + 12, y + h + 30],
+                fill=C["label_bg"], outline=C["castle_stone_dark"], width=1)
+    d.text((x + (w + sw) // 2, y + h + 14), "CATHEDRAL",
+           font=load_font(13, bold=True), fill=C["text"], anchor="mm")
+    d.text((x + (w + sw) // 2, y + h + 25), "of Whisperleaf-on-the-Hill",
+           font=load_font(10), fill=C["text"], anchor="mm")
+
+
+# ============================================================================
+# ADVENTURER'S GUILD HALL — 2-story with heraldic shield
+# ============================================================================
+
+def draw_guild_hall(d):
+    """The Adventurer's Guild — 2-story timber. Shield over the door."""
+    x, y, w, h = 740, 920, 140, 90
+    roof_h = 22
+    upper_h = 32
+    d.polygon([(x - 4, y + roof_h), (x + w // 2, y - 4), (x + w + 4, y + roof_h)],
+              fill=C["roof_dark_red"], outline=C["wood_dark"], width=2)
+    d.rectangle([x - 2, y + roof_h, x + w + 2, y + roof_h + upper_h],
+                fill=(178, 122, 80), outline=C["wood_dark"], width=2)
+    for i in range(3):
+        wx = x + 12 + i * ((w - 24) // 3)
+        d.rectangle([wx, y + roof_h + 6, wx + (w - 24) // 3 - 8,
+                     y + roof_h + upper_h - 6],
+                    fill=C["window"], outline=C["wood_dark"], width=1)
+    g_y = y + roof_h + upper_h
+    d.rectangle([x, g_y, x + w, y + h], fill=(138, 90, 59),
+                outline=C["wood_dark"], width=2)
+    d.rectangle([x + w // 2 - 14, y + h - 30, x + w // 2 + 14, y + h], fill=C["wood_dark"])
+    d.line([(x + w // 2, y + h - 30), (x + w // 2, y + h)], fill=(46, 30, 16), width=1)
+    d.rectangle([x + 8, g_y + 6, x + 28, g_y + 24], fill=C["window"], outline=C["wood_dark"], width=1)
+    d.rectangle([x + w - 28, g_y + 6, x + w - 8, g_y + 24],
+                fill=C["window"], outline=C["wood_dark"], width=1)
+    # Heraldic shield above the door
+    sh_cx, sh_cy = x + w // 2, g_y + 4
+    d.polygon([(sh_cx - 12, sh_cy - 4), (sh_cx + 12, sh_cy - 4),
+               (sh_cx + 12, sh_cy + 8), (sh_cx, sh_cy + 18),
+               (sh_cx - 12, sh_cy + 8)],
+              fill=C["banner_gold"], outline=C["castle_roof_dark"], width=2)
+    d.line([(sh_cx - 8, sh_cy + 2), (sh_cx + 8, sh_cy + 14)],
+           fill=C["stone_dark"], width=2)
+    d.line([(sh_cx + 8, sh_cy + 2), (sh_cx - 8, sh_cy + 14)],
+           fill=C["stone_dark"], width=2)
+    d.rectangle([x - 2, y + h + 6, x + w + 2, y + h + 30],
+                fill=C["label_bg"], outline=C["wood_dark"], width=1)
+    d.text((x + w // 2, y + h + 14), "ADVENTURER'S GUILD",
+           font=load_font(12, bold=True), fill=C["text"], anchor="mm")
+    d.text((x + w // 2, y + h + 25), "post a vigil · take a job",
+           font=load_font(10), fill=C["text"], anchor="mm")
+
+
+# ============================================================================
+# CEMETERY — gravestones in fenced plot
+# ============================================================================
+
+def draw_cemetery(d):
+    x, y, w, h = 80, 900, 180, 80
+    d.rectangle([x, y, x + w, y + h], fill=(110, 140, 80),
+                outline=C["wood_dark"], width=1)
+    for fx in range(x, x + w, 8):
+        d.rectangle([fx + 2, y - 10, fx + 4, y], fill=C["iron"])
+    d.line([(x, y - 4), (x + w, y - 4)], fill=C["iron"], width=1)
+    graves = [
+        (x + 16, y + 18, "round"), (x + 42, y + 22, "tablet"),
+        (x + 70, y + 16, "cross"), (x + 100, y + 26, "tablet"),
+        (x + 130, y + 18, "round"), (x + 160, y + 24, "cross"),
+        (x + 30, y + 52, "tablet"), (x + 80, y + 56, "round"),
+        (x + 120, y + 50, "tablet"), (x + 158, y + 56, "cross"),
+    ]
+    for gx, gy, kind in graves:
+        if kind == "round":
+            d.rectangle([gx - 6, gy + 4, gx + 6, gy + 18], fill=C["grave"], outline=C["stone_dark"], width=1)
+            d.chord([gx - 6, gy - 2, gx + 6, gy + 10], 180, 360, fill=C["grave"], outline=C["stone_dark"], width=1)
+        elif kind == "cross":
+            d.rectangle([gx - 1, gy, gx + 1, gy + 20], fill=C["grave"], outline=C["stone_dark"], width=1)
+            d.rectangle([gx - 6, gy + 4, gx + 6, gy + 8], fill=C["grave"], outline=C["stone_dark"], width=1)
+        else:
+            d.rectangle([gx - 5, gy, gx + 5, gy + 18], fill=C["grave"], outline=C["stone_dark"], width=1)
+            d.line([(gx - 3, gy + 6), (gx + 3, gy + 6)], fill=C["stone_dark"], width=1)
+    # Weeping willow at one corner
+    d.rectangle([x + 8, y + 65, x + 12, y + 80], fill=C["wood_dark"])
+    d.ellipse([x - 4, y + 56, x + 24, y + 78], fill=(110, 152, 78), outline=(70, 100, 50), width=1)
+    d.text((x + w // 2, y - 22), "Quiet Grove", font=load_font(11, bold=True),
+           fill=C["text"], anchor="mm")
+    d.text((x + w // 2, y - 8), "those who tended the village", font=load_font(9),
+           fill=C["text"], anchor="mm")
+
+
+# ============================================================================
+# STABLES + a free horse
+# ============================================================================
+
+def horse_free(d, x, y, color=(134, 88, 56)):
+    d.ellipse([x - 14, y - 14, x + 14, y - 4], fill=color, outline=C["wood_dark"], width=1)
+    d.polygon([(x + 10, y - 14), (x + 22, y - 22), (x + 22, y - 8),
+               (x + 14, y - 6)], fill=color, outline=C["wood_dark"], width=1)
+    d.line([(x + 14, y - 18), (x + 12, y - 12)], fill=(46, 30, 16), width=1)
+    for dx in [-10, -2, 6, 12]:
+        d.rectangle([x + dx, y - 8, x + dx + 2, y], fill=color, outline=C["wood_dark"], width=1)
+    d.line([(x - 14, y - 12), (x - 22, y - 6)], fill=(46, 30, 16), width=2)
+
+
+def draw_stables(d):
+    x, y, w, h = 280, 920, 220, 70
+    d.polygon([(x - 4, y + 18), (x + w // 2, y), (x + w + 4, y + 18)],
+              fill=C["wood_dark"], outline=(40, 25, 16), width=2)
+    d.rectangle([x, y + 18, x + w, y + h], fill=(160, 122, 80),
+                outline=C["wood_dark"], width=2)
+    horse_colors = [C["horse_brown"], C["horse_white"], C["horse_brown"],
+                    (90, 70, 56), C["horse_white"]]
+    for i, hc in enumerate(horse_colors):
+        sx = x + 12 + i * 40
+        d.rectangle([sx, y + 22, sx + 24, y + h - 8],
+                    fill=(60, 38, 22), outline=C["wood_dark"], width=1)
+        d.ellipse([sx + 4, y + 28, sx + 20, y + 44], fill=hc, outline=C["wood_dark"], width=1)
+        d.line([(sx + 12, y + 26), (sx + 12, y + 36)], fill=(46, 30, 16), width=2)
+        d.polygon([(sx + 6, y + 28), (sx + 4, y + 24), (sx + 8, y + 28)], fill=hc, outline=C["wood_dark"], width=1)
+        d.polygon([(sx + 18, y + 28), (sx + 16, y + 24), (sx + 20, y + 28)], fill=hc, outline=C["wood_dark"], width=1)
+        d.ellipse([sx + 12, y + 32, sx + 15, y + 35], fill=C["text"])
+    d.rectangle([x + w + 8, y + 38, x + w + 11, y + h + 6], fill=C["wood_dark"])
+    d.rectangle([x + w + 8, y + 38, x + w + 30, y + 41], fill=C["wood_dark"])
+    horse_free(d, x + w + 36, y + h + 4, C["horse_brown"])
+    d.text((x + w // 2, y + h + 18), "Stables",
+           font=load_font(11, bold=True), fill=C["text"], anchor="mm")
+    d.text((x + w // 2, y + h + 30), "rest the road's mounts",
+           font=load_font(9), fill=C["text"], anchor="mm")
+
+
+# ============================================================================
+# WHEAT FIELDS + SCARECROW
+# ============================================================================
+
+def draw_wheat_fields(d):
+    patches = [
+        (560, 900, 140, 60),
+        (1110, 880, 180, 70),
+        (1300, 920, 180, 60),
+    ]
+    for px, py, pw, ph in patches:
+        d.rectangle([px, py, px + pw, py + ph], fill=C["wheat_dark"],
+                    outline=C["wood_dark"], width=1)
+        d.rectangle([px + 2, py + 2, px + pw - 2, py + ph - 2], fill=C["wheat"])
+        for sxx in range(px + 5, px + pw - 5, 6):
+            for syy in range(py + 5, py + ph - 5, 7):
+                d.line([(sxx, syy), (sxx, syy + 5)], fill=C["wheat_dark"], width=1)
+                d.line([(sxx, syy), (sxx - 1, syy + 2)], fill=C["wheat_dark"], width=1)
+                d.line([(sxx, syy), (sxx + 1, syy + 2)], fill=C["wheat_dark"], width=1)
+    # Scarecrow in middle patch
+    sx, sy = 630, 910
+    d.rectangle([sx - 1, sy, sx + 1, sy + 36], fill=C["wood_dark"])
+    d.rectangle([sx - 14, sy + 6, sx + 14, sy + 8], fill=C["wood_dark"])
+    d.ellipse([sx - 5, sy - 4, sx + 5, sy + 4], fill=(232, 208, 168), outline=C["wood_dark"], width=1)
+    d.ellipse([sx - 2, sy - 2, sx - 1, sy - 1], fill=C["text"])
+    d.ellipse([sx + 1, sy - 2, sx + 2, sy - 1], fill=C["text"])
+    d.polygon([(sx - 6, sy - 4), (sx + 6, sy - 4), (sx + 4, sy - 8), (sx - 4, sy - 8)],
+              fill=C["roof_brown"], outline=C["wood_dark"], width=1)
+    d.rectangle([sx - 8, sy - 4, sx + 8, sy - 2], fill=C["roof_brown"])
+    # Crow on the post
+    d.ellipse([sx - 4, sy - 14, sx + 4, sy - 8], fill=(36, 26, 22))
+    d.polygon([(sx + 4, sy - 12), (sx + 8, sy - 11), (sx + 4, sy - 10)], fill=(220, 160, 60))
+
+
+# ============================================================================
+# EXTRA WOODEN BRIDGES (siblings of the stone bridge)
+# ============================================================================
+
+def draw_wooden_bridge(d, x, y, length=70):
+    d.rectangle([x, y, x + length, y + 8], fill=C["wood"], outline=C["wood_dark"], width=1)
+    for px in range(x, x + length, 8):
+        d.line([(px, y), (px, y + 8)], fill=C["wood_dark"], width=1)
+    d.rectangle([x - 2, y - 14, x + 2, y + 2], fill=C["wood_dark"])
+    d.rectangle([x + length - 2, y - 14, x + length + 2, y + 2], fill=C["wood_dark"])
+    d.line([(x, y - 10), (x + length, y - 10)], fill=C["wood_dark"], width=1)
+
+
+def draw_extra_bridges(d):
+    # 1) Wooden bridge across small creek into the cherry grove
+    d.line([(60, 350), (220, 360), (340, 380)], fill=C["river"], width=12)
+    d.line([(60, 350), (220, 360), (340, 380)], fill=C["river_light"], width=8)
+    draw_wooden_bridge(d, 220, 354, length=60)
+    # 2) Footbridge across runoff stream south of windmill
+    d.line([(840, 900), (940, 920), (1020, 940)], fill=C["river"], width=10)
+    d.line([(840, 900), (940, 920), (1020, 940)], fill=C["river_light"], width=6)
+    draw_wooden_bridge(d, 880, 904, length=70)
+
+
+# ============================================================================
+# CARTS + EXTRA NPCs (guards, farmers, monks, travelers)
+# ============================================================================
+
+def cart(d, x, y, cargo_color=(178, 132, 80)):
+    d.rectangle([x, y, x + 28, y + 14], fill=C["wood"], outline=C["wood_dark"], width=1)
+    d.rectangle([x + 2, y - 4, x + 26, y], fill=cargo_color, outline=C["wood_dark"], width=1)
+    d.ellipse([x - 2, y + 12, x + 8, y + 22], fill=C["wood_dark"])
+    d.ellipse([x + 20, y + 12, x + 30, y + 22], fill=C["wood_dark"])
+    d.ellipse([x - 1, y + 13, x + 7, y + 21], fill=(120, 80, 40))
+    d.ellipse([x + 21, y + 13, x + 29, y + 21], fill=(120, 80, 40))
+
+
+def draw_extra_npcs_and_carts(d):
+    # Wall guards
+    npc(d, 580, 870, C["castle_roof"], hat="brim")
+    npc(d, 660, 870, C["castle_roof"], hat="brim")
+    npc(d, 1100, 360, C["castle_roof"], hat="brim")
+    npc(d, 60, 360, C["castle_roof"], hat="brim")
+    # Castle guards
+    npc(d, 1340, 410, (170, 170, 170), hat="brim")
+    npc(d, 1400, 420, (170, 170, 170), hat="brim")
+    # Monks near cathedral
+    npc(d, 830, 440, (108, 88, 64))
+    npc(d, 870, 444, (108, 88, 64))
+    # Farmers in wheat
+    npc(d, 1180, 920, C["npc_brown"], hat="brim")
+    npc(d, 1380, 950, C["npc_brown"], hat="brim")
+    # Travelers approaching the great gate
+    npc(d, 600, 950, C["npc_blue"])
+    npc(d, 640, 956, C["npc_violet"])
+    # Cemetery mourner
+    npc(d, 170, 940, (96, 96, 110))
+    # Carts
+    cart(d, 700, 960, cargo_color=C["hay"])
+    cart(d, 1280, 420, cargo_color=C["wheat"])
+
+
+# ============================================================================
+# MORE WELLS (siblings)
+# ============================================================================
+
+def draw_more_wells(d):
+    well(d, 900, 480)
+    well(d, 420, 960)
+    well(d, 200, 970)
 
 
 # ============================================================================
@@ -1293,7 +1861,7 @@ def draw_compass(d):
 
 
 def draw_legend(d):
-    x, y, w, h = 56, 940, 360, 56
+    x, y, w, h = 56, 1040, 380, 56
     d.rectangle([x, y, x + w, y + h], fill=C["legend_bg"], outline=(111, 67, 33), width=2)
     d.text((x + w // 2, y + 10), "Legend", font=load_font(12, bold=True), fill=C["text"], anchor="mm")
     rows = [
@@ -1329,48 +1897,70 @@ def main() -> int:
     img = Image.new("RGB", (W, H), C["grass_light"])
     d = ImageDraw.Draw(img)
 
+    # === Backdrop layers ===
     draw_base_ground(d)
+    draw_mountains_and_sky(d)
     draw_forest_border(d)
 
+    # === Paths + water (below buildings) ===
     draw_paths(d)
     draw_inner_trees(d)
-
     draw_waterfall_and_river(d)
     draw_bridge(d)
+    draw_extra_bridges(d)
 
+    # === Atmospheric region ===
     draw_cherry_grove(d)
 
-    draw_filler_houses(d)
+    # === Outskirts (outside the town wall) ===
+    draw_wheat_fields(d)
+    draw_cemetery(d)
+    draw_stables(d)
+    draw_guild_hall(d)
 
+    # === Filler houses + decoration inside / around town ===
+    draw_filler_houses(d)
     draw_wells(d)
+    draw_more_wells(d)
     draw_benches_out(d)
     draw_veggie_gardens(d)
     draw_fences(d)
     draw_misc_props(d)
 
-    # Named portfolio buildings around the plaza
+    # === Named portfolio buildings around the plaza ===
     draw_atelier(d)
     draw_quest_board(d)
     draw_vaults(d)
     draw_forge(d)
+    draw_cathedral(d)
     draw_inn(d)
     draw_windmill(d)
     draw_clock_tower(d)
 
-    # THE PLAZA & ITS BUSINESS CENTER
+    # === Plaza + business center ===
     draw_town_square_plaza(d)
     draw_plaza_shops(d)
     draw_bell_tower(d)
 
+    # === Residential lane + spawn ===
     draw_weird_houses(d)
     draw_player_spawn(d)
 
-    # PEOPLE
-    draw_people(d)
+    # === Town wall (drawn AFTER buildings so the wall encloses on top) ===
+    draw_town_wall(d)
 
+    # === Castle on the NE hill (drawn last to sit above background) ===
+    draw_castle(d)
+
+    # === People & carts ===
+    draw_people(d)
+    draw_extra_npcs_and_carts(d)
+
+    # === Beach + sea + beacon ===
     draw_beach_and_sea(d)
     draw_beacon(d)
 
+    # === Overlays ===
     draw_compass(d)
     draw_legend(d)
     draw_title(d)
