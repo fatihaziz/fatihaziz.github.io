@@ -1,45 +1,31 @@
 # Documentation Index
 
-This directory contains the complete documentation for the RPG Village Portfolio project, organized into focused sections for better navigation and maintainability.
+Personal portfolio at **fatihaziz.com** — a 3D interactive village built with Nuxt 3 + TresJS + Quaternius low-poly assets. Cinematic on-rails camera, Studio-Ghibli-adjacent mood.
 
-## 📁 Documentation Structure
+## Structure
 
-### 🏗️ [Architecture](./architecture/)
-Technical architecture and system design documentation.
+| Path | Purpose |
+|------|---------|
+| [spec/dream-village-3d.md](./spec/dream-village-3d.md) | **Source of truth.** Complete design + implementation spec for the 3D village. Read this first. |
+| [technical/project-setup.md](./technical/project-setup.md) | Local dev commands, dependencies, configuration |
+| [technical/deployment.md](./technical/deployment.md) | GitHub Pages deploy pipeline |
+| [development/guidelines.md](./development/guidelines.md) | Vue 3 / TypeScript / styling conventions |
 
-### 🎨 [Design](./design/) 
-RPG theme concepts, user experience design, and visual elements.
+## Active deliverable
 
-### 👨‍💻 [Development](./development/)
-Development workflows, guidelines, and implementation details.
+3D village at `/` with 5 routable building scenes:
 
-### 🔧 [Technical](./technical/)
-Technical specifications, configurations, and deployment guides.
+- `/` Hero panorama (village from elevated path, golden-hour mood)
+- `/workbench` Projects
+- `/armory` Skills
+- `/codex` Writings
+- `/hearth` About / journey
+- `/beacon` Contact
 
-## 🗂️ Quick Navigation
+All scenes built with TresJS declarative components. Asset source: Quaternius CC0 low-poly packs.
 
-| Section | Description | Key Files |
-|---------|-------------|-----------|
-| **Project Setup** | [technical/project-setup.md](./technical/project-setup.md) | Commands, dependencies, configuration |
-| **RPG Design System** | [design/rpg-theme.md](./design/rpg-theme.md) | Core theme, visual concepts, interactions |
-| **Component Architecture** | [architecture/components.md](./architecture/components.md) | Vue component structure and patterns |
-| **Development Guidelines** | [development/guidelines.md](./development/guidelines.md) | Coding standards and best practices |
-| **Interactive Mechanics** | [design/interactive-mechanics.md](./design/interactive-mechanics.md) | Detailed interaction designs |
-| **Deployment** | [technical/deployment.md](./technical/deployment.md) | GitHub Pages deployment process |
+See [spec/dream-village-3d.md](./spec/dream-village-3d.md) for full architecture, scene specs, camera narrative, asset list, perf plan, and implementation phases.
 
-## 🎯 Current Development Focus
+## History
 
-Currently implementing **Chapter I: Hero Section Interactive Elements** - Town Square discovery tutorial with parallax effects, interactive elements, and atmospheric controls.
-
-## 📝 Contributing to Documentation
-
-When updating documentation:
-1. Keep each file focused on a single topic
-2. Use clear headings and consistent formatting
-3. Include code examples where relevant
-4. Cross-reference related sections using relative links
-5. Update this index when adding new files
-
-## 🔄 Migration from CLAUDE.md
-
-This organized structure replaces the single large `CLAUDE.md` file for better maintainability and easier navigation. The original comprehensive content has been split into logical sections while preserving all information and context.
+Prior RPG-village iteration (parallax SVG / emoji approach) was scrapped — see git history before commit `26b74f7` if needed. Spec is the new ground truth; do not reference deleted docs.

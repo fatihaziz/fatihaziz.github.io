@@ -35,3 +35,8 @@ playwright-report
 # Claude Code local MCP store
 .claude/chain-context-mcp/
 .claude/chain-context/
+
+# Local SQLite stores
+*.db
+*.db-shm
+*.db-wal

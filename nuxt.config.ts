@@ -7,7 +7,10 @@ export default defineNuxtConfig({
     "~/assets/css/main.css", // Ensure this path is correct and the file exists
     ...getAllFontCssFiles(), // Ensure this function returns correct paths
   ],
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/color-mode"],
+  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/color-mode", "@tresjs/nuxt"],
+  build: {
+    transpile: ["three"],
+  },
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -33,6 +36,7 @@ export default defineNuxtConfig({
     optimizeDeps: {
       // Don't pre-bundle the manifest module -- it has the dead import that breaks resolution.
       exclude: ['nuxt/dist/app/composables/manifest.js'],
+      include: ['three'],
     },
   },
   app:{
