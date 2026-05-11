@@ -1,12 +1,15 @@
 import Phaser from 'phaser'
 
 /**
- * J.0 Boot scene. Shows a "Loading Aetherveil..." text and a progress bar
+ * J.0 Boot scene. Shows a "Loading Aetherveil..." title + progress bar
  * while preloading any registered assets, then transitions to the overworld.
  *
- * In J.0 we register a few sample Kenney atlases just to validate the
- * pipeline; the full tilemap arrives in J.1.
+ * Typography: Cinzel for the title (Roman/elven caps), Cormorant Garamond
+ * for body text (elegant serif, Frieren/Himmel vibe).
  */
+const FONT_TITLE = '"Cinzel", "Georgia", serif'
+const FONT_BODY = '"Cormorant Garamond", "Georgia", serif'
+
 export default class Boot extends Phaser.Scene {
   constructor() {
     super('Boot')
@@ -17,56 +20,43 @@ export default class Boot extends Phaser.Scene {
     const h = Number(this.game.config.height)
 
     // Title
-    this.add.text(w / 2, h / 2 - 80, 'AETHERVEIL', {
-      fontFamily: 'monospace',
-      fontSize: '56px',
+    this.add.text(w / 2, h / 2 - 90, 'AETHERVEIL', {
+      fontFamily: FONT_TITLE,
+      fontSize: '64px',
       color: '#3a2418',
-      fontStyle: 'bold',
-    }).setOrigin(0.5)
+      fontStyle: '700',
+    }).setOrigin(0.5).setResolution(2)
 
     this.add.text(w / 2, h / 2 - 30, 'preparing the valley...', {
-      fontFamily: 'monospace',
-      fontSize: '20px',
+      fontFamily: FONT_BODY,
+      fontSize: '24px',
       color: '#5a3826',
-    }).setOrigin(0.5)
+      fontStyle: 'italic',
+    }).setOrigin(0.5).setResolution(2)
 
     // Progress bar frame
     const frame = this.add.graphics()
     frame.lineStyle(2, 0x5a3826, 1)
-    frame.strokeRect(w / 2 - 220, h / 2 + 20, 440, 28)
+    frame.strokeRect(w / 2 - 220, h / 2 + 30, 440, 24)
 
     const bar = this.add.graphics()
-    const pctText = this.add.text(w / 2, h / 2 + 70, '0%', {
-      fontFamily: 'monospace',
-      fontSize: '14px',
+    const pctText = this.add.text(w / 2, h / 2 + 78, '0%', {
+      fontFamily: FONT_BODY,
+      fontSize: '18px',
       color: '#5a3826',
-    }).setOrigin(0.5)
+    }).setOrigin(0.5).setResolution(2)
 
     this.load.on('progress', (val: number) => {
       bar.clear()
       bar.fillStyle(0xa98758)
-      bar.fillRect(w / 2 - 216, h / 2 + 24, 432 * val, 20)
+      bar.fillRect(w / 2 - 216, h / 2 + 34, 432 * val, 16)
       pctText.setText(`${Math.round(val * 100)}%`)
     })
 
-    // Sample preload — one tile from Tiny Town to validate atlas pipeline.
-    // If the file is missing the scene still boots; we just show a warning.
-    this.load.image(
-      'sample-tile',
-      '/atlases/tiny-town/Tiles/tile_0046.png'
-    )
-
-    // Also load Tiny Town's packed tilemap (used for tilemap rendering in J.1)
-    this.load.image(
-      'tiny-town-tilemap',
-      '/atlases/tiny-town/Tilemap/tilemap_packed.png'
-    )
-
-    // UI pack sample
-    this.load.image(
-      'sample-button',
-      '/atlases/ui-pack-rpg/PNG/buttonLong_beige.png'
-    )
+    // Sample preload — validates atlas pipeline.
+    this.load.image('sample-tile', '/atlases/tiny-town/Tiles/tile_0046.png')
+    this.load.image('tiny-town-tilemap', '/atlases/tiny-town/Tilemap/tilemap_packed.png')
+    this.load.image('sample-button', '/atlases/ui-pack-rpg/PNG/buttonLong_beige.png')
   }
 
   create() {

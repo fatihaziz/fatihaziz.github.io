@@ -12,7 +12,12 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     parent,
     width: 1600,
     height: 1000,
-    pixelArt: true,
+    // J.0 text-heavy title screen wants smooth antialiased fonts. We'll
+    // re-enable pixelArt in J.1 when the tilemap arrives and use
+    // BitmapText / DOM-overlay for crisp typography.
+    pixelArt: false,
+    antialias: true,
+    roundPixels: false,
     backgroundColor: '#9ec370',
     scale: {
       mode: Phaser.Scale.FIT,
