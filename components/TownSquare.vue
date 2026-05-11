@@ -1,5 +1,5 @@
 <template>
-  <div class="town-square" :class="timeClass">
+  <div class="town-square" :class="timeClass" data-testid="town-square">
     <!-- Parallax Background Layers -->
     <div class="parallax-layer background" :style="{ transform: background.transform }">
       <div class="mountains"></div>
@@ -44,11 +44,13 @@
         <div class="building guild-hall" @click="enterBuilding('guild-hall')">
           <div class="building-base"></div>
           <div class="flag" :style="flagAnimation"></div>
-          <div 
+          <div
             class="weather-vane interactive-element"
             @click="changeWeather"
             @mouseenter="showHint('weather-vane')"
             @mouseleave="hideHint"
+            data-testid="weather-vane"
+            :data-weather="weather"
           >
             <div class="vane-post"></div>
             <div class="vane-arrow" :class="`weather-${weather}`"></div>
@@ -69,11 +71,12 @@
       </div>
       
       <!-- Central Village Well -->
-      <div 
+      <div
         class="village-well interactive-element"
         @click="interactWithWell"
         @mouseenter="showHint('well')"
         @mouseleave="hideHint"
+        data-testid="village-well"
       >
         <div class="well-base"></div>
         <div class="well-rope"></div>
@@ -84,11 +87,13 @@
       </div>
       
       <!-- Street Lamp -->
-      <div 
+      <div
         class="street-lamp interactive-element"
         @click="cycleTimeOfDay"
         @mouseenter="showHint('lamp')"
         @mouseleave="hideHint"
+        data-testid="street-lamp"
+        :data-time="timeOfDay"
       >
         <div class="lamp-post"></div>
         <div class="lamp-light" :class="{ glowing: timeOfDay === 'night' || timeOfDay === 'dusk' }"></div>
@@ -100,42 +105,112 @@
     <div class="parallax-layer foreground" :style="{ transform: foreground.transform }">
       <!-- Flying Birds -->
       <div class="birds-container">
-        <div 
-          v-for="bird in birds" 
+        <div
+          v-for="bird in birds"
           :key="bird.id"
           class="bird interactive-element"
           :style="bird.style"
           @click="followBird(bird)"
+          :data-testid="`bird-${bird.id}`"
         >
-          🐦
+          <svg viewBox="0 0 36 24" width="32" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Flying bird">
+            <ellipse cx="16" cy="14" rx="10" ry="6" fill="#1e88e5"/>
+            <circle cx="24" cy="11" r="4.5" fill="#1e88e5"/>
+            <polygon points="27,10 33,9.5 27,12.5" fill="#ffa726"/>
+            <circle cx="25" cy="10" r="0.9" fill="#1a1a1a"/>
+            <circle cx="25.2" cy="9.7" r="0.3" fill="#fff"/>
+            <path d="M9 12 Q4 6 1 11 Q4 15 9 14 Z" fill="#1565c0"/>
+            <path d="M18 7 Q22 2 28 7 Q22 11 18 13 Z" fill="#1565c0"/>
+            <ellipse cx="14" cy="16" rx="3" ry="1.2" fill="#90caf9"/>
+          </svg>
         </div>
       </div>
       
       <!-- Village Cat -->
-      <div 
+      <div
         class="village-cat interactive-element"
         :style="catPosition"
         @click="interactWithCat"
         @mouseenter="showHint('cat')"
         @mouseleave="hideHint"
+        data-testid="village-cat"
       >
-        🐱
+        <svg viewBox="0 0 64 64" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Village cat">
+          <ellipse cx="32" cy="46" rx="18" ry="13" fill="#3a3a3a"/>
+          <circle cx="32" cy="28" r="14" fill="#3a3a3a"/>
+          <polygon points="20,18 23,8 28,19" fill="#3a3a3a"/>
+          <polygon points="36,19 41,8 44,18" fill="#3a3a3a"/>
+          <polygon points="22,16 24,12 26,16" fill="#ff9bb3"/>
+          <polygon points="38,16 40,12 42,16" fill="#ff9bb3"/>
+          <ellipse cx="27" cy="28" rx="2.2" ry="3.2" fill="#ffd54f"/>
+          <ellipse cx="37" cy="28" rx="2.2" ry="3.2" fill="#ffd54f"/>
+          <ellipse cx="27" cy="29" rx="0.8" ry="2" fill="#1a1a1a"/>
+          <ellipse cx="37" cy="29" rx="0.8" ry="2" fill="#1a1a1a"/>
+          <circle cx="26.5" cy="27.5" r="0.5" fill="#fff"/>
+          <circle cx="36.5" cy="27.5" r="0.5" fill="#fff"/>
+          <polygon points="31,33 32,35 33,33" fill="#ff9bb3"/>
+          <path d="M30 36 Q32 38 34 36" stroke="#ff9bb3" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          <line x1="18" y1="29" x2="10" y2="27" stroke="#fff" stroke-width="0.6"/>
+          <line x1="18" y1="31" x2="10" y2="31" stroke="#fff" stroke-width="0.6"/>
+          <line x1="46" y1="29" x2="54" y2="27" stroke="#fff" stroke-width="0.6"/>
+          <line x1="46" y1="31" x2="54" y2="31" stroke="#fff" stroke-width="0.6"/>
+          <path d="M50 50 Q58 38 52 28" stroke="#3a3a3a" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
       </div>
       
       <!-- Flower Pots for Career Growth -->
       <div class="flower-garden">
-        <div 
-          v-for="(pot, index) in flowerPots" 
+        <div
+          v-for="(pot, index) in flowerPots"
           :key="index"
           class="flower-pot interactive-element"
           :style="pot.style"
           @click="growFlower(index)"
           @mouseenter="showHint('flower-pot')"
           @mouseleave="hideHint"
+          :data-testid="`flower-pot-${index}`"
+          :data-stage="pot.stage"
         >
           <div class="pot-base"></div>
-          <div class="plant" :class="pot.stage">{{ pot.plant }}</div>
-          <div class="growth-sparkles" v-if="pot.growing">✨</div>
+          <div class="plant" :class="pot.stage">
+            <svg v-if="pot.stage === 'seed'" viewBox="0 0 24 24" width="18" height="18" aria-label="Seed">
+              <ellipse cx="12" cy="14" rx="3" ry="4" fill="#8d6e63"/>
+              <path d="M12 10 Q14 8 14 6" stroke="#4caf50" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            </svg>
+            <svg v-else-if="pot.stage === 'sprout'" viewBox="0 0 24 24" width="22" height="22" aria-label="Sprout">
+              <path d="M12 22 L12 8" stroke="#2e7d32" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M12 12 Q6 10 5 4 Q10 5 12 12" fill="#66bb6a"/>
+              <path d="M12 14 Q18 12 19 6 Q14 7 12 14" fill="#81c784"/>
+            </svg>
+            <svg v-else-if="pot.stage === 'flower'" viewBox="0 0 24 24" width="24" height="24" aria-label="Flower">
+              <path d="M12 22 L12 12" stroke="#2e7d32" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M12 14 Q7 13 5 8 Q10 9 12 14" fill="#66bb6a"/>
+              <circle cx="12" cy="9" r="3.5" fill="#ec407a"/>
+              <circle cx="9" cy="7" r="2.5" fill="#f48fb1"/>
+              <circle cx="15" cy="7" r="2.5" fill="#f48fb1"/>
+              <circle cx="12" cy="5" r="2.5" fill="#f48fb1"/>
+              <circle cx="12" cy="9" r="1.4" fill="#fff59d"/>
+            </svg>
+            <svg v-else viewBox="0 0 28 28" width="26" height="26" aria-label="Bloom">
+              <path d="M14 26 L14 16" stroke="#2e7d32" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M14 18 Q8 17 6 12 Q11 13 14 18" fill="#66bb6a"/>
+              <path d="M14 18 Q20 17 22 12 Q17 13 14 18" fill="#81c784"/>
+              <circle cx="14" cy="11" r="4" fill="#e91e63"/>
+              <circle cx="10" cy="8" r="3" fill="#f06292"/>
+              <circle cx="18" cy="8" r="3" fill="#f06292"/>
+              <circle cx="14" cy="5" r="3" fill="#f8bbd0"/>
+              <circle cx="11" cy="14" r="3" fill="#f06292"/>
+              <circle cx="17" cy="14" r="3" fill="#f06292"/>
+              <circle cx="14" cy="11" r="1.8" fill="#fff59d"/>
+            </svg>
+          </div>
+          <div class="growth-sparkles" v-if="pot.growing" aria-hidden="true">
+            <svg viewBox="0 0 20 20" width="18" height="18">
+              <polygon points="10,2 11.5,8.5 18,10 11.5,11.5 10,18 8.5,11.5 2,10 8.5,8.5" fill="#fff59d"/>
+              <polygon points="4,4 4.6,6 6,6.6 4.6,7.2 4,9 3.4,7.2 2,6.6 3.4,6" fill="#ffeb3b"/>
+              <polygon points="16,12 16.6,14 18,14.6 16.6,15.2 16,17 15.4,15.2 14,14.6 15.4,14" fill="#ffeb3b"/>
+            </svg>
+          </div>
         </div>
       </div>
       
@@ -150,7 +225,7 @@
     <div class="lighting-overlay" :class="timeClass"></div>
     
     <!-- Welcome Message -->
-    <div class="welcome-message" v-if="showWelcome">
+    <div class="welcome-message" v-if="showWelcome" data-testid="welcome-message">
       <h1>Welcome home, adventurer!</h1>
       <p>Let's go explore my city!</p>
     </div>
@@ -480,7 +555,7 @@ setTimeout(() => {
 }
 
 .parallax-layer.foreground {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .sky-layer {
@@ -491,6 +566,7 @@ setTimeout(() => {
   height: 100%;
   z-index: 1;
   transition: background 2s ease;
+  pointer-events: none;
 }
 
 .lighting-overlay {

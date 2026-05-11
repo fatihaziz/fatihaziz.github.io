@@ -27,3 +27,11 @@ logs
 !pnpm-lock.yaml
 
 biodata/
+
+# Playwright artifacts
+test-results
+playwright-report
+
+# Claude Code local MCP store
+.claude/chain-context-mcp/
+.claude/chain-context/
