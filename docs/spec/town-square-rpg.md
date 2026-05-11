@@ -44,56 +44,15 @@
 - Walking the entire perimeter at base speed: ~45 seconds. The valley feels like a *place*, not a hub.
 - Outdoors = single Phaser scene `AetherveilOverworld`. Interior buildings = separate scenes loaded on door-trigger.
 
-### B.2 The valley — ASCII overview
+### B.2 The valley — visual map
 
-```
-                                                          N
-                                                          |
-                                                          v
- col:    0    5    10   15   20   25   30   35   40   45   50   55   60   65   70   75   80
-        +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
-   row 0|TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT TTTT |   forest
-      5 |TT~~ ~~~~ ~~~~ ~~~~ ~~~~ . .  . .  . .  . . .  . W W W  . . . . . . . . T |   ~ = cliff
-        |T 7  CHERRY  BLOSSOM     . .  . .  . .  . . .  . W W W mist . . . . . . T |   W = waterfall
-     10 |T 7  GROVE   (sakura)    . .  . .  . .  . . .  . W W W  -> river   . . T |
-        |T 7  swing + meditation  . .  . .  . .  ::ATELIER::  R R . . . . . . . T |   :: = building
-     15 |T 7  stone-of-quotes     . .  . .  . .  ::workshop::  R R . . . . . . . T |   R = river tile
-        |T 7  petals falling      . . . pine ::  ::(door)  ::  R R . . . . . . . T |
-     20 |T 7  hidden hermit       . . . trees..  . . . . .   R R::::: BRIDGE :::T |
-        |T7   path -> south       . . . . . . .  ::QUEST    .  R R::::stone::::T |
-     25 |T . . . . . . . . . . .  . . . . . . . ::BOARD::   .  R R . . ::EMBERS' T |
-        |T . sign: "town square"  . . . . . . . . . . . . . . R R . . :: FORGE   T |
-     30 |T . . . . . . . . . . .  . . . ___MARKET STALLS___ .  R R . . ::(door)::T |
-        |T . . . ::VAULTS:: . . . . . | TOWN SQUARE      | .   R R . . ::      ::T |
-     35 |T . . . ::OF      :: . . . . | FOUNTAIN  + MAYOR| .   R R . . . . . . . T |
-        |T . . . ::WHISPER  :: . . .  | M = Mayor's spot |.    R R . . . . . . . T |
-     40 |T . . . ::LEAF (door)::. . . |__________________| .   R R . . . . . . . T |
-        |T . . . . . . . . . . . . . . . . . . . . . . . . .   R R . . . . . . . T |
-     45 |T . CAT INV PNT HER MUS . . . . . . . . . . . . . . . R R . . . . . . . T |
-        |T . [H] [H] [H] [H] [H] residential lane . . . . . .  R R . ::CLOCK::  T |
-     50 |T . . . . . . . . . . . . . . . . . . . . . . . . . . R R . :: TOWER:: T |
-        |T . . . . . . . . . . ::HEARTH:: ::WIND:: . . . . . . R R . ::(arch):: T |
-     55 |T . . . . . . . . . . :: INN :: ::MILL:: . . . . . . . R R . under-pass T |
-        |T . . . . . . . . . . :: (door)::          . . . . . . R~~~~~~~~~~~~~~T |   ~~ = sand
-     58 |T . . . . . . . . . . . . . . [P] . . . . . SAND SAND SAND  ::BEACON:: T |   [P] = player spawn
-        |T~ . . . . . . . . . . . . . . . . . . . . . sand ::DOCK:: ::lighthouse T |
-     60 |T ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ sea sea sea sea sea sea sea T|
-        +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
-                                                          ^
-                                                          S
-        Legend:
-          T  = pine tree border (forest)
-          ~  = cliff edge / sand-to-sea
-          R  = river (flowing south)
-          W  = waterfall
-          :: = building wall
-          .  = grass / path
-          7  = cherry tree (pink)
-          [H]= residential house
-          [P]= player spawn
-```
+![Aetherveil Valley overworld map — colored regions, buildings, paths, river, sea, lighthouse, residential lane](./assets/aetherveil-map.png)
 
-(ASCII is approximate; final tilemap will be precise. Treat this as a visual contract for placement, not pixel layout.)
+> Rendered via `scripts/render_aetherveil_map.py` (Pillow → 1200×900 PNG). Re-run that script any time the design changes. The PNG embeds directly in any markdown viewer (GitHub, VS Code Preview, etc.) and opens crisp in any browser.
+
+**How to read the map:** north is up. The **forest border** (dark green) wraps three sides. The **river** (light blue ribbon) starts at the **waterfall** (NE) and flows south, then east, into the **sea** (bottom). The single **stone bridge** crosses the river east of the town square. **Cobblestone paths** (tan lines) connect the town square to every building. **Lantern posts** sit at the four corners of the square. The **player spawns** south of the town square at the signpost. **All 14 regions** are labeled directly on the map; see §B.3 for the table of what each region contains and rewards.
+
+This SVG is the visual contract for placement and density. The actual Phaser tilemap (80×60 cells, 32 px each) will be hand-built from this layout in J.0.
 
 ### B.3 Regions overview (14 named places, west→east, north→south)
 
