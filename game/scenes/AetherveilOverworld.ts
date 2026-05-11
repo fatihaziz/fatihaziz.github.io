@@ -26,17 +26,17 @@ export default class AetherveilOverworld extends Phaser.Scene {
     // Title
     this.add.text(w / 2, h / 2 - 240, 'AETHERVEIL', {
       fontFamily: FONT_TITLE,
-      fontSize: '120px',
+      fontSize: '96px',
       color: '#3a2418',
       fontStyle: '700',
-    }).setOrigin(0.5).setResolution(2).setLetterSpacing(8)
+    }).setOrigin(0.5).setResolution(3).setLetterSpacing(4)
 
     this.add.text(w / 2, h / 2 - 150, 'a valley of craftsmen and dreamers', {
       fontFamily: FONT_BODY,
       fontSize: '32px',
       color: '#5a3826',
       fontStyle: 'italic',
-    }).setOrigin(0.5).setResolution(2)
+    }).setOrigin(0.5).setResolution(3)
 
     // Decorative divider (subtle horizontal rule)
     const dg = this.add.graphics()
@@ -51,7 +51,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
       fontSize: '22px',
       color: '#3a2418',
       fontStyle: '600',
-    }).setOrigin(0.5).setResolution(2).setLetterSpacing(2)
+    }).setOrigin(0.5).setResolution(3).setLetterSpacing(2)
 
     const lines = [
       'Phaser 3 mounted at /aetherveil',
@@ -64,7 +64,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
         fontFamily: FONT_BODY,
         fontSize: '22px',
         color: '#3a2418',
-      }).setOrigin(0.5).setResolution(2)
+      }).setOrigin(0.5).setResolution(3)
     })
 
     // Show loaded samples (if any)
@@ -75,7 +75,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
         fontFamily: FONT_BODY,
         fontSize: '16px',
         color: '#3a6b3d',
-      }).setOrigin(0.5).setResolution(2)
+      }).setOrigin(0.5).setResolution(3)
       sx += 160
     }
     if (this.textures.exists('sample-button')) {
@@ -84,7 +84,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
         fontFamily: FONT_BODY,
         fontSize: '16px',
         color: '#3a6b3d',
-      }).setOrigin(0.5).setResolution(2)
+      }).setOrigin(0.5).setResolution(3)
     }
 
     // Footer
@@ -93,7 +93,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
       fontSize: '16px',
       color: '#5a3826',
       fontStyle: 'italic',
-    }).setOrigin(0.5).setResolution(2)
+    }).setOrigin(0.5).setResolution(3)
 
     // Simple input demo: marker moves with arrow keys / WASD.
     const marker = this.add.circle(w / 2, h - 120, 8, 0x5a3826)
@@ -111,6 +111,6 @@ export default class AetherveilOverworld extends Phaser.Scene {
       fontFamily: FONT_BODY,
       fontSize: '15px',
       color: '#5a3826',
-    }).setOrigin(0.5).setResolution(2)
+    }).setOrigin(0.5).setResolution(3)
   }
 }

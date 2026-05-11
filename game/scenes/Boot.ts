@@ -25,14 +25,14 @@ export default class Boot extends Phaser.Scene {
       fontSize: '64px',
       color: '#3a2418',
       fontStyle: '700',
-    }).setOrigin(0.5).setResolution(2)
+    }).setOrigin(0.5).setResolution(3)
 
     this.add.text(w / 2, h / 2 - 30, 'preparing the valley...', {
       fontFamily: FONT_BODY,
       fontSize: '24px',
       color: '#5a3826',
       fontStyle: 'italic',
-    }).setOrigin(0.5).setResolution(2)
+    }).setOrigin(0.5).setResolution(3)
 
     // Progress bar frame
     const frame = this.add.graphics()
@@ -44,7 +44,7 @@ export default class Boot extends Phaser.Scene {
       fontFamily: FONT_BODY,
       fontSize: '18px',
       color: '#5a3826',
-    }).setOrigin(0.5).setResolution(2)
+    }).setOrigin(0.5).setResolution(3)
 
     this.load.on('progress', (val: number) => {
       bar.clear()
