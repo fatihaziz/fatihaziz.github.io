@@ -3,28 +3,46 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, watchEffect } from 'vue'
+import { shallowRef, watch } from 'vue'
 import { useGLTF } from '@tresjs/cientos'
 import type { Object3D } from 'three'
 
 const props = defineProps<{
   src: string
   scale?: number | [number, number, number]
+  position?: [number, number, number]
+  rotationY?: number
 }>()
 
 const root = shallowRef<Object3D | null>(null)
+const { state, execute } = useGLTF(props.src)
 
-watchEffect(async () => {
-  if (!props.src) return
+// Kick off load and watch state for the cloned scene.
+;(async () => {
   try {
-    const { scene } = await useGLTF(props.src)
-    const clone = scene.clone(true)
+    await execute()
+  } catch (err) {
+    console.warn(`[GlbModel] failed to load ${props.src}`, err)
+  }
+})()
+
+watch(
+  state,
+  (gltf) => {
+    if (!gltf?.scene) return
+    const clone = gltf.scene.clone(true)
     if (props.scale !== undefined) {
       if (typeof props.scale === 'number') {
         clone.scale.setScalar(props.scale)
       } else {
         clone.scale.set(...props.scale)
       }
+    }
+    if (props.position) {
+      clone.position.set(...props.position)
+    }
+    if (props.rotationY !== undefined) {
+      clone.rotation.y = props.rotationY
     }
     clone.traverse((node) => {
       if ((node as any).isMesh) {
@@ -34,9 +52,7 @@ watchEffect(async () => {
       }
     })
     root.value = clone
-  } catch (err) {
-    console.warn(`[GlbModel] failed to load ${props.src}`, err)
-    root.value = null
-  }
-})
+  },
+  { immediate: true },
+)
 </script>

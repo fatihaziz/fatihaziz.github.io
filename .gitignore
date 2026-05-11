@@ -40,3 +40,6 @@ playwright-report
 *.db
 *.db-shm
 *.db-wal
+
+# Asset download cache (Kenney zips etc — extracted GLBs live in public/models/)
+.cache/

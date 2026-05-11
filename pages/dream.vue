@@ -18,6 +18,9 @@
         <SkyDome />
         <Lighting />
         <GroundPlane />
+        <Suspense>
+          <VillageScene />
+        </Suspense>
       </TresCanvas>
       <template #fallback>
         <div class="canvas-fallback">Preparing the village...</div>
@@ -28,8 +31,8 @@
     <BackToVillage />
 
     <div class="hud-note">
-      <p>J.0 sandbox. Sky + ground + golden-hour lighting.</p>
-      <p>Hero scene + 5 buildings arrive in subsequent /grind runs.</p>
+      <p>Dream Village &mdash; sandbox</p>
+      <p>Kenney CC0 props. Hero camera + 5 routes arrive in J.1.</p>
     </div>
   </div>
 </template>
@@ -38,14 +41,17 @@
 import SkyDome from '~/components/3d/env/SkyDome.vue'
 import Lighting from '~/components/3d/env/Lighting.vue'
 import GroundPlane from '~/components/3d/env/GroundPlane.vue'
+import VillageScene from '~/components/3d/VillageScene.vue'
 import RouteCrumb from '~/components/ui/RouteCrumb.vue'
 import BackToVillage from '~/components/ui/BackToVillage.vue'
-// Sandbox-specific camera: higher lookAt so frame includes blue sky band.
-// Real hero waypoint (low lookAt for hilltop-overlook) ships in J.1.
+
+// Eye-level approach: camera in front-right of the village, looking at
+// the tower mid-height. Frame composition: ground bottom, trees framing,
+// sky upper third with horizon visible behind tower.
 const sandboxCam = {
-  pos: [30, 18, 50] as [number, number, number],
-  look: [0, 25, 0] as [number, number, number],
-  fov: 55,
+  pos: [12, 5, 18] as [number, number, number],
+  look: [0, 3, 0] as [number, number, number],
+  fov: 50,
 }
 
 useHead({
