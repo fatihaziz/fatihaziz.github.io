@@ -55,8 +55,14 @@ export default class Boot extends Phaser.Scene {
 
     // Sample preload — validates atlas pipeline.
     this.load.image('sample-tile', '/atlases/tiny-town/Tiles/tile_0046.png')
-    this.load.image('tiny-town-tilemap', '/atlases/tiny-town/Tilemap/tilemap_packed.png')
     this.load.image('sample-button', '/atlases/ui-pack-rpg/PNG/buttonLong_beige.png')
+
+    // Tiny Town tilemap as 16x16 spritesheet -- main world tiles (132 frames).
+    this.load.spritesheet(
+      'tiny-town',
+      '/atlases/tiny-town/Tilemap/tilemap_packed.png',
+      { frameWidth: 16, frameHeight: 16 },
+    )
   }
 
   create() {

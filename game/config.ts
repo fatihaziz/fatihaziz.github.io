@@ -12,12 +12,13 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     parent,
     width: 1600,
     height: 1000,
-    // J.0 text-heavy title screen wants smooth antialiased fonts. We'll
-    // re-enable pixelArt in J.1 when the tilemap arrives and use
-    // BitmapText / DOM-overlay for crisp typography.
-    pixelArt: false,
-    antialias: true,
-    roundPixels: false,
+    // J.1b enables pixelArt so Tiny Town tiles render with nearest-neighbor
+    // scaling (no bilinear blur on scale-2 sprites). Text still renders
+    // crisply because each Text uses setResolution(3) which rasterises the
+    // glyphs at 3x layout size.
+    pixelArt: true,
+    antialias: false,
+    roundPixels: true,
     backgroundColor: '#9ec370',
     scale: {
       mode: Phaser.Scale.FIT,
