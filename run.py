@@ -5,14 +5,13 @@ Wipes build artifacts, reinstalls deps, runs the github_pages build, and
 optionally serves the static output for local preview.
 
 Usage:
-    python clean_build.py [--no-install] [--serve] [--preset PRESET]
+    python run.py [--no-install] [--serve] [--preset PRESET] [--tests]
 
 Flags:
     --no-install   skip `pnpm install` (faster when lockfile is clean)
     --serve        after build, serve .output/public on http://localhost:4173
     --preset NAME  Nuxt build preset (default: github_pages)
-    --skip-tests   skip the playwright smoke run (default: also skipped unless --tests)
-    --tests        run playwright smoke against /village after build (dev-server based)
+    --tests        run playwright smoke against /village after build
 """
 from __future__ import annotations
 
@@ -24,7 +23,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent
 ARTIFACTS = [".nuxt", ".output", "dist", "node_modules/.cache", "node_modules/.vite"]
 
 
@@ -47,15 +46,13 @@ def run(cmd: list[str], cwd: Path = ROOT, check: bool = True) -> int:
 
 
 def resolve_pnpm() -> list[str]:
-    candidate = shutil.which("pnpm")
-    if candidate:
-        return [candidate]
-    candidate = shutil.which("pnpm.cmd")
-    if candidate:
-        return [candidate]
-    candidate = shutil.which("corepack")
-    if candidate:
-        return [candidate, "pnpm"]
+    for name in ("pnpm", "pnpm.cmd"):
+        path = shutil.which(name)
+        if path:
+            return [path]
+    corepack = shutil.which("corepack") or shutil.which("corepack.cmd")
+    if corepack:
+        return [corepack, "pnpm"]
     print("!! pnpm not found on PATH. Install pnpm or enable corepack.", file=sys.stderr)
     sys.exit(127)
 
@@ -80,8 +77,9 @@ def build(pnpm: list[str], preset: str) -> None:
     banner(f"BUILD (preset={preset})")
     env = os.environ.copy()
     env["NITRO_PRESET"] = preset
-    step(f"$ {' '.join([*pnpm, 'exec', 'nuxt', 'build', '--preset', preset])}")
-    proc = subprocess.run([*pnpm, "exec", "nuxt", "build", "--preset", preset], cwd=ROOT, env=env)
+    cmd = [*pnpm, "exec", "nuxt", "build", "--preset", preset]
+    step(f"$ {' '.join(cmd)}")
+    proc = subprocess.run(cmd, cwd=ROOT, env=env)
     if proc.returncode != 0:
         print(f"!! build failed (exit {proc.returncode})", file=sys.stderr)
         sys.exit(proc.returncode)
