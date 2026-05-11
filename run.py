@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Clean-build the Nuxt RPG village site.
+"""Run the Nuxt site in dev mode or clean-build for deploy.
 
-Wipes build artifacts, reinstalls deps, runs the github_pages build, and
-optionally serves the static output for local preview.
+Modes:
+    build (default)  -> clean + install + nuxt build --preset <preset>
+    dev              -> install + nuxt dev (hot reload at http://localhost:3000)
 
 Usage:
-    python run.py [--no-install] [--serve] [--preset PRESET] [--tests]
+    python run.py [build|dev] [--no-install] [--serve] [--preset PRESET]
 
 Flags:
     --no-install   skip `pnpm install` (faster when lockfile is clean)
     --serve        after build, serve .output/public on http://localhost:4173
-    --preset NAME  Nuxt build preset (default: github_pages)
-    --tests        run playwright smoke against /village after build
+    --preset NAME  Nuxt build preset for build mode (default: github_pages)
 """
 from __future__ import annotations
 
@@ -85,9 +85,13 @@ def build(pnpm: list[str], preset: str) -> None:
         sys.exit(proc.returncode)
 
 
-def run_tests(pnpm: list[str]) -> None:
-    banner("PLAYWRIGHT SMOKE")
-    run([*pnpm, "exec", "playwright", "test", "--reporter=list"])
+def dev(pnpm: list[str]) -> None:
+    banner("DEV SERVER (nuxt dev)")
+    step("starting on http://localhost:3000 (Ctrl+C to stop)")
+    try:
+        subprocess.run([*pnpm, "exec", "nuxt", "dev"], cwd=ROOT)
+    except KeyboardInterrupt:
+        print("\n-> dev server stopped", flush=True)
 
 
 def serve(pnpm: list[str]) -> None:
@@ -104,24 +108,35 @@ def serve(pnpm: list[str]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Clean-build the Nuxt RPG village site.")
+    parser = argparse.ArgumentParser(description="Run or build the Nuxt site.")
+    parser.add_argument(
+        "mode",
+        nargs="?",
+        default="build",
+        choices=["build", "dev"],
+        help="build (default) or dev",
+    )
     parser.add_argument("--no-install", action="store_true", help="skip pnpm install")
     parser.add_argument("--serve", action="store_true", help="serve .output/public after build")
-    parser.add_argument("--tests", action="store_true", help="run playwright smoke after build")
-    parser.add_argument("--preset", default="github_pages", help="Nuxt build preset")
+    parser.add_argument("--preset", default="github_pages", help="Nuxt build preset (build mode only)")
     args = parser.parse_args()
 
     start = time.time()
     pnpm = resolve_pnpm()
     print(f"[i] using pnpm: {' '.join(pnpm)}", flush=True)
     print(f"[i] project root: {ROOT}", flush=True)
+    print(f"[i] mode: {args.mode}", flush=True)
+
+    if args.mode == "dev":
+        if not args.no_install:
+            install(pnpm)
+        dev(pnpm)
+        return
 
     clean()
     if not args.no_install:
         install(pnpm)
     build(pnpm, args.preset)
-    if args.tests:
-        run_tests(pnpm)
 
     elapsed = time.time() - start
     banner(f"DONE in {elapsed:.1f}s -- output at .output/public")

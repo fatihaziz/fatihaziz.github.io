@@ -1,11 +1,12 @@
 # PowerShell wrapper for run.py
 #
 # Usage:
-#   .\run.ps1                 # clean + install + build
-#   .\run.ps1 -Serve          # then serve .output/public
-#   .\run.ps1 -Tests          # also run playwright smoke
-#   .\run.ps1 -NoInstall      # skip pnpm install
-#   .\run.ps1 -Preset static  # different Nuxt preset
+#   .\run.ps1                  # clean + install + build (preset github_pages)
+#   .\run.ps1 dev              # install + nuxt dev (hot reload localhost:3000)
+#   .\run.ps1 build            # explicit build (same as default)
+#   .\run.ps1 -Serve           # build then serve .output/public
+#   .\run.ps1 -NoInstall       # skip pnpm install
+#   .\run.ps1 -Preset static   # different Nuxt build preset
 #
 # Python resolution order:
 #   1. py -3       (Windows launcher; most reliable on Windows)
@@ -16,8 +17,10 @@
 
 [CmdletBinding()]
 param(
+    [Parameter(Position = 0)]
+    [ValidateSet("build", "dev", "")]
+    [string]$Mode = "",
     [switch]$Serve,
-    [switch]$Tests,
     [switch]$NoInstall,
     [string]$Preset = "github_pages"
 )
@@ -85,9 +88,10 @@ Then reopen the shell and re-run.
     exit 127
 }
 
-$scriptArgs = $pythonArgs + @($pyScript, "--preset", $Preset)
+$scriptArgs = $pythonArgs + @($pyScript)
+if ($Mode -ne "") { $scriptArgs += $Mode }
+$scriptArgs += @("--preset", $Preset)
 if ($NoInstall) { $scriptArgs += "--no-install" }
-if ($Tests)     { $scriptArgs += "--tests" }
 if ($Serve)     { $scriptArgs += "--serve" }
 
 Write-Host "==> $pythonCmd $($scriptArgs -join ' ')" -ForegroundColor Cyan
