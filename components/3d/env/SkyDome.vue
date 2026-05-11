@@ -1,38 +1,52 @@
 <template>
   <TresMesh :scale="500" :frustum-culled="false">
-    <TresSphereGeometry :args="[1, 32, 16]" @created="onGeo" />
-    <TresMeshBasicMaterial :side="BackSide" :vertex-colors="true" :depth-write="false" :fog="false" />
+    <TresSphereGeometry :args="[1, 64, 32]" />
+    <TresShaderMaterial
+      :side="BackSide"
+      :depth-write="false"
+      :fog="false"
+      :uniforms="uniforms"
+      :vertex-shader="vertexShader"
+      :fragment-shader="fragmentShader"
+    />
   </TresMesh>
 </template>
 
 <script setup lang="ts">
-import { BackSide, BufferAttribute, Color, type SphereGeometry } from 'three'
+import { BackSide, Color } from 'three'
 import { useGoldenHour } from '~/composables/useGoldenHour'
 
 const gh = useGoldenHour()
 
-function onGeo({ instance }: { instance: SphereGeometry }) {
-  const positions = instance.attributes.position
-  const count = positions.count
-  const colors = new Float32Array(count * 3)
-  const top = new Color(gh.sky.top)
-  const mid = new Color(gh.sky.middle)
-  const horizon = new Color(gh.sky.horizon)
-  for (let i = 0; i < count; i++) {
-    const y = positions.getY(i)
-    const t = (y + 1) / 2
-    let c: Color
-    if (t > 0.6) {
-      const u = Math.min(1, (t - 0.6) / 0.4)
-      c = mid.clone().lerp(top, u)
-    } else {
-      const u = t / 0.6
-      c = horizon.clone().lerp(mid, u)
-    }
-    colors[i * 3] = c.r
-    colors[i * 3 + 1] = c.g
-    colors[i * 3 + 2] = c.b
-  }
-  instance.setAttribute('color', new BufferAttribute(colors, 3))
+const uniforms = {
+  uTop:     { value: new Color(gh.sky.top) },
+  uMid:     { value: new Color(gh.sky.middle) },
+  uHorizon: { value: new Color(gh.sky.horizon) },
 }
+
+const vertexShader = /* glsl */ `
+  varying vec3 vWorldPos;
+  void main() {
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vWorldPos = wp.xyz;
+    gl_Position = projectionMatrix * viewMatrix * wp;
+  }
+`
+
+const fragmentShader = /* glsl */ `
+  uniform vec3 uTop;
+  uniform vec3 uMid;
+  uniform vec3 uHorizon;
+  varying vec3 vWorldPos;
+  void main() {
+    float h = normalize(vWorldPos).y;          // -1..1 along world up
+    float t = clamp((h + 1.0) * 0.5, 0.0, 1.0);
+    // 3-stop: horizon(0) -> mid(0.5) -> top(1)
+    float warm = smoothstep(0.0, 0.5, t);
+    float cool = smoothstep(0.45, 0.85, t);
+    vec3 col = mix(uHorizon, uMid, warm);
+    col = mix(col, uTop, cool);
+    gl_FragColor = vec4(col, 1.0);
+  }
+`
 </script>

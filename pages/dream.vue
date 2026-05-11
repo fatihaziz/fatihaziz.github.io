@@ -9,9 +9,9 @@
         class="dream-canvas"
       >
         <TresPerspectiveCamera
-          :position="heroHome.pos"
-          :look-at="heroHome.look"
-          :fov="heroHome.fov ?? 50"
+          :position="sandboxCam.pos"
+          :look-at="sandboxCam.look"
+          :fov="sandboxCam.fov"
           :near="0.1"
           :far="2000"
         />
@@ -40,9 +40,13 @@ import Lighting from '~/components/3d/env/Lighting.vue'
 import GroundPlane from '~/components/3d/env/GroundPlane.vue'
 import RouteCrumb from '~/components/ui/RouteCrumb.vue'
 import BackToVillage from '~/components/ui/BackToVillage.vue'
-import { useSceneRoutes } from '~/composables/useSceneRoutes'
-
-const { heroHome } = useSceneRoutes()
+// Sandbox-specific camera: higher lookAt so frame includes blue sky band.
+// Real hero waypoint (low lookAt for hilltop-overlook) ships in J.1.
+const sandboxCam = {
+  pos: [30, 18, 50] as [number, number, number],
+  look: [0, 25, 0] as [number, number, number],
+  fov: 55,
+}
 
 useHead({
   title: 'Dream Village — Fatih',
