@@ -1,52 +1,36 @@
 # Asset Credits
 
-3D village at fatihaziz.com uses third-party assets. All credits below.
+Aetherveil at fatihaziz.com uses third-party assets. All credits below.
 
-## 3D Models
+## Pixel-art sprite + tile packs
 
 ### Kenney (kenney.nl) -- CC0
 
-In active use on `/dream` sandbox. Nature props + castle building shells.
+Planned for J.0 download (per `docs/spec/town-square-rpg.md` §G.1).
 
 | Pack | Used for | Source |
 |------|---------|--------|
-| Nature Kit | Trees, bushes, flowers, mushrooms, grass, rocks | https://kenney.nl/assets/nature-kit |
-| Castle Kit | Tower building, flag, modular pieces | https://kenney.nl/assets/castle-kit |
+| Tiny Town | Town tiles, building exteriors, characters | https://kenney.nl/assets/tiny-town |
+| Tiny Dungeon | Interior stone/wood tiles, weapons, props | https://kenney.nl/assets/tiny-dungeon |
+| Roguelike RPG Pack | Weapon variants, character variants, dialog faces | https://kenney.nl/assets/roguelike-rpg-pack |
+| UI Pack RPG | Dialog box frames, buttons, modal borders | https://kenney.nl/assets/ui-pack-rpg-expansion |
+| Particle Pack | Embers, sparkles, fireflies, smoke | https://kenney.nl/assets/particle-pack |
 
-Specific GLBs in `public/models/nature/` and `public/models/buildings/`. The Castle Kit
-texture `colormap.png` lives at `public/models/buildings/Textures/colormap.png` (referenced
-by GLBs via relative path -- do not move).
+All CC0. Attribution not required by license, included here by gratitude.
 
-### Quaternius (quaternius.com) -- CC0
+## Audio (J.7 polish, optional)
 
-Reserved for J.2-J.6 building scenes per spec (`docs/spec/dream-village-3d.md` Section F).
-Not yet downloaded.
-
-| Pack | Source |
-|------|-------|
-| Ultimate Buildings Pack | https://quaternius.com/packs/ultimatebuildings.html |
-| Ultimate Modular Castle Kit | https://quaternius.com/packs/ultimatemodularcastle.html |
-| Ultimate Nature Pack | https://quaternius.com/packs/ultimatenature.html |
-| Ultimate Weapons Pack | https://quaternius.com/packs/ultimateweapons.html |
-| Ultimate Stylized Animals Pack | https://quaternius.com/packs/ultimatestylizedanimals.html |
-
-## Channel logos (Beacon scene, J.6)
-
-Used per each brand's guidelines:
-
-- GitHub Octocat -- github.com/logos
-- LinkedIn "in" -- LinkedIn Brand Guidelines
-- Medium "M" -- Medium Brand Guidelines
-- Envelope icon -- Heroicons (MIT)
+- Step / door / page-turn / flame whoosh: **freesound.org** (CC0-filtered), Kenney audio packs, OpenGameArt.
 
 ## Fonts
 
-Existing project fonts (Mangiola, Mondapick, Supreme, Satoshi, etc) -- see individual
-license files under `assets/font/*/License.txt` or pack README.
+- **Press Start 2P** -- Google Font (SIL OFL). Pixel font for signs, names, dialog.
+- **Mondapick** -- already in project (`assets/font/mondapick/`). Fallback for modal body text.
+- Other existing project fonts (Mangiola, Supreme, Satoshi, etc) -- see individual license files.
 
 ## Code libraries
 
-- TresJS (`@tresjs/core`, `@tresjs/nuxt`, `@tresjs/cientos`) -- MIT
-- Three.js -- MIT
+- Phaser 3 -- MIT
 - Nuxt 3 -- MIT
 - Vue 3 -- MIT
+- TailwindCSS -- MIT

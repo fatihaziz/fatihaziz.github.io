@@ -1,0 +1,1 @@
+import{_ as o,x as t,y as a,X as s}from"#entry";const n={},c={class:"novel-layout-root"};function r(e,_){return t(),a("div",c,[s(e.$slots,"default",{},void 0,!0)])}const l=o(n,[["render",r],["__scopeId","data-v-a51ecba5"]]);export{l as default};
