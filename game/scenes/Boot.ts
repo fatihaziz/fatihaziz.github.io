@@ -88,6 +88,7 @@ export default class Boot extends Phaser.Scene {
         else if (s === 'vaults') target = 'VaultsOfWhisperleaf'
         else if (s === 'forge') target = 'EmbersForge'
         else if (s === 'inn') target = 'HearthlightInn'
+        else if (s === 'beacon') target = 'BeaconOfDistantRoads'
       }
     } catch { /* ignore */ }
     this.time.delayedCall(400, () => {

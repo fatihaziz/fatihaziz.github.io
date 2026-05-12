@@ -11,6 +11,7 @@ import AtelierInterior from './scenes/AtelierInterior'
 import VaultsOfWhisperleaf from './scenes/VaultsOfWhisperleaf'
 import EmbersForge from './scenes/EmbersForge'
 import HearthlightInn from './scenes/HearthlightInn'
+import BeaconOfDistantRoads from './scenes/BeaconOfDistantRoads'
 
 export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -37,6 +38,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
         debug: false,
       },
     },
-    scene: [Boot, AetherveilOverworld, AtelierInterior, VaultsOfWhisperleaf, EmbersForge, HearthlightInn],
+    scene: [Boot, AetherveilOverworld, AtelierInterior, VaultsOfWhisperleaf, EmbersForge, HearthlightInn, BeaconOfDistantRoads],
   }
 }

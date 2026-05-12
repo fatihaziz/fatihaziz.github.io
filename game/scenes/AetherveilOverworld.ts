@@ -705,6 +705,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
       vaults: 'VaultsOfWhisperleaf',
       forge: 'EmbersForge',
       inn: 'HearthlightInn',
+      beacon: 'BeaconOfDistantRoads',
     }
     const target = interiorMap[b.key]
     if (target) {
