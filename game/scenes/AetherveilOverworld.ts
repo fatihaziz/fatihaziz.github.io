@@ -64,6 +64,26 @@ const T = {
   RED_DOOR: 55,
   RED_WALL_R: 54,
   ROOF_PEAK: 67,
+  // Stone castle / walls
+  STONE_GATE_ARCH: 75,    // archway opening
+  STONE_BLOCK_TOP_L: 76,  // upper stone wall pieces
+  STONE_BLOCK_TOP_M: 77,
+  STONE_BLOCK_TOP_R: 78,
+  STONE_BLOCK_DOOR: 79,
+  STONE_CREN_L: 96,       // crenellated top (left cap)
+  STONE_CREN_M: 97,       // crenellated top (middle)
+  STONE_CREN_R: 98,       // crenellated top (right cap)
+  STONE_WALL_L: 99,       // wall middle column (left)
+  STONE_WALL_M: 100,      // wall middle column (mid)
+  STONE_WALL_R: 101,      // wall middle column (right)
+  STONE_GATE_ARCH_2: 102, // alt arch
+  STONE_CASTLE_DOOR: 103, // big castle door
+  STONE_BASE_L: 108,      // smooth stone wall base
+  STONE_BASE_M: 109,
+  STONE_BASE_R: 110,
+  STONE_SLIT_L: 120,      // wall with arrow slits
+  STONE_SLIT_M: 121,
+  STONE_SLIT_R: 122,
 }
 
 interface BuildingDef {
@@ -76,9 +96,9 @@ interface BuildingDef {
 }
 
 const BUILDINGS: BuildingDef[] = [
-  // North of plaza (Atelier)
+  // North-west of plaza, east of cherry grove (Atelier moved out of castle footprint).
   { key: 'atelier',  label: 'The Atelier',
-    cx: 22, cy: 5,  w: 5, kind: 'red' },
+    cx: 11, cy: 8,  w: 5, kind: 'red' },
   // West of plaza (Vaults)
   { key: 'vaults',   label: 'Vaults of Whisperleaf',
     cx: 3,  cy: 18, w: 5, kind: 'blue' },
@@ -126,6 +146,9 @@ export default class AetherveilOverworld extends Phaser.Scene {
     this.buildPlaza()
     this.buildDecorations()
     this.buildBuildings()
+    this.buildCastle()
+    this.buildPerimeterWalls()
+    this.buildVillagers()
     this.buildMayor()
     this.buildPlayer()
     this.buildHud()
@@ -311,6 +334,175 @@ export default class AetherveilOverworld extends Phaser.Scene {
     }
   }
 
+  // ============================================================
+  // CASTLE + WALLS + VILLAGERS (J.1d -- Frieren medieval town vibe)
+  // ============================================================
+
+  private buildCastle() {
+    // Imposing stone fortress at the north of the map, looming over the town.
+    // Vertical silhouette: tall central keep (3 floors) flanked by towers.
+    //
+    //         . . [P] . .                     <- row 0: keep peak (peaks 67)
+    //       . . [C C C] . .                   <- row 1: keep top (cren)
+    //       [SC SC SC SC SC]                  <- row 2: arrow-slit floor
+    //   [Tc][SC SC SC SC SC SC SC SC][Tc]    <- row 3: top main wall
+    //   [Ts][W  W  GATE W  W  W  W ][Ts]    <- row 4: castle gate floor
+    //   [Tb][B  B  B  B  B  B  B  B ][Tb]    <- row 5: base
+    //
+    const cx = 22                  // left edge of main wall
+    const cy = 1                   // top edge of arrow-slit row
+    const W = 14                   // main wall width
+    const peakCx = cx + Math.floor(W / 2) - 1  // 3-wide keep peak at centre
+    const KEEP_W = 3
+
+    // Erase forest-belt trees over the castle footprint so it reads cleanly.
+    for (let c = cx - 1; c <= cx + W; c++) {
+      this.tile(c, 0, T.GRASS_A, 0)
+    }
+
+    // Row 0: keep peak (single roof-peak chevron at very top centre)
+    this.tile(peakCx + 1, 0, T.ROOF_PEAK, 5)
+
+    // Row 1: keep top, 3-wide crenellated band raised above main wall
+    for (let i = 0; i < KEEP_W; i++) {
+      let f: number
+      if (i === 0) f = T.STONE_CREN_L
+      else if (i === KEEP_W - 1) f = T.STONE_CREN_R
+      else f = T.STONE_CREN_M
+      this.tile(peakCx + i, 1, f, 5)
+    }
+
+    // Row 2: arrow-slit floor (main wall width)
+    for (let i = 0; i < W; i++) {
+      let f: number
+      if (i === 0) f = T.STONE_CREN_L
+      else if (i === W - 1) f = T.STONE_CREN_R
+      else f = T.STONE_CREN_M
+      this.tile(cx + i, cy + 1, f, 4)
+    }
+
+    // Row 3: arrow-slit / parapet floor
+    for (let i = 0; i < W; i++) {
+      let f: number
+      if (i === 0) f = T.STONE_SLIT_L
+      else if (i === W - 1) f = T.STONE_SLIT_R
+      else f = T.STONE_SLIT_M
+      this.tile(cx + i, cy + 2, f, 4)
+    }
+
+    // Row 4: main wall middle band with massive central gate
+    const gateCol = Math.floor(W / 2)
+    for (let i = 0; i < W; i++) {
+      let f: number
+      if (i === gateCol) f = T.STONE_CASTLE_DOOR
+      else if (i === 0) f = T.STONE_WALL_L
+      else if (i === W - 1) f = T.STONE_WALL_R
+      else f = T.STONE_WALL_M
+      this.tile(cx + i, cy + 3, f, 4)
+    }
+
+    // Row 5: smooth stone base
+    for (let i = 0; i < W; i++) {
+      let f: number
+      if (i === 0) f = T.STONE_BASE_L
+      else if (i === W - 1) f = T.STONE_BASE_R
+      else f = T.STONE_BASE_M
+      this.tile(cx + i, cy + 4, f, 4)
+    }
+
+    // Flanking towers -- 1 tile wider than main wall, stacked 5 tall.
+    const towerCols: number[] = [cx - 1, cx + W]
+    for (const tc of towerCols) {
+      this.tile(tc, cy,     T.ROOF_PEAK,     5)
+      this.tile(tc, cy + 1, T.STONE_CREN_M,  5)
+      this.tile(tc, cy + 2, T.STONE_SLIT_M,  5)
+      this.tile(tc, cy + 3, T.STONE_WALL_M,  5)
+      this.tile(tc, cy + 4, T.STONE_BASE_M,  5)
+    }
+
+    // Castle name plate just below the gate, on grass.
+    const labelX = (cx + gateCol + 0.5) * TILE
+    const labelY = (cy + 5) * TILE + 14
+    this.add.text(labelX, labelY, 'Castle Aetherveil', {
+      fontFamily: FONT_TITLE, fontSize: '17px', color: '#f5e5c5', fontStyle: '600',
+      stroke: '#3a2418', strokeThickness: 4,
+    }).setOrigin(0.5).setResolution(3).setLetterSpacing(2).setDepth(5)
+  }
+
+  private buildPerimeterWalls() {
+    // Town wall: stone wall pieces forming a U around the valley.
+    // West wall column, east wall column, south wall row -- north stays open
+    // because the castle dominates that flank.
+    const WEST = 1
+    const EAST = COLS - 2
+    const SOUTH = ROWS - 3
+    // West vertical run
+    for (let r = 10; r < SOUTH; r++) {
+      const top = r === 10
+      const bottom = r === SOUTH - 1
+      const f = top ? T.STONE_CREN_M : bottom ? T.STONE_BASE_M : T.STONE_WALL_M
+      this.tile(WEST, r, f, 2)
+    }
+    // East vertical run
+    for (let r = 10; r < SOUTH; r++) {
+      const top = r === 10
+      const bottom = r === SOUTH - 1
+      const f = top ? T.STONE_CREN_M : bottom ? T.STONE_BASE_M : T.STONE_WALL_M
+      this.tile(EAST, r, f, 2)
+    }
+    // South wall run -- gate at the path column.
+    const gateCol = Math.floor(COLS / 2)
+    for (let c = WEST + 1; c < EAST; c++) {
+      let f: number
+      if (c === gateCol - 1) f = T.STONE_CREN_R
+      else if (c === gateCol + 1) f = T.STONE_CREN_L
+      else if (c === gateCol) {
+        // skip -- gate opening below
+        continue
+      } else if (c === WEST + 1) f = T.STONE_CREN_L
+      else if (c === EAST - 1) f = T.STONE_CREN_R
+      else f = T.STONE_CREN_M
+      this.tile(c, SOUTH, f, 2)
+    }
+    // Gate arch tile spanning 1 tile + tall arch on top.
+    this.tile(gateCol, SOUTH - 1, T.STONE_GATE_ARCH, 2)
+    this.tile(gateCol, SOUTH, T.STONE_CASTLE_DOOR, 2)
+    // South-gate label
+    this.add.text(gateCol * TILE + TILE / 2, (SOUTH + 1) * TILE + 6, 'Southgate', {
+      fontFamily: FONT_BODY, fontSize: '13px', color: '#f5e5c5',
+      fontStyle: 'italic', stroke: '#3a2418', strokeThickness: 3,
+    }).setOrigin(0.5).setResolution(3).setDepth(5)
+  }
+
+  private buildVillagers() {
+    // Static NPCs scattered around town -- pure scenery, no interaction yet.
+    // [col, row, dungeon-frame, label]
+    const villagers: [number, number, number, string][] = [
+      [9,  19, 88, 'a librarian'],     // brown villager near Vaults
+      [38, 16, 109, 'a smith\'s apprentice'],  // monk-yellow near Forge
+      [24, 30, 87, 'an old wanderer'],         // white-hair elf near Inn
+      [40, 28, 99, 'a noble in travel cloak'], // princess near Beacon
+      [16, 12, 85, 'a market crier'],          // peasant on plaza road
+    ]
+    for (const [c, r, frame] of villagers) {
+      const px = c * TILE + TILE / 2
+      const py = r * TILE + TILE / 2
+      this.add.ellipse(px, py + 18, 24, 7, 0x000000, 0.25).setDepth(5)
+      const sprite = this.add.sprite(px, py, 'tiny-dungeon', frame)
+        .setScale(CHAR_SCALE).setDepth(6)
+      // Tiny idle bob -- staggered phase by frame index so they don't sync
+      this.tweens.add({
+        targets: sprite,
+        y: py - 2,
+        duration: 1200 + (frame % 7) * 80,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: -1,
+        delay: (frame % 11) * 60,
+      })
+    }
+  }
+
   private buildMayor() {
     // Mayor stands just south of the fountain, on the plaza cobble.
     const fcx = Math.floor(COLS / 2) * TILE
@@ -340,12 +532,19 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   private buildPlayer() {
-    // Spawn near south entrance, on the dirt road.
-    const px = Math.floor(COLS / 2) * TILE
-    const py = (ROWS - 4) * TILE
-    // Soft shadow under player feet -- moved with player in update().
+    // Default spawn: south entrance on the dirt road.
+    let px = Math.floor(COLS / 2) * TILE
+    let py = (ROWS - 4) * TILE
+    // Debug spawn override via ?spawn=castle|plaza|north (for screenshot iters).
+    try {
+      if (typeof window !== 'undefined') {
+        const sp = new URLSearchParams(window.location.search).get('spawn')
+        if (sp === 'castle') { px = 36 * TILE; py = 8 * TILE }
+        else if (sp === 'plaza') { px = 25 * TILE; py = 17 * TILE }
+        else if (sp === 'north') { px = 25 * TILE; py = 3 * TILE }
+      }
+    } catch { /* ignore */ }
     this.playerShadow = this.add.ellipse(px, py + 22, 30, 9, 0x000000, 0.30).setDepth(5)
-    // Player sprite: tiny-dungeon frame 100 (white-hair elf girl, Frieren-coded).
     this.player = this.physics.add.sprite(px, py, 'tiny-dungeon', 100)
       .setScale(CHAR_SCALE)
       .setDepth(6)
