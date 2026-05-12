@@ -233,12 +233,48 @@ export default class AetherveilOverworld extends Phaser.Scene {
         this.tile(cxStart + c, cyStart + r, T.STONE_PATH, 2)
       }
     }
-    // Fountain at plaza centre -- single stone tile + circle accent on top.
+    // Fountain at plaza centre -- stone rim + animated water layers.
     const fcx = Math.floor(COLS / 2) * TILE
     const fcy = Math.floor(ROWS / 2) * TILE
-    this.add.circle(fcx, fcy, 18, 0x7fb9e5).setStrokeStyle(2, 0x3a6b8c).setDepth(3)
-    this.add.circle(fcx, fcy, 7, 0x9bd0eb).setStrokeStyle(1, 0x3a6b8c).setDepth(3)
-    this.add.circle(fcx, fcy, 2, 0xffffff).setDepth(3)
+    // Stone rim (static)
+    this.add.circle(fcx, fcy, 22, 0x9b8a72).setStrokeStyle(2, 0x5a4838).setDepth(3)
+    // Outer water disc (animated alpha pulse)
+    const waterOuter = this.add.circle(fcx, fcy, 18, 0x7fb9e5, 0.92).setDepth(3)
+    this.tweens.add({
+      targets: waterOuter,
+      alpha: 0.72,
+      duration: 1600,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,
+    })
+    // Inner ripple ring -- scale up + fade, then snap back via onRepeat.
+    const ripple = this.add.circle(fcx, fcy, 8, 0x9bd0eb, 0.85).setDepth(3)
+    this.tweens.add({
+      targets: ripple,
+      scale: 1.8,
+      alpha: 0.15,
+      duration: 1400,
+      ease: 'Sine.easeOut',
+      repeat: -1,
+      onRepeat: () => {
+        ripple.setScale(1)
+        ripple.setAlpha(0.85)
+      },
+    })
+    // Bright centre highlight (steady)
+    this.add.circle(fcx, fcy, 3, 0xffffff, 0.95).setDepth(3)
+    // Tiny spout-glints: two small offset circles that pulse out of phase.
+    const glint1 = this.add.circle(fcx - 5, fcy - 4, 1.5, 0xffffff, 0.9).setDepth(3)
+    const glint2 = this.add.circle(fcx + 4, fcy + 3, 1.5, 0xffffff, 0.9).setDepth(3)
+    this.tweens.add({
+      targets: glint1, alpha: 0.2, duration: 900,
+      ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
+    })
+    this.tweens.add({
+      targets: glint2, alpha: 0.2, duration: 1100, delay: 400,
+      ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
+    })
     // Bell tower: 3 stacked roof+wall tiles immediately NE of the fountain.
     const bcx = Math.floor(COLS / 2) + 2
     const bcy = Math.floor(ROWS / 2) - 3
@@ -475,31 +511,71 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   private buildVillagers() {
-    // Static NPCs scattered around town -- pure scenery, no interaction yet.
-    // [col, row, dungeon-frame, label]
-    const villagers: [number, number, number, string][] = [
-      [9,  19, 88, 'a librarian'],     // brown villager near Vaults
-      [38, 16, 109, 'a smith\'s apprentice'],  // monk-yellow near Forge
-      [24, 30, 87, 'an old wanderer'],         // white-hair elf near Inn
-      [40, 28, 99, 'a noble in travel cloak'], // princess near Beacon
-      [16, 12, 85, 'a market crier'],          // peasant on plaza road
+    // Static NPCs scattered around town. Each one has a hit-zone + dialog
+    // beats so clicking them adds flavour to the world. Pure atmosphere
+    // -- they don't reveal project content, that lives behind building doors.
+    interface VillagerDef {
+      col: number
+      row: number
+      frame: number
+      name: string
+      beats: string[]
+    }
+    const villagers: VillagerDef[] = [
+      {
+        col: 9, row: 19, frame: 88, name: 'A Librarian',
+        beats: [
+          'The keeper does not speak. I tend the shelves while she sleeps. Three sheaves of scrolls arrived this moon -- try the cedar rack at the south wall, they still smell of pine.',
+          'Take any you wish, only return them by dusk. The scrolls remember which hands held them last.',
+        ],
+      },
+      {
+        col: 38, row: 16, frame: 109, name: "A Smith's Apprentice",
+        beats: [
+          'Master tempers the steel by sound, not colour. I am still learning to hear it.',
+          'If you bring a cracked blade he will look at it for a long time, then ask what you struck. The answer matters more than the steel.',
+        ],
+      },
+      {
+        col: 24, row: 30, frame: 87, name: 'An Old Wanderer',
+        beats: [
+          'The road from Greybranch narrows each season. Soon only foxes and grief will pass that way.',
+          'The Inn-keep keeps a fire for travellers who have nothing to trade. That is rare, in this age.',
+        ],
+      },
+      {
+        col: 40, row: 28, frame: 99, name: 'A Noble in Travel Cloak',
+        beats: [
+          'If I light the flame at the Beacon tonight, my brother will see it from the hold by dawn. He always watches at dawn.',
+          'It is a small magic, but small magics keep families standing.',
+        ],
+      },
+      {
+        col: 16, row: 12, frame: 85, name: 'A Market Crier',
+        beats: [
+          'Onions! Crow-feathers! Apple-honey! All from the valley, none from the king\'s road.',
+          'Trade fair, trade plain. The Mayor watches us, and he is gentle. He is also not entirely a man.',
+        ],
+      },
     ]
-    for (const [c, r, frame] of villagers) {
-      const px = c * TILE + TILE / 2
-      const py = r * TILE + TILE / 2
-      this.add.ellipse(px, py + 18, 24, 7, 0x000000, 0.25).setDepth(5)
-      const sprite = this.add.sprite(px, py, 'tiny-dungeon', frame)
+    for (const v of villagers) {
+      const px = v.col * TILE + TILE / 2
+      const py = v.row * TILE + TILE / 2
+      this.add.ellipse(px, py + 22, 26, 8, 0x000000, 0.28).setDepth(5)
+      const sprite = this.add.sprite(px, py, 'tiny-dungeon', v.frame)
         .setScale(CHAR_SCALE).setDepth(6)
-      // Tiny idle bob -- staggered phase by frame index so they don't sync
       this.tweens.add({
         targets: sprite,
         y: py - 2,
-        duration: 1200 + (frame % 7) * 80,
+        duration: 1200 + (v.frame % 7) * 80,
         ease: 'Sine.easeInOut',
         yoyo: true,
         repeat: -1,
-        delay: (frame % 11) * 60,
+        delay: (v.frame % 11) * 60,
       })
+      const hit = this.add.zone(px, py, 48, 56)
+        .setInteractive({ useHandCursor: true })
+      hit.on('pointerdown', () => this.showDialog(v.name, v.beats))
     }
   }
 
@@ -540,8 +616,9 @@ export default class AetherveilOverworld extends Phaser.Scene {
       if (typeof window !== 'undefined') {
         const sp = new URLSearchParams(window.location.search).get('spawn')
         if (sp === 'castle') { px = 36 * TILE; py = 8 * TILE }
-        else if (sp === 'plaza') { px = 25 * TILE; py = 17 * TILE }
+        else if (sp === 'plaza') { px = 30 * TILE; py = 17 * TILE }
         else if (sp === 'north') { px = 25 * TILE; py = 3 * TILE }
+        else if (sp === 'fountain') { px = 31 * TILE; py = 18 * TILE }
       }
     } catch { /* ignore */ }
     this.playerShadow = this.add.ellipse(px, py + 22, 30, 9, 0x000000, 0.30).setDepth(5)
