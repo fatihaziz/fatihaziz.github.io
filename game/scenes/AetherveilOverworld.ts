@@ -703,6 +703,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
     const interiorMap: Record<string, string> = {
       atelier: 'AtelierInterior',
       vaults: 'VaultsOfWhisperleaf',
+      forge: 'EmbersForge',
     }
     const target = interiorMap[b.key]
     if (target) {

@@ -86,6 +86,7 @@ export default class Boot extends Phaser.Scene {
         const s = new URLSearchParams(window.location.search).get('scene')
         if (s === 'atelier') target = 'AtelierInterior'
         else if (s === 'vaults') target = 'VaultsOfWhisperleaf'
+        else if (s === 'forge') target = 'EmbersForge'
       }
     } catch { /* ignore */ }
     this.time.delayedCall(400, () => {

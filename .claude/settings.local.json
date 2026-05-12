@@ -10,7 +10,18 @@
       "Bash(npx nuxi:*)",
       "Bash(pnpm build:*)",
       "Bash(pkill -f 'nuxt dev')",
-      "Bash(lsof -ti:3000,3001)"
+      "Bash(lsof -ti:3000,3001)",
+      "Bash(pnpm exec *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/aetherveil)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j3-01-vaults.png \"/aetherveil?scene=vaults\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j3-02-stone.png \"/aetherveil?scene=vaults\" 3000 --no-dialog)",
+      "Bash(pnpm build-github *)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j3-03-from-overworld.png \"/aetherveil\" 3000 --no-dialog --click=180,620)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j4-01-forge.png \"/aetherveil?scene=forge\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j4-02-tworows.png \"/aetherveil?scene=forge\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j4-03-flames.png \"/aetherveil?scene=forge\" 3000 --no-dialog)",
+      "Bash(pnpm dev *)",
+      "Read(//tmp/**)"
     ],
     "deny": []
   }
