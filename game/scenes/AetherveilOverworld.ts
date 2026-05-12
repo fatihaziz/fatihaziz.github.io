@@ -698,12 +698,17 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   private openBuilding(b: BuildingDef) {
-    // Only the Atelier has a real interior scene wired (J.2). The others
+    // Atelier (J.2) and Vaults (J.3) have real interior scenes. The rest
     // still surface a stub dialog until their phases land.
-    if (b.key === 'atelier') {
+    const interiorMap: Record<string, string> = {
+      atelier: 'AtelierInterior',
+      vaults: 'VaultsOfWhisperleaf',
+    }
+    const target = interiorMap[b.key]
+    if (target) {
       this.cameras.main.fadeOut(280, 26, 16, 8)
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start('AtelierInterior')
+        this.scene.start(target)
       })
       return
     }

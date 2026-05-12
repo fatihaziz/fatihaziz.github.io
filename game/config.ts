@@ -8,6 +8,7 @@ import Phaser from 'phaser'
 import Boot from './scenes/Boot'
 import AetherveilOverworld from './scenes/AetherveilOverworld'
 import AtelierInterior from './scenes/AtelierInterior'
+import VaultsOfWhisperleaf from './scenes/VaultsOfWhisperleaf'
 
 export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -34,6 +35,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
         debug: false,
       },
     },
-    scene: [Boot, AetherveilOverworld, AtelierInterior],
+    scene: [Boot, AetherveilOverworld, AtelierInterior, VaultsOfWhisperleaf],
   }
 }
