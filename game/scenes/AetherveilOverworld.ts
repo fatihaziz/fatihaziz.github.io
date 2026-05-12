@@ -340,7 +340,6 @@ export default class AetherveilOverworld extends Phaser.Scene {
       this.placeHouse(b)
       const cxPx = (b.cx + b.w / 2) * TILE
       const cyPx = (b.cy + 3) * TILE + 8
-      // Click hitbox over the wall row of the house.
       const hit = this.add.zone(cxPx, (b.cy + 1.5) * TILE, b.w * TILE, 2 * TILE)
         .setInteractive({ useHandCursor: true })
       hit.on('pointerdown', () => this.openBuilding(b))
@@ -348,7 +347,29 @@ export default class AetherveilOverworld extends Phaser.Scene {
       this.add.text(cxPx, cyPx, b.label, {
         fontFamily: FONT_BODY, fontSize: '16px', color: '#3a2418', fontStyle: '500',
       }).setOrigin(0.5).setResolution(3).setDepth(5)
+      // J.7: small italic mark next to the label if the visitor has been inside
+      if (this.isBuildingVisited(b.key)) {
+        this.add.text(cxPx, cyPx + 18, '~ returned ~', {
+          fontFamily: FONT_BODY, fontSize: '13px', color: '#8a5a2a',
+          fontStyle: 'italic',
+        }).setOrigin(0.5).setResolution(3).setDepth(5)
+      }
     }
+  }
+
+  private isBuildingVisited(key: string): boolean {
+    try {
+      if (typeof window === 'undefined') return false
+      return window.localStorage.getItem(`aetherveil.visited.${key}`) === '1'
+    } catch { return false }
+  }
+
+  private markBuildingVisited(key: string): void {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(`aetherveil.visited.${key}`, '1')
+      }
+    } catch { /* ignore */ }
   }
 
   private placeHouse(b: BuildingDef) {
@@ -694,6 +715,17 @@ export default class AetherveilOverworld extends Phaser.Scene {
   // ============================================================
 
   private openMayorDialog() {
+    // If the visitor has been inside every building, Mayor Halden notices.
+    const allKeys = BUILDINGS.map((b) => b.key)
+    const allVisited = allKeys.every((k) => this.isBuildingVisited(k))
+    if (allVisited) {
+      this.showDialog('Mayor Halden', [
+        "So -- you've seen all five doors. Every one. Most travelers visit two or three, and the rest stay shut until next season.",
+        "I won't ask which you liked. That's between you and the crafter. But Aetherveil is smaller for being known, isn't it. The valley fits in the head now.",
+        "Come back when the road brings you. You'll find a flame still lit on the Beacon. The crafter prefers it that way.",
+      ])
+      return
+    }
     this.showDialog('Mayor Halden', MAYOR_DIALOG)
   }
 
@@ -709,6 +741,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
     }
     const target = interiorMap[b.key]
     if (target) {
+      this.markBuildingVisited(b.key)
       this.cameras.main.fadeOut(280, 26, 16, 8)
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start(target)
