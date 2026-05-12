@@ -1,10 +1,13 @@
 /**
  * Phaser game config for Aetherveil.
- * Imports scenes registered in load order: Boot -> AetherveilOverworld.
+ * Scenes load in registration order; the first scene is started by Phaser
+ * automatically. Building-interior scenes are reachable only via
+ * scene.start() from the overworld.
  */
 import Phaser from 'phaser'
 import Boot from './scenes/Boot'
 import AetherveilOverworld from './scenes/AetherveilOverworld'
+import AtelierInterior from './scenes/AtelierInterior'
 
 export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -31,6 +34,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
         debug: false,
       },
     },
-    scene: [Boot, AetherveilOverworld],
+    scene: [Boot, AetherveilOverworld, AtelierInterior],
   }
 }

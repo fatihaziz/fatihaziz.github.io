@@ -25,6 +25,17 @@ def main() -> int:
     port = int(sys.argv[3]) if len(sys.argv) > 3 else int(os.environ.get("DREAM_PORT", "3000"))
     # Optional flag: --no-dialog will press ESC to close any auto-opened dialog
     no_dialog = "--no-dialog" in sys.argv
+    # Optional flag: --click=x,y issues a single mouse click at the given
+    # CSS-px coordinate after the canvas attaches, then waits 1.2s and
+    # screenshots. Used to drive scene transitions (overworld -> atelier).
+    click_xy: tuple[int, int] | None = None
+    for arg in sys.argv:
+        if arg.startswith("--click="):
+            try:
+                xs, ys = arg.split("=", 1)[1].split(",")
+                click_xy = (int(xs), int(ys))
+            except Exception:
+                pass
     out_path = OUT / out_name
 
     with sync_playwright() as p:
@@ -56,6 +67,12 @@ def main() -> int:
             page.wait_for_timeout(1500)  # extra frames
         except Exception:
             pass
+        if click_xy is not None:
+            try:
+                page.mouse.click(click_xy[0], click_xy[1])
+                page.wait_for_timeout(1200)
+            except Exception as exc:
+                print(f"!! click failed: {exc}")
         page.screenshot(path=str(out_path), full_page=False)
 
         def safe(s: str) -> str:

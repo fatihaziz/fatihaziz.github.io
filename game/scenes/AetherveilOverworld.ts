@@ -327,7 +327,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
       // Click hitbox over the wall row of the house.
       const hit = this.add.zone(cxPx, (b.cy + 1.5) * TILE, b.w * TILE, 2 * TILE)
         .setInteractive({ useHandCursor: true })
-      hit.on('pointerdown', () => this.openBuildingStub(b.label))
+      hit.on('pointerdown', () => this.openBuilding(b))
       // Name plate below.
       this.add.text(cxPx, cyPx, b.label, {
         fontFamily: FONT_BODY, fontSize: '16px', color: '#3a2418', fontStyle: '500',
@@ -653,9 +653,18 @@ export default class AetherveilOverworld extends Phaser.Scene {
     this.showDialog('Mayor Halden', MAYOR_DIALOG)
   }
 
-  private openBuildingStub(label: string) {
-    this.showDialog(label, [
-      `${label} — the door listens, but the interior is still under construction. Return after the next chapter.`,
+  private openBuilding(b: BuildingDef) {
+    // Only the Atelier has a real interior scene wired (J.2). The others
+    // still surface a stub dialog until their phases land.
+    if (b.key === 'atelier') {
+      this.cameras.main.fadeOut(280, 26, 16, 8)
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start('AtelierInterior')
+      })
+      return
+    }
+    this.showDialog(b.label, [
+      `${b.label} — the door listens, but the interior is still under construction. Return after the next chapter.`,
     ])
   }
 

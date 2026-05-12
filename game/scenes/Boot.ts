@@ -78,8 +78,17 @@ export default class Boot extends Phaser.Scene {
   }
 
   create() {
+    // Allow direct-jump to interior scenes via ?scene=atelier for screenshot
+    // iteration. Defaults to the overworld for normal play.
+    let target = 'AetherveilOverworld'
+    try {
+      if (typeof window !== 'undefined') {
+        const s = new URLSearchParams(window.location.search).get('scene')
+        if (s === 'atelier') target = 'AtelierInterior'
+      }
+    } catch { /* ignore */ }
     this.time.delayedCall(400, () => {
-      this.scene.start('AetherveilOverworld')
+      this.scene.start(target)
     })
   }
 }
