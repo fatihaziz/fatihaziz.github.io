@@ -63,6 +63,18 @@ export default class Boot extends Phaser.Scene {
       '/atlases/tiny-town/Tilemap/tilemap_packed.png',
       { frameWidth: 16, frameHeight: 16 },
     )
+
+    // Tiny Dungeon tilemap as 16x16 spritesheet -- characters live here.
+    // Frame indices of interest:
+    //   84 = purple-hat wizard (Mayor Halden)
+    //   87 = white-hair elf,  88 = villager
+    //   99 = princess-purple, 100 = white-hair elf girl (player, Frieren-coded)
+    //   109 = monk-yellow, 112 = green-cap bandit
+    this.load.spritesheet(
+      'tiny-dungeon',
+      '/atlases/tiny-dungeon/Tilemap/tilemap_packed.png',
+      { frameWidth: 16, frameHeight: 16 },
+    )
   }
 
   create() {

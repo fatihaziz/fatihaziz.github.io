@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Headless screenshot + console-log dump for any local route.
 
-Usage: python scripts/dream_screenshot.py [out_png] [route]
+Usage: python scripts/dream_screenshot.py [out_png] [route] [port]
 Default out: test-results/dream-iter.png
 Default route: /aetherveil
+Default port: 3000 (override if Nuxt fell back to 3001/3002)
 """
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -20,11 +22,18 @@ OUT.mkdir(exist_ok=True)
 def main() -> int:
     out_name = sys.argv[1] if len(sys.argv) > 1 else "dream-iter.png"
     route = sys.argv[2] if len(sys.argv) > 2 else "/aetherveil"
+    port = int(sys.argv[3]) if len(sys.argv) > 3 else int(os.environ.get("DREAM_PORT", "3000"))
+    # Optional flag: --no-dialog will press ESC to close any auto-opened dialog
+    no_dialog = "--no-dialog" in sys.argv
     out_path = OUT / out_name
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         ctx = browser.new_context(viewport={"width": 1600, "height": 900})
+        # Pre-seed localStorage so the first-visit Mayor dialog doesn't auto-open
+        # on no_dialog runs (cleaner shot of world + player).
+        if no_dialog:
+            ctx.add_init_script("window.localStorage.setItem('aetherveil.visited', '1')")
         page = ctx.new_page()
 
         console_msgs: list[str] = []
@@ -33,7 +42,7 @@ def main() -> int:
         page.on("pageerror", lambda e: page_errors.append(str(e)))
 
         route = route if route.startswith("/") else "/" + route
-        page.goto(f"http://localhost:3000{route}", wait_until="networkidle", timeout=60_000)
+        page.goto(f"http://localhost:{port}{route}", wait_until="networkidle", timeout=60_000)
         # Wait for loading_screen overlay to fully detach (it runs 15s + 800ms + 1.5s transition)
         try:
             page.wait_for_selector(".loading-screen", state="detached", timeout=25_000)

@@ -1,28 +1,21 @@
 import Phaser from 'phaser'
 
 /**
- * J.1b Aetherveil Overworld -- rendered using Kenney Tiny Town tilemap
- * sprites instead of placeholder rectangles. World is 50x36 tiles at
+ * J.1c Aetherveil Overworld -- world rendered from Kenney Tiny Town tiles,
+ * characters from Kenney Tiny Dungeon spritesheet. World is 50x36 tiles at
  * 32 px (16x16 source scaled 2x) = 1600x1152 px.
  *
- * Tile-index reference (Tiny Town packed sheet, 12 cols x 11 rows = 132):
- *   GRASS variants:        0, 1, 2
- *   GRASS-to-dirt edges:   12-14, 24-26, 36-42
- *   DIRT full:             24, 25, 26
- *   STONE PATH tile:       43
- *   BUSHES (single-tile):  5, 6, 7, 8
- *   SHRUBS:                17
- *   TREES (small):         3 (orange), 4 (green), 27 (autumn), 28 (autumn-green)
- *   FENCE pieces:          44, 45, 46, 47, 56, 58, 68, 70, 80-82
- *   HOUSE BLUE roof row:   60 (L), 61 (M), 62 (R)
- *   HOUSE BLUE wall row:   48 (L), 51 (door), 50 (R)
- *   HOUSE RED  roof row:   64 (L), 65 (M), 66 (R)
- *   HOUSE RED  wall row:   52 (L), 55 (door), 54 (R)
- *   ROOF PEAK chevron:     67
- *   STAIRS / cobble:       96, 97, 98 (stone stairs)
+ * Tile-index reference (Tiny Town packed, 12x11 = 132):
+ *   GRASS:         0/1/2     DIRT:    25     STONE_PATH: 43
+ *   BUSHES:        5-8       SHRUB:   17
+ *   TREES:         3 (orange), 4 (green)
+ *   BLUE house:    roof 60/61/62, wall 48/51/50
+ *   RED house:     roof 64/65/66, wall 52/55/54
+ *   ROOF PEAK:     67
  *
- * Player + Mayor remain primitives this cycle (no character sheet from
- * Tiny Town). J.1c will swap in Roguelike RPG character sprites.
+ * Character-index reference (Tiny Dungeon packed):
+ *   84  Mayor Halden -- purple-hat wizard (wise elder)
+ *   100 Player      -- white-hair elf girl (Frieren-coded traveler)
  */
 
 const FONT_TITLE = '"Cinzel", "Georgia", serif'
@@ -31,6 +24,9 @@ const FONT_BODY = '"Cormorant Garamond", "Georgia", serif'
 const SRC_TILE = 16
 const SCALE = 2
 const TILE = SRC_TILE * SCALE       // 32 px on screen
+// Characters scale slightly larger than tiles so they read clearly without
+// requiring camera zoom (which would mangle scroll-factor=0 HUD).
+const CHAR_SCALE = 3                // 48 px tall char on 32 px tiles
 const COLS = 50
 const ROWS = 36
 const WORLD_W = COLS * TILE         // 1600
@@ -107,8 +103,9 @@ const MAYOR_DIALOG = [
 ]
 
 export default class AetherveilOverworld extends Phaser.Scene {
-  private player!: Phaser.GameObjects.Container & { body: Phaser.Physics.Arcade.Body }
-  private mayor!: Phaser.GameObjects.Container
+  private player!: Phaser.Physics.Arcade.Sprite
+  private playerShadow!: Phaser.GameObjects.Ellipse
+  private mayor!: Phaser.GameObjects.Sprite
   private mayorHit!: Phaser.GameObjects.Zone
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
   private wasd?: Record<string, Phaser.Input.Keyboard.Key>
@@ -315,33 +312,44 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   private buildMayor() {
+    // Mayor stands just south of the fountain, on the plaza cobble.
     const fcx = Math.floor(COLS / 2) * TILE
-    const fcy = Math.floor(ROWS / 2) * TILE + 50
-    // Body cloak ellipse + head circle (still primitives until J.1c)
-    const body = this.add.ellipse(fcx, fcy + 4, 20, 26, 0x4a6b3a).setStrokeStyle(1.5, 0x2a3f22).setDepth(6)
-    const head = this.add.circle(fcx, fcy - 8, 8, 0xf5d8b0).setStrokeStyle(1, 0x3a2418).setDepth(6)
-    const cane = this.add.rectangle(fcx + 11, fcy + 4, 2, 22, 0xa98758).setDepth(6)
-    this.mayor = this.add.container(0, 0, [body, head, cane]).setDepth(6)
-    this.mayorHit = this.add.zone(fcx, fcy, 36, 38)
+    const fcy = Math.floor(ROWS / 2) * TILE + 56
+    // Soft shadow ellipse under feet (depth 5, below sprite)
+    this.add.ellipse(fcx, fcy + 26, 32, 9, 0x000000, 0.30).setDepth(5)
+    // Mayor sprite: tiny-dungeon frame 84 (purple-hat wizard, 48px tall)
+    this.mayor = this.add.sprite(fcx, fcy, 'tiny-dungeon', 84)
+      .setScale(CHAR_SCALE)
+      .setDepth(6)
+    // Gentle idle bob -- 2px Y oscillation, yoyo
+    this.tweens.add({
+      targets: this.mayor,
+      y: fcy - 3,
+      duration: 1400,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,
+    })
+    this.mayorHit = this.add.zone(fcx, fcy, 52, 56)
       .setInteractive({ useHandCursor: true })
     this.mayorHit.on('pointerdown', () => this.openMayorDialog())
-    this.add.text(fcx, fcy - 26, 'Mayor Halden', {
-      fontFamily: FONT_BODY, fontSize: '14px', color: '#3a2418', fontStyle: '600',
+    this.add.text(fcx, fcy - 36, 'Mayor Halden', {
+      fontFamily: FONT_BODY, fontSize: '15px', color: '#f5e5c5', fontStyle: '600',
+      stroke: '#3a2418', strokeThickness: 3,
     }).setOrigin(0.5).setResolution(3).setDepth(7)
   }
 
   private buildPlayer() {
+    // Spawn near south entrance, on the dirt road.
     const px = Math.floor(COLS / 2) * TILE
     const py = (ROWS - 4) * TILE
-    const body = this.add.ellipse(0, 4, 18, 24, 0x5a4a8a).setStrokeStyle(1.5, 0x3a2a6a)
-    const head = this.add.circle(0, -10, 7, 0xf5d8b0).setStrokeStyle(1, 0x3a2418)
-    const cape = this.add.polygon(0, 4, [-9, -6, 9, -6, 11, 12, -11, 12], 0x4a3a6a, 0.5)
-    const cont = this.add.container(px, py, [cape, body, head]).setDepth(6)
-    this.physics.add.existing(cont)
-    this.player = cont as Phaser.GameObjects.Container & { body: Phaser.Physics.Arcade.Body }
-    this.player.body.setSize(20, 26)
-    this.player.body.setOffset(-10, -10)
-    this.player.body.setCollideWorldBounds(true)
+    // Soft shadow under player feet -- moved with player in update().
+    this.playerShadow = this.add.ellipse(px, py + 22, 30, 9, 0x000000, 0.30).setDepth(5)
+    // Player sprite: tiny-dungeon frame 100 (white-hair elf girl, Frieren-coded).
+    this.player = this.physics.add.sprite(px, py, 'tiny-dungeon', 100)
+      .setScale(CHAR_SCALE)
+      .setDepth(6)
+    this.player.setCollideWorldBounds(true)
   }
 
   private buildHud() {
@@ -434,9 +442,11 @@ export default class AetherveilOverworld extends Phaser.Scene {
 
   update() {
     if (!this.player || !this.cursors || !this.wasd) return
-    const body = this.player.body
-    body.setVelocity(0)
-    if (this.dialogOpen) return
+    this.player.setVelocity(0)
+    if (this.dialogOpen) {
+      this.syncPlayerShadow()
+      return
+    }
     const speed = 220
     let vx = 0, vy = 0
     if (this.cursors.left.isDown || this.wasd.A?.isDown) vx -= 1
@@ -444,6 +454,16 @@ export default class AetherveilOverworld extends Phaser.Scene {
     if (this.cursors.up.isDown || this.wasd.W?.isDown) vy -= 1
     if (this.cursors.down.isDown || this.wasd.S?.isDown) vy += 1
     if (vx !== 0 && vy !== 0) { const inv = 1 / Math.sqrt(2); vx *= inv; vy *= inv }
-    body.setVelocity(vx * speed, vy * speed)
+    this.player.setVelocity(vx * speed, vy * speed)
+    if (vx < 0) this.player.setFlipX(true)
+    else if (vx > 0) this.player.setFlipX(false)
+    this.syncPlayerShadow()
+  }
+
+  private syncPlayerShadow() {
+    if (this.playerShadow && this.player) {
+      this.playerShadow.x = this.player.x
+      this.playerShadow.y = this.player.y + 22
+    }
   }
 }
