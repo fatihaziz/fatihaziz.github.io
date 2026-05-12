@@ -10,6 +10,7 @@ import AetherveilOverworld from './scenes/AetherveilOverworld'
 import AtelierInterior from './scenes/AtelierInterior'
 import VaultsOfWhisperleaf from './scenes/VaultsOfWhisperleaf'
 import EmbersForge from './scenes/EmbersForge'
+import HearthlightInn from './scenes/HearthlightInn'
 
 export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -36,6 +37,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
         debug: false,
       },
     },
-    scene: [Boot, AetherveilOverworld, AtelierInterior, VaultsOfWhisperleaf, EmbersForge],
+    scene: [Boot, AetherveilOverworld, AtelierInterior, VaultsOfWhisperleaf, EmbersForge, HearthlightInn],
   }
 }
