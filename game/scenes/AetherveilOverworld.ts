@@ -301,6 +301,22 @@ export default class AetherveilOverworld extends Phaser.Scene {
       fontFamily: FONT_BODY, fontSize: '15px', color: '#7a3957', fontStyle: 'italic',
     }).setOrigin(0.5).setResolution(3).setDepth(5)
 
+    // Cherry-petal particle drift -- spawn from grove, fall SE on the breeze.
+    // Use the small bush tile tinted pink as the petal sprite (no separate
+    // particle asset needed). One petal every ~130 ms, lifetime 5 s, fade out.
+    this.add.particles(0, 0, 'tiny-town', {
+      frame: T.BUSH_A,
+      x: { min: 3 * TILE, max: 11 * TILE },
+      y: { min: 2 * TILE, max: 8 * TILE },
+      lifespan: 5000,
+      speedX: { min: 12, max: 32 },
+      speedY: { min: 18, max: 38 },
+      scale: { start: 0.4, end: 0.15 },
+      alpha: { start: 0.85, end: 0 },
+      tint: [0xffaad0, 0xffc0d8, 0xff8aaa],
+      frequency: 130,
+    }).setDepth(4)
+
     // Scatter wild bushes + trees in outer fields (away from plaza centre).
     const spots: [number, number, number][] = [
       [3, 12, T.BUSH_B], [5, 14, T.BUSH_C], [11, 12, T.BUSH_A],
@@ -454,7 +470,35 @@ export default class AetherveilOverworld extends Phaser.Scene {
       this.tile(tc, cy + 2, T.STONE_SLIT_M,  5)
       this.tile(tc, cy + 3, T.STONE_WALL_M,  5)
       this.tile(tc, cy + 4, T.STONE_BASE_M,  5)
+      // Pennant: small crimson cloth flapping on the tower peak.
+      const px = tc * TILE + TILE / 2
+      const py = cy * TILE + 4
+      const pennant = this.add.triangle(px + 8, py, 0, -6, 18, -2, 0, 10, 0xa83232)
+        .setStrokeStyle(1, 0x5a1818).setDepth(6).setOrigin(0, 0.5)
+      this.tweens.add({
+        targets: pennant,
+        scaleX: 0.55,
+        duration: 900,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: -1,
+      })
     }
+    // Central keep peak gets a larger banner (slightly different colour).
+    const keepBannerX = (peakCx + 1) * TILE + TILE / 2
+    const keepBannerY = 0 * TILE + 4
+    const keepBanner = this.add.triangle(keepBannerX + 10, keepBannerY,
+      0, -8, 24, -2, 0, 14, 0xc04848)
+      .setStrokeStyle(1, 0x5a1818).setDepth(6).setOrigin(0, 0.5)
+    this.tweens.add({
+      targets: keepBanner,
+      scaleX: 0.6,
+      duration: 1100,
+      ease: 'Sine.easeInOut',
+      yoyo: true,
+      repeat: -1,
+      delay: 200,
+    })
 
     // Castle name plate just below the gate, on grass.
     const labelX = (cx + gateCol + 0.5) * TILE
