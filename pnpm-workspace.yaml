@@ -1,0 +1,11 @@
+# pnpm v11 moved dependency build-script approval out of package.json
+# (onlyBuiltDependencies was removed) and into this file as `allowBuilds`.
+# These are the deps that ship install/build scripts; allow them to run so a
+# clean CI/Docker `pnpm install --frozen-lockfile` doesn't fail with
+# ERR_PNPM_IGNORED_BUILDS. better-sqlite3 is the load-bearing one (native addon).
+allowBuilds:
+  "@parcel/watcher": true
+  better-sqlite3: true
+  core-js: true
+  esbuild: true
+  vue-demi: true

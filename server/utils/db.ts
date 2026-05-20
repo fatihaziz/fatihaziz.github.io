@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import Database from 'better-sqlite3'
 
 export interface StoryRow {
@@ -19,17 +19,19 @@ export interface StoryRow {
 
 let _db: Database.Database | null = null
 
-// Anchor the SQLite file to <projectRoot>/data. nuxt dev/start run with cwd at
-// the project root, so this stays inside the repo and never leaks elsewhere.
-function dataDir(): string {
-  const dir = join(process.cwd(), 'data')
+// SQLite path. Prod (Fly) sets DB_PATH=/data/journal.db on the persistent
+// volume; local dev falls back to <projectRoot>/data/journal.db (gitignored).
+function dbFile(): string {
+  const explicit = process.env.DB_PATH?.trim()
+  const file = explicit || join(process.cwd(), 'data', 'journal.db')
+  const dir = dirname(file)
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-  return dir
+  return file
 }
 
 export function getDb(): Database.Database {
   if (_db) return _db
-  const db = new Database(join(dataDir(), 'journal.db'))
+  const db = new Database(dbFile())
   db.pragma('journal_mode = WAL')
   db.exec(`
     CREATE TABLE IF NOT EXISTS stories (

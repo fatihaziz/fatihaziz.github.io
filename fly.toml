@@ -1,0 +1,44 @@
+# Fly.io deploy for the full Nuxt app (Aetherveil + journal).
+# Conforms to __standards/flyio-deployment (adapted from Go to Node/Nitro).
+# Deploy: fly deploy --ha=false --local-only   (ONE machine; SQLite = single writer).
+
+app = "CHANGE-ME"        # set with `fly apps create <name>`, then put the name here
+primary_region = "sin"   # Singapore -- closest to Indonesia
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  HOST = "0.0.0.0"
+  DB_PATH = "/data/journal.db"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"   # idle -> stop -> ~$0 of compute
+  auto_start_machines = true    # wake on request (small cold-start)
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 25             # keep low: SQLite is single-writer
+    soft_limit = 20
+
+# SQLite persistence on a single-attach volume. ONE machine only -- enforce with
+# `fly deploy --ha=false` so Fly never spawns a second machine it can't attach.
+[mounts]
+  source = "journal_data"
+  destination = "/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"             # Node/Nitro needs more headroom than the Go standard's 256mb
+
+[checks]
+  [checks.health]
+    type = "http"
+    port = 8080
+    path = "/api/health"
+    interval = "30s"
+    timeout = "5s"

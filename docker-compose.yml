@@ -1,0 +1,18 @@
+# Local production-parity run (standard flyio-deployment Testing section):
+#   docker compose up --build    -> http://localhost:8080
+#   docker compose down -v        -> reset the SQLite volume
+services:
+  journal:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      HOST: "0.0.0.0"
+      DB_PATH: /data/journal.db
+    volumes:
+      - journal_data:/data
+    restart: unless-stopped
+
+volumes:
+  journal_data:

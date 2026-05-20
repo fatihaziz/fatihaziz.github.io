@@ -1,0 +1,25 @@
+.git
+.github
+node_modules
+.nuxt
+.output
+.fly
+dist
+docs
+*.log
+.DS_Store
+
+# never bake secrets into the image
+.env
+.env.*
+
+# local SQLite must never enter the image (keeps data/journal-themes.ts though)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+*.db
+*.db-shm
+*.db-wal
+
+# dev/recon junk
+**/__pycache__
