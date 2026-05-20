@@ -60,8 +60,10 @@ import CloudFormation from './CloudFormation.vue';
 const route = useRoute();
 const isLovePage = computed(() => route.path === '/i-love-you-dian');
 const isNovelPage = computed(() => route.path === '/laut');
+const isJournalPage = computed(() => route.path.startsWith('/journal'));
 
-const loading = ref(true);
+// The journal has its own per-story backdrop, so skip the village intro there.
+const loading = ref(!isJournalPage.value);
 const progress = ref(0);
 const currentMessage = ref('');
 
@@ -117,6 +119,8 @@ function pickMessageInterval() {
 }
 
 onMounted(() => {
+  if (!loading.value) return;
+
   const messages = pickMessages();
   const duration = pickDuration();
 

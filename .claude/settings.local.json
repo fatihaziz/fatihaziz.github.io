@@ -21,7 +21,15 @@
       "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j4-02-tworows.png \"/aetherveil?scene=forge\" 3000 --no-dialog)",
       "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j4-03-flames.png \"/aetherveil?scene=forge\" 3000 --no-dialog)",
       "Bash(pnpm dev *)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j5-01-inn.png \"/aetherveil?scene=inn\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j5-02-inn.png \"/aetherveil?scene=inn\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j5-03-inn.png \"/aetherveil?scene=inn\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j5-04-inn.png \"/aetherveil?scene=inn\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j6-01-beacon.png \"/aetherveil?scene=beacon\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j6-02-beacon.png \"/aetherveil?scene=beacon\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j6-03-beacon.png \"/aetherveil?scene=beacon\" 3000 --no-dialog)",
+      "Bash(MSYS_NO_PATHCONV=1 python scripts/dream_screenshot.py j6-final-overworld.png \"/aetherveil\" 3000 --no-dialog)"
     ],
     "deny": []
   }

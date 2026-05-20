@@ -15,6 +15,11 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
+  runtimeConfig: {
+    // Empty = open public writes (no login). Set NUXT_WRITE_SECRET to require
+    // an x-write-secret header on create/update.
+    writeSecret: process.env.NUXT_WRITE_SECRET || '',
+  },
   plugins: [],
   components: true,
   experimental: {

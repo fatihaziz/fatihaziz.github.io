@@ -1,10 +1,16 @@
 {
   "dependencies": {
     "@nuxt/webpack": "^2.18.1",
+    "@tiptap/extension-text-align": "^3.23.5",
+    "@tiptap/extension-underline": "^3.23.5",
+    "@tiptap/pm": "^3.23.5",
+    "@tiptap/starter-kit": "^3.23.5",
+    "@tiptap/vue-3": "^3.23.5",
     "@tresjs/cientos": "^5.7.0",
     "@tresjs/core": "^5.8.0",
     "@tresjs/nuxt": "^5.6.0",
     "@vueuse/core": "^13.4.0",
+    "better-sqlite3": "^12.10.0",
     "defu": "^6.1.4",
     "nuxt": "3.19.2",
     "phaser": "^3.90.0",
@@ -44,6 +50,7 @@
   "pnpm": {
     "overrides": {
       "ignore": "5.3.2"
-    }
+    },
+    "onlyBuiltDependencies": ["better-sqlite3"]
   }
 }
