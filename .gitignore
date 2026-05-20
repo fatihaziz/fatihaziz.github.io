@@ -9,6 +9,13 @@ dist
 # Node dependencies
 node_modules
 
+# Python (deploy scripts)
+__pycache__/
+*.pyc
+
+# Fly.io deploy sandbox (created by scripts/deploy_fly.py, lives one dir up)
+_deploy-flyio/
+
 # Logs
 logs
 *.log
