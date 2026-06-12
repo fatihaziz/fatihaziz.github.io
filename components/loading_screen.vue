@@ -61,6 +61,9 @@ const route = useRoute();
 const isLovePage = computed(() => route.path === '/i-love-you-dian');
 const isNovelPage = computed(() => route.path === '/laut');
 const isJournalPage = computed(() => route.path.startsWith('/journal'));
+// Aetherveil has its own in-game Boot loading bar -- keep this intro short,
+// just enough to cover the font + Phaser init.
+const isGamePage = computed(() => route.path === '/' || route.path.startsWith('/aetherveil'));
 
 // The journal has its own per-story backdrop, so skip the village intro there.
 const loading = ref(!isJournalPage.value);
@@ -109,12 +112,14 @@ function pickMessages() {
 function pickDuration() {
   if (isNovelPage.value) return 3500;
   if (isLovePage.value) return 6000;
+  if (isGamePage.value) return 2800;
   return 15000;
 }
 
 function pickMessageInterval() {
   if (isNovelPage.value) return 600;
   if (isLovePage.value) return 700;
+  if (isGamePage.value) return 380;
   return 800;
 }
 
