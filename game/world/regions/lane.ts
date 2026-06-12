@@ -260,7 +260,12 @@ function openPaintingModal(ctx: WorldCtx, p: PaintingDef): void {
   const { scene } = ctx
   const camW = scene.scale.gameSize.width
   const camH = scene.scale.gameSize.height
-  const layer = scene.add.container(0, 0).setScrollFactor(0).setDepth(300)
+  // World-anchored at the camera's current view: interactive children keep
+  // valid hit areas (scrollFactor-0 containers hit-test in world space and
+  // miss once the camera scrolls). The player is frozen while it's open.
+  ctx.modalOpen(true)
+  const view = scene.cameras.main.worldView
+  const layer = scene.add.container(view.x, view.y).setDepth(300)
 
   const dim = scene.add.rectangle(camW / 2, camH / 2, camW, camH, 0x000000, 0.55).setInteractive()
   const frameW = 460
@@ -284,9 +289,15 @@ function openPaintingModal(ctx: WorldCtx, p: PaintingDef): void {
   }).setOrigin(0.5).setResolution(3)
 
   layer.add([dim, frame, g, title, caption, hint])
-  // swallow the opening click, then close on the next one
+  const close = () => {
+    layer.destroy()
+    ctx.modalOpen(false)
+    scene.input.keyboard?.off('keydown-ESC', close)
+  }
+  // swallow the opening click, then close on the next one (or ESC)
   scene.time.delayedCall(150, () => {
-    dim.once('pointerdown', () => layer.destroy())
+    dim.on('pointerdown', close)
+    scene.input.keyboard?.once('keydown-ESC', close)
   })
 }
 
@@ -375,7 +386,10 @@ function openMusicBox(ctx: WorldCtx): void {
   const { scene } = ctx
   const camW = scene.scale.gameSize.width
   const camH = scene.scale.gameSize.height
-  const layer = scene.add.container(0, 0).setScrollFactor(0).setDepth(300)
+  // world-anchored for the same hit-area reason as the painting modal
+  ctx.modalOpen(true)
+  const view = scene.cameras.main.worldView
+  const layer = scene.add.container(view.x, view.y).setDepth(300)
 
   const dim = scene.add.rectangle(camW / 2, camH / 2, camW, camH, 0x000000, 0.55).setInteractive()
   const w = 520
@@ -416,9 +430,16 @@ function openMusicBox(ctx: WorldCtx): void {
   const closeBtn = scene.add.text(fx, fy + h / 2 - 30, '[ close the lid ]', {
     fontFamily: FONT_BODY, fontSize: '16px', color: '#9a8a6e',
   }).setOrigin(0.5).setResolution(3).setInteractive({ useHandCursor: true })
-  closeBtn.on('pointerdown', () => {
+  const close = () => {
     stopMelody()
     layer.destroy()
+    ctx.modalOpen(false)
+    scene.input.keyboard?.off('keydown-ESC', close)
+  }
+  closeBtn.on('pointerdown', close)
+  scene.time.delayedCall(150, () => {
+    dim.on('pointerdown', close)
+    scene.input.keyboard?.once('keydown-ESC', close)
   })
   layer.add(closeBtn)
 }

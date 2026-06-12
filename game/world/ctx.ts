@@ -28,4 +28,6 @@ export interface WorldCtx {
   enterInterior(sceneKey: string, buildingKey: string): void
   /** has the visitor been inside this building before */
   visitedBuilding(buildingKey: string): boolean
+  /** freeze/unfreeze the player while a custom modal is up */
+  modalOpen(open: boolean): void
 }

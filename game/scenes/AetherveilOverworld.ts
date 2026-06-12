@@ -128,10 +128,12 @@ export default class AetherveilOverworld extends Phaser.Scene {
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
   private wasd?: Record<string, Phaser.Input.Keyboard.Key>
   private dialogOpen = false
+  private uiModalOpen = false
   private reduced = false
 
   private blocked = new Set<number>()
   private vdir = { up: false, down: false, left: false, right: false }
+  private lastSafe = { x: 0, y: 0 }
 
   private fishing!: FishingMinigame
   private dockPrompt!: Phaser.GameObjects.Text
@@ -214,6 +216,12 @@ export default class AetherveilOverworld extends Phaser.Scene {
       this.mayorGreetPending = true
       this.showWelcomeTooltip()
     }
+
+    // test/debug hook: probe the collision grid from Playwright
+    try {
+      ;(window as any).__aetherveilIsBlocked =
+        (c: number, r: number) => this.blocked.has(this.tileKey(c, r))
+    } catch { /* ignore */ }
   }
 
   // ============================================================
@@ -236,6 +244,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
       playerPos: () => ({ x: this.player?.x ?? 0, y: this.player?.y ?? 0 }),
       enterInterior: (sceneKey, buildingKey) => this.enterInterior(sceneKey, buildingKey),
       visitedBuilding: (key) => isBuildingVisited(key),
+      modalOpen: (open) => { this.uiModalOpen = open },
     }
   }
 
@@ -741,6 +750,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
     this.player = this.physics.add.sprite(px, py, 'tiny-dungeon', 100)
       .setScale(CHAR_SCALE).setDepth(6)
     this.player.setCollideWorldBounds(true)
+    this.lastSafe = { x: px, y: py }
   }
 
   private showWelcomeTooltip() {
@@ -769,35 +779,44 @@ export default class AetherveilOverworld extends Phaser.Scene {
     const camW = this.scale.gameSize.width
     const camH = this.scale.gameSize.height
 
-    // findings counter (click for the list)
+    // findings counter (click for the list) + mute toggle.
+    // scrollFactor-0 objects hit-test in world space (long-standing Phaser
+    // quirk), so screen-fixed UI is hit-tested manually on pointer.x/y.
     this.findingsText = this.add.text(camW - 20, 22, '', {
       fontFamily: FONT_BODY, fontSize: '16px', color: '#f5e5c5',
       stroke: '#3a2418', strokeThickness: 3,
     }).setScrollFactor(0).setResolution(3).setOrigin(1, 0).setDepth(100)
-      .setInteractive({ useHandCursor: true })
-    this.findingsText.on('pointerdown', () => {
-      const labels = findingsLabels()
-      if (labels.length === 0) {
-        this.showDialog('Findings', ['nothing yet. the valley hides small things for the unhurried: shells, coins, riddles, trust.'])
-        return
-      }
-      this.showDialog('Findings', [
-        'so far the valley has given you:\n- ' + labels.join('\n- '),
-      ])
-    })
     this.refreshFindings()
 
-    // mute toggle
     this.muteText = this.add.text(camW - 20, camH - 26, '', {
       fontFamily: FONT_BODY, fontSize: '14px', color: '#d4b890',
       stroke: '#3a2418', strokeThickness: 3,
     }).setScrollFactor(0).setResolution(3).setOrigin(1, 1).setDepth(100)
-      .setInteractive({ useHandCursor: true })
     this.muteText.setText(audioMuted() ? '[ sound: off ]' : '[ sound: on ]')
-    this.muteText.on('pointerdown', () => {
-      const m = toggleMute()
-      this.muteText.setText(m ? '[ sound: off ]' : '[ sound: on ]')
-      if (!m) sfxBlip()
+
+    const screenHit = (t: Phaser.GameObjects.Text, x: number, y: number) => {
+      const w = t.displayWidth + 16
+      const h = t.displayHeight + 12
+      const left = t.x - w + 8        // both texts are right-aligned (originX 1)
+      const top = t.originY === 1 ? t.y - h + 6 : t.y - 6
+      return x >= left && x <= t.x + 8 && y >= top && y <= top + h
+    }
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.dialogOpen || this.uiModalOpen) return
+      if (screenHit(this.muteText, pointer.x, pointer.y)) {
+        const m = toggleMute()
+        this.muteText.setText(m ? '[ sound: off ]' : '[ sound: on ]')
+        if (!m) sfxBlip()
+      } else if (screenHit(this.findingsText, pointer.x, pointer.y)) {
+        const labels = findingsLabels()
+        if (labels.length === 0) {
+          this.showDialog('Findings', ['nothing yet. the valley hides small things for the unhurried: shells, coins, riddles, trust.'])
+          return
+        }
+        this.showDialog('Findings', [
+          'so far the valley has given you:\n- ' + labels.join('\n- '),
+        ])
+      }
     })
 
     this.add.text(20, camH - 30,
@@ -867,16 +886,29 @@ export default class AetherveilOverworld extends Phaser.Scene {
       { dx: 54, dy: 0, dir: 'right', glyph: '>' },
     ]
     for (const d of defs) {
-      const btn = this.add.circle(cx + d.dx, cy + d.dy, 30, 0x2a1a0c, 0.55)
+      this.add.circle(cx + d.dx, cy + d.dy, 30, 0x2a1a0c, 0.55)
         .setScrollFactor(0).setStrokeStyle(2, 0xa98758, 0.8).setDepth(160)
-        .setInteractive({ useHandCursor: true })
       this.add.text(cx + d.dx, cy + d.dy, d.glyph, {
         fontFamily: FONT_TITLE, fontSize: '20px', color: '#f5e5c5',
       }).setOrigin(0.5).setScrollFactor(0).setResolution(3).setDepth(161)
-      btn.on('pointerdown', () => { this.vdir[d.dir] = true })
-      btn.on('pointerup', () => { this.vdir[d.dir] = false })
-      btn.on('pointerout', () => { this.vdir[d.dir] = false })
     }
+    // manual screen-space hit-testing (same Phaser scrollFactor quirk as HUD)
+    const dirAt = (x: number, y: number) => {
+      for (const d of defs) {
+        if (Phaser.Math.Distance.Between(x, y, cx + d.dx, cy + d.dy) <= 34) return d.dir
+      }
+      return null
+    }
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      const dir = dirAt(pointer.x, pointer.y)
+      if (dir) this.vdir[dir] = true
+    })
+    const clearAll = () => {
+      this.vdir.up = false; this.vdir.down = false
+      this.vdir.left = false; this.vdir.right = false
+    }
+    this.input.on('pointerup', clearAll)
+    this.input.on('pointerupoutside', clearAll)
   }
 
   private buildAmbient(): void {
@@ -1005,11 +1037,21 @@ export default class AetherveilOverworld extends Phaser.Scene {
     this.player.setVelocity(0)
     this.fishing?.update()
 
-    if (this.dialogOpen || this.fishing?.active) {
+    if (this.dialogOpen || this.uiModalOpen || this.fishing?.active) {
       this.syncPlayerShadow()
       this.maybeSunset()
       this.updateDockPrompt()
       return
+    }
+
+    // physics may apply velocity over a longer real frame than the dt used
+    // for prediction (headless / busy tabs) -- if we ended up inside a
+    // blocked tile, snap back to the last safe spot
+    if (this.feetCollide(this.player.x, this.player.y)) {
+      this.player.setPosition(this.lastSafe.x, this.lastSafe.y)
+    } else {
+      this.lastSafe.x = this.player.x
+      this.lastSafe.y = this.player.y
     }
 
     const speed = 220
@@ -1033,6 +1075,14 @@ export default class AetherveilOverworld extends Phaser.Scene {
     if (vx < 0) this.player.setFlipX(true)
     else if (vx > 0) this.player.setFlipX(false)
     this.syncPlayerShadow()
+
+    // test/debug hook: current player tile, readable from Playwright
+    try {
+      ;(window as any).__aetherveil = {
+        x: this.player.x, y: this.player.y,
+        col: this.player.x / TILE, row: this.player.y / TILE,
+      }
+    } catch { /* ignore */ }
 
     this.updateZones()
     this.updateDockPrompt()
