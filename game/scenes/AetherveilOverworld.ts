@@ -1,18 +1,25 @@
 import Phaser from 'phaser'
 
 /**
- * Aetherveil Overworld -- the full valley (spec v2).
+ * Aetherveil Overworld -- rebuilt from the overworld design map (j9):
+ * 80x60 tiles @ 32 px, single Phaser scene (2560x1920 px world).
  *
- * 64x52 tiles at 32 px (16 px source scaled 2x) = 2048x1664 px world.
- * The walled town sits in the north-west quadrant (unchanged from J.1);
- * new land east (river / bridge / waterfall / meadow) and south
- * (residential lane / windmill / beach / dock / lighthouse / sea).
+ * Geography (per docs/spec/concept-map-j9.png):
+ *   NW  Cherry Blossom Grove (sakura, swing, meditation stone)
+ *   N   The Atelier, Quest Board, Cathedral of Whisperleaf-on-the-Hill
+ *   NE  Waterfall Cascade -> pool -> river south to the sea; Aetherveil Keep
+ *   E   Embers' Forge on the keep road; two bridges over the river
+ *   W   Residential lane: Vaults of Whisperleaf + six trade shops + the
+ *       odd houses (cats, inventor, painter, hermit, music) + Quiet Grove
+ *   C   Walled Town Square: bell tower, bazaar stalls, well, Mayor Halden
+ *   S   Hearthlight Inn, Great Gate, windmill, spawn crossroads, Clock
+ *       Tower underpass on the beach road, stilt house, stables
+ *   SE  Wheat fields + scarecrows, Beacon of Distant Roads on the shore
+ *   S   Beach, fishing dock, the sea
  *
- * Region builders live in game/world/regions/*; they receive a WorldCtx
- * and place their own tiles, collision and interactions. This scene owns
- * terrain, paths, town, the player, the Mayor, collision movement, HUD,
- * the dialog box, fishing integration, and the ambient systems (sunset,
- * birds, underpass dim, bridge echo, virtual d-pad).
+ * Region builders live in game/world/regions/*; they receive a WorldCtx.
+ * This scene owns terrain, walls, roads, villagers, the player, collision
+ * movement, HUD, the dialog box, fishing integration, and ambient systems.
  *
  * Tile-index reference (tiny-town packed, 12x11 = 132):
  *   GRASS 0/1/2  TREES 3/4  BUSHES 5-8  SHRUB 17  DIRT 25  PATH 39-42
@@ -30,11 +37,13 @@ import {
   sfxBlip, sfxDoor, sfxCollect, sfxChime, sfxEcho,
 } from '../world/audio'
 import { buildGrove } from '../world/regions/grove'
-import { buildSquare } from '../world/regions/square'
-import { buildWaterfall } from '../world/regions/waterfall'
-import { buildClockTower } from '../world/regions/clockTower'
+import { buildNorth } from '../world/regions/north'
+import { buildKeep } from '../world/regions/keep'
+import { buildRiver } from '../world/regions/river'
 import { buildLane } from '../world/regions/lane'
-import { buildBeach, SAND_TOP } from '../world/regions/beach'
+import { buildSquare } from '../world/regions/square'
+import { buildClockTower } from '../world/regions/clockTower'
+import { buildShore, SAND_TOP } from '../world/regions/shore'
 import { FishingMinigame } from '../minigames/fishing'
 
 const FONT_TITLE = '"Cinzel", "Georgia", serif'
@@ -44,18 +53,17 @@ const SRC_TILE = 16
 const SCALE = 2
 const TILE = SRC_TILE * SCALE       // 32 px on screen
 const CHAR_SCALE = 3                // 48 px tall char on 32 px tiles
-const COLS = 64
-const ROWS = 52
-const WORLD_W = COLS * TILE         // 2048
-const WORLD_H = ROWS * TILE         // 1664
+const COLS = 80
+const ROWS = 60
+const WORLD_W = COLS * TILE         // 2560
+const WORLD_H = ROWS * TILE         // 1920
 
-// The town keeps its J.1 coordinates -- expansion added land east + south,
-// so the old "centre of the world" is now a named constant.
-const TOWN_CX = 25                  // fountain column
-const TOWN_CY = 18                  // fountain row
-const WEST_WALL = 1
-const EAST_WALL = 48
-const SOUTH_WALL = 33
+// Anchor rows/cols from the design map.
+const NORTH_WALL = 17               // wall rows 17-18, road rows 19-20
+const NORTH_ROAD = 19
+const SOUTH_WALL = 47               // wall rows 47-48, Great Gate cols 29-32
+const BEACH_ROAD = 38               // E-W road rows 38-39 through the underpass
+const VROAD = 41                    // vertical road cols 41-42
 
 // Tile-index constants (tiny-town)
 const T = {
@@ -71,60 +79,31 @@ const T = {
   SHRUB: 17,
   DIRT: 25,
   STONE_PATH: 43,
-  // Blue house
-  BLUE_ROOF_L: 60, BLUE_ROOF_M: 61, BLUE_ROOF_R: 62,
-  BLUE_WALL_L: 48, BLUE_DOOR: 51, BLUE_WALL_R: 50,
-  // Red house
-  RED_ROOF_L: 64, RED_ROOF_M: 65, RED_ROOF_R: 66,
-  RED_WALL_L: 52, RED_DOOR: 55, RED_WALL_R: 54,
-  ROOF_PEAK: 67,
-  // Stone castle / walls
   STONE_GATE_ARCH: 75,
   STONE_CREN_L: 96, STONE_CREN_M: 97, STONE_CREN_R: 98,
   STONE_WALL_L: 99, STONE_WALL_M: 100, STONE_WALL_R: 101,
-  STONE_CASTLE_DOOR: 103,
   STONE_BASE_L: 108, STONE_BASE_M: 109, STONE_BASE_R: 110,
-  STONE_SLIT_L: 120, STONE_SLIT_M: 121, STONE_SLIT_R: 122,
 }
-
-interface BuildingDef {
-  key: string
-  label: string
-  scene: string
-  cx: number
-  cy: number
-  w: number
-  kind: 'red' | 'blue'
-}
-
-// The Beacon moved to the shore (a real lighthouse, built by the beach
-// region) -- four buildings remain inside the walls.
-const BUILDINGS: BuildingDef[] = [
-  { key: 'atelier', label: 'The Atelier', scene: 'AtelierInterior', cx: 11, cy: 8, w: 5, kind: 'red' },
-  { key: 'vaults', label: 'Vaults of Whisperleaf', scene: 'VaultsOfWhisperleaf', cx: 3, cy: 18, w: 5, kind: 'blue' },
-  { key: 'forge', label: "Embers' Forge", scene: 'EmbersForge', cx: 41, cy: 14, w: 5, kind: 'red' },
-  { key: 'inn', label: 'The Hearthlight Inn', scene: 'HearthlightInn', cx: 21, cy: 28, w: 6, kind: 'red' },
-]
-const ALL_BUILDING_KEYS = ['atelier', 'vaults', 'forge', 'inn', 'beacon']
 
 const MAYOR_TOUR = [
   "Ah, a new face! Welcome, traveler. You've reached Aetherveil -- a small valley of craftsmen, dreamers, and one talkative miller. I am the Mayor here. Halden, if you'd like a name to call me by.",
-  'North of the square stands The Atelier -- wonders forged from focused thought. Past it, follow the petal-fall to the Cherry Blossom Grove: a swing, a stone for sitting, and quiet enough to hear yourself.',
-  'Take the east gate and you cross the Stone Bridge. The river runs swift from the Waterfall up north -- worth the walk. Mind the current; the bridge is the only crossing.',
-  "West rest the Vaults of Whisperleaf -- bound scrolls collected over many seasons. East glows the Embers' Forge; every art has its temper learned there. South of the fountain, the Hearthlight Inn -- Marlowe will talk your ear warm.",
-  'Through Southgate lies a lane of odd little houses: the Cat Lady, a tinkerer, a painter, a hermit who trades in riddles, and a hut full of song. The Clock Tower arch beyond the Forge road also leads down to our beach.',
-  'On the shore stands the Beacon of Distant Roads -- wake a flame there, and a message will travel. Cast a line off the dock if you fancy. Wander where you will, traveler: each door listens. When you have seen the valley, return to the fountain. I will be here.',
+  'North, past the wall, stands The Atelier -- wonders forged from focused thought, crafts on display. Follow the petal-fall north-west and you reach the Cherry Blossom Grove: a swing, a stone for sitting, and quiet enough to hear yourself.',
+  'On the hill above the square rises the Cathedral of Whisperleaf-on-the-Hill. Its little sister sits west along the lane: the Vaults of Whisperleaf, where the bound scrolls live. The lane itself is full of odd doors -- a cat or five, a tinkerer, a painter, a hermit who trades in riddles, a hut full of song.',
+  "East, over the Stone Bridge, glows the Embers' Forge -- every art has its temper learned there. The river it sits on falls from the cascade up north, below Aetherveil Keep. The Keep watches; it always has.",
+  'South of the square: the Hearthlight Inn, where the road tells its chapters. The Great Gate opens to the shore. The Clock Tower arch on the east road leads to the wheat fields -- mind the scarecrows, they mind you back.',
+  'Past the wheat, on the shore, stands the Beacon of Distant Roads -- wake a flame there, and a message will travel. Cast a line off the dock if you fancy. Wander where you will, traveler: each door listens. When you have seen the valley, return to the well. I will be here.',
 ]
 
 const MAYOR_RETURNING = [
   "Welcome back, traveler. The valley's much as you left it -- though the fishing's been better.",
-  "If you lose your way: north the Atelier and the grove, east the bridge and the falls, west the Vaults, south the lane, the shore, the Beacon. I'll be here.",
+  "If you lose your way: the Atelier and the grove north, the Forge and the Keep east over the bridges, the Vaults and the lane west, the Gate, the fields and the Beacon south. I'll be here.",
 ]
+
+const ALL_BUILDING_KEYS = ['atelier', 'vaults', 'forge', 'inn', 'beacon']
 
 export default class AetherveilOverworld extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite
   private playerShadow!: Phaser.GameObjects.Ellipse
-  private mayor!: Phaser.GameObjects.Sprite
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
   private wasd?: Record<string, Phaser.Input.Keyboard.Key>
   private dialogOpen = false
@@ -171,29 +150,27 @@ export default class AetherveilOverworld extends Phaser.Scene {
     initAudio()
     const ctx = this.makeCtx()
 
-    // terrain + town (scene-owned)
+    // scene-owned terrain
     this.buildGround()
-    this.buildPaths()
-    this.buildPlaza()
-    this.buildDecorations()
-    this.buildBuildings()
-    this.buildCastle()
-    this.buildPerimeterWalls()
-    this.buildVillagers()
-    this.buildMayor()
+    this.buildWalls()
+    this.buildRoads()
+    this.buildWilds()
 
-    // regions (module-owned)
+    // regions (module-owned), west to east, north to south
     buildGrove(ctx)
+    buildNorth(ctx)
+    buildKeep(ctx)
+    const river = buildRiver(ctx)
+    this.bridgeRect = river.stoneBridgeRect
+    buildLane(ctx)
     const square = buildSquare(ctx)
     this.lanternGlows = square.lanternGlows
-    const falls = buildWaterfall(ctx)
-    this.bridgeRect = falls.bridgeRect
     const tower = buildClockTower(ctx)
     this.passageRect = tower.passageRect
-    buildLane(ctx)
-    const beach = buildBeach(ctx)
-    this.fishing = new FishingMinigame(ctx, beach.dockRect, beach.bobberPoint)
+    const shore = buildShore(ctx)
+    this.fishing = new FishingMinigame(ctx, shore.dockRect, shore.bobberPoint)
 
+    this.buildVillagers()
     this.buildPlayer()
     this.buildHud()
     this.buildAmbient()
@@ -276,7 +253,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
     return this.blocked.has(this.tileKey(c, r))
   }
 
-  /** the player's feet box -- a slab around (x, y+14)..(x, y+22) */
+  /** the player's feet box -- a slab around (x, y+12)..(x, y+22) */
   private feetCollide(x: number, y: number): boolean {
     const hw = 9
     return this.isBlockedPx(x - hw, y + 12) || this.isBlockedPx(x + hw, y + 12)
@@ -284,7 +261,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   // ============================================================
-  // TERRAIN
+  // TERRAIN: ground, walls, roads, wild scatter
   // ============================================================
 
   private tile(col: number, row: number, frame: number, depth = 0): Phaser.GameObjects.Image {
@@ -295,7 +272,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   private buildGround() {
-    // Grass over the land half; the beach module paints sand + sea below.
+    // Grass over the land half; the shore module paints sand + sea below.
     for (let r = 0; r < SAND_TOP; r++) {
       for (let c = 0; c < COLS; c++) {
         const noise = (r * 31 + c * 17) % 100
@@ -305,311 +282,125 @@ export default class AetherveilOverworld extends Phaser.Scene {
         this.tile(c, r, frame, 0)
       }
     }
-    // Forest border: top edge + west/east flanks down to the sand line.
+    // Pine forest border: two rows top, two columns down each flank.
     for (let c = 0; c < COLS; c++) {
-      this.tile(c, 0, T.TREE_GREEN, 1)
-      this.block(c, 0)
+      this.tile(c, 0, T.TREE_GREEN, 1); this.block(c, 0)
+      this.tile(c, 1, T.TREE_GREEN, 1); this.block(c, 1)
     }
-    for (let r = 0; r < SAND_TOP + 3; r++) {
-      this.tile(0, r, T.TREE_GREEN, 1)
-      this.block(0, r)
-      this.tile(COLS - 1, r, T.TREE_GREEN, 1)
-      this.block(COLS - 1, r)
-    }
-  }
-
-  private buildPaths() {
-    // South road: fountain -> southgate -> lane -> beach.
-    for (let r = TOWN_CY - 1; r < SAND_TOP; r++) {
-      this.tile(TOWN_CX - 1, r, T.DIRT, 1)
-      this.tile(TOWN_CX, r, T.DIRT, 1)
-      this.tile(TOWN_CX + 1, r, T.DIRT, 1)
-    }
-    // East-west road through the plaza, out the east gate, to the meadow.
-    for (let c = 2; c <= 62; c++) {
-      this.tile(c, TOWN_CY - 1, T.DIRT, 1)
-      this.tile(c, TOWN_CY, T.DIRT, 1)
-      this.tile(c, TOWN_CY + 1, T.DIRT, 1)
-    }
-    // Forge-road spur down to the clock tower arch.
-    for (let r = TOWN_CY + 2; r <= 30; r++) {
-      this.tile(42, r, T.DIRT, 1)
-    }
-  }
-
-  private buildPlaza() {
-    const cxStart = TOWN_CX - 5
-    const cyStart = TOWN_CY - 3
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 10; c++) {
-        this.tile(cxStart + c, cyStart + r, T.STONE_PATH, 2)
+    for (let r = 2; r < SAND_TOP; r++) {
+      for (const c of [0, 1, COLS - 2, COLS - 1]) {
+        this.tile(c, r, T.TREE_GREEN, 1)
+        this.block(c, r)
       }
     }
-    // Fountain at plaza centre -- stone rim + animated water layers.
-    const fcx = TOWN_CX * TILE
-    const fcy = TOWN_CY * TILE
-    this.add.circle(fcx, fcy, 22, 0x9b8a72).setStrokeStyle(2, 0x5a4838).setDepth(3)
-    const waterOuter = this.add.circle(fcx, fcy, 18, 0x7fb9e5, 0.92).setDepth(3)
-    if (!this.reduced) {
-      this.tweens.add({
-        targets: waterOuter, alpha: 0.72,
-        duration: 1600, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
-      })
-      const ripple = this.add.circle(fcx, fcy, 8, 0x9bd0eb, 0.85).setDepth(3)
-      this.tweens.add({
-        targets: ripple, scale: 1.8, alpha: 0.15,
-        duration: 1400, ease: 'Sine.easeOut', repeat: -1,
-        onRepeat: () => { ripple.setScale(1); ripple.setAlpha(0.85) },
-      })
-    }
-    this.add.circle(fcx, fcy, 3, 0xffffff, 0.95).setDepth(3)
-    this.block(TOWN_CX, TOWN_CY)
-    // fountain click
-    const fhit = this.add.zone(fcx, fcy, 48, 48).setInteractive({ useHandCursor: true })
-    fhit.on('pointerdown', () =>
-      this.showDialog('The Fountain', ['a copper coin sits at the bottom. you decide not to disturb it.']))
-
-    // Bell tower NE of the fountain.
-    const bcx = TOWN_CX + 2
-    const bcy = TOWN_CY - 3
-    this.tile(bcx, bcy, T.ROOF_PEAK, 4)
-    this.tile(bcx, bcy + 1, T.BLUE_WALL_L, 4)
-    this.tile(bcx, bcy + 2, T.BLUE_WALL_L, 4)
-    this.blockRect(bcx, bcy, 1, 3)
-
-    this.add.text(fcx, fcy + 80, 'TOWN SQUARE', {
-      fontFamily: FONT_TITLE, fontSize: '18px', color: '#3a2418', fontStyle: '600',
-    }).setOrigin(0.5).setResolution(3).setLetterSpacing(2).setDepth(5)
   }
 
-  private buildDecorations() {
-    // Cherry grove NW.
-    const cherrySpots: [number, number][] = [
-      [4, 2], [6, 3], [8, 2], [5, 4], [3, 6], [7, 5], [9, 4], [6, 6], [4, 7],
-    ]
-    for (const [c, r] of cherrySpots) {
-      // orange poplar tinted rose -- multiply-tint over warm base reads as
-      // sakura pink (green base goes muddy instead)
-      this.tile(c, r, T.TREE_ORANGE, 2).setTint(0xffb8d8)
-      this.block(c, r)
+  private buildWalls() {
+    // North town wall, rows 17-18. Openings: grove path (12-13), the
+    // Atelier path (32-33); the Cathedral hill interrupts cols 38-48; the
+    // wall resumes 49-52 and stops at the river.
+    const gap = (c: number) =>
+      (c >= 12 && c <= 13) || (c >= 32 && c <= 33) || (c >= 38 && c <= 48)
+    for (let c = 2; c <= 52; c++) {
+      if (gap(c)) continue
+      this.tile(c, NORTH_WALL, T.STONE_CREN_M, 2)
+      this.tile(c, NORTH_WALL + 1, T.STONE_WALL_M, 2)
+      this.block(c, NORTH_WALL)
+      this.block(c, NORTH_WALL + 1)
     }
-    this.add.text(7 * TILE, 1 * TILE, 'Cherry Blossom Grove', {
-      fontFamily: FONT_BODY, fontSize: '15px', color: '#7a3957', fontStyle: 'italic',
-    }).setOrigin(0.5).setResolution(3).setDepth(5)
+    // arches over the two wall openings
+    for (const c of [12, 13, 32, 33]) {
+      this.tile(c, NORTH_WALL, T.STONE_GATE_ARCH, 2)
+    }
 
+    // South town wall, rows 47-48, west half only (cols 2-34); the Great
+    // Gate (cols 29-32) is built by the square region. East of col 34 the
+    // town opens onto the stilt-house slope and the fields.
+    for (let c = 2; c <= 34; c++) {
+      if (c >= 29 && c <= 32) continue
+      this.tile(c, SOUTH_WALL, T.STONE_CREN_M, 2)
+      this.tile(c, SOUTH_WALL + 1, T.STONE_BASE_M, 2)
+      this.block(c, SOUTH_WALL)
+      this.block(c, SOUTH_WALL + 1)
+    }
+
+    // Rampart watch-towers: west end of the south wall + the lone field
+    // tower by the river (per the map).
+    this.rampartTower(6, SOUTH_WALL - 2)
+    this.rampartTower(53, 42)
+  }
+
+  private rampartTower(c: number, topRow: number): void {
+    this.tile(c, topRow, T.STONE_CREN_L, 3)
+    this.tile(c + 1, topRow, T.STONE_CREN_R, 3)
+    this.tile(c, topRow + 1, T.STONE_WALL_L, 3)
+    this.tile(c + 1, topRow + 1, T.STONE_WALL_R, 3)
+    this.tile(c, topRow + 2, T.STONE_BASE_L, 3)
+    this.tile(c + 1, topRow + 2, T.STONE_BASE_R, 3)
+    this.blockRect(c, topRow, 2, 3)
+    const px = (c + 1) * TILE
+    const py = topRow * TILE + 2
+    const pennant = this.add.triangle(px + 6, py, 0, -6, 16, -2, 0, 9, 0xa83232)
+      .setStrokeStyle(1, 0x5a1818).setDepth(6).setOrigin(0, 0.5)
     if (!this.reduced) {
-      this.add.particles(0, 0, 'tiny-town', {
-        frame: T.BUSH_A,
-        x: { min: 3 * TILE, max: 11 * TILE },
-        y: { min: 2 * TILE, max: 8 * TILE },
-        lifespan: 5000,
-        speedX: { min: 12, max: 32 },
-        speedY: { min: 18, max: 38 },
-        scale: { start: 0.4, end: 0.15 },
-        alpha: { start: 0.85, end: 0 },
-        tint: [0xffaad0, 0xffc0d8, 0xff8aaa],
-        frequency: 130,
-      }).setDepth(4)
+      this.tweens.add({
+        targets: pennant, scaleX: 0.55,
+        duration: 900, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
+      })
     }
+  }
 
-    // Wild bushes + trees in outer fields.
+  private buildRoads() {
+    const stone = (c: number, r: number) => this.tile(c, r, T.STONE_PATH, 1)
+    const dirt = (c: number, r: number) => this.tile(c, r, T.DIRT, 1)
+
+    // North road below the wall (rows 19-20, cols 2-53).
+    for (let c = 2; c <= 53; c++) { stone(c, NORTH_ROAD); stone(c, NORTH_ROAD + 1) }
+    // Vertical road below the hill: cathedral forecourt -> spawn crossroads.
+    for (let r = 24; r < BEACH_ROAD; r++) { stone(VROAD, r); stone(VROAD + 1, r) }
+    // East-west beach road through the Clock Tower (rows 38-39, cols 25-53).
+    for (let c = 25; c <= 53; c++) { stone(c, BEACH_ROAD); stone(c, BEACH_ROAD + 1) }
+    // Gate road: below the Inn -> Great Gate -> beach (cols 30-31).
+    for (let r = 43; r < SAND_TOP + 1; r++) { stone(30, r); stone(31, r) }
+    // Forge road: vertical road -> Stone Bridge (rows 28-29).
+    for (let c = 43; c <= 53; c++) { stone(c, 28); stone(c, 29) }
+    // Keep road: north bridge -> Keep door (dirt, rows 19-20 east of river).
+    for (let c = 57; c <= 70; c++) { dirt(c, NORTH_ROAD); dirt(c, NORTH_ROAD + 1) }
+    // Grove path through the wall opening (cols 12-13).
+    for (let r = 15; r < NORTH_ROAD; r++) { dirt(12, r); dirt(13, r) }
+    // Atelier path through its wall opening (cols 32-33).
+    for (let r = 13; r < NORTH_ROAD; r++) { dirt(32, r); dirt(33, r) }
+    // West lane (dirt, rows 36-37) + its connector up to the north road.
+    for (let c = 3; c <= 26; c++) { dirt(c, 36); dirt(c, 37) }
+    for (let r = 21; r < 36; r++) { dirt(18, r); dirt(19, r) }
+    // Lane -> plaza connector.
+    for (let c = 20; c <= 26; c++) { dirt(c, 33); dirt(c, 34) }
+  }
+
+  private buildWilds() {
+    // Scattered bushes/trees in the open meadows (kept off roads + regions).
     const spots: [number, number, number][] = [
-      [3, 12, T.BUSH_B], [5, 14, T.BUSH_C], [11, 12, T.BUSH_A],
-      [38, 5, T.TREE_ORANGE], [43, 8, T.BUSH_D], [44, 11, T.TREE_GREEN],
-      [3, 22, T.BUSH_A], [7, 23, T.TREE_ORANGE], [4, 26, T.BUSH_B],
-      [38, 22, T.TREE_GREEN], [44, 25, T.BUSH_C], [42, 26, T.BUSH_D],
-      [10, 30, T.TREE_ORANGE], [15, 32, T.BUSH_A], [33, 31, T.TREE_GREEN],
-      [11, 5, T.SHRUB], [40, 11, T.SHRUB], [12, 28, T.SHRUB],
-      // new south + east fields
-      [5, 34, T.BUSH_B], [36, 35, T.BUSH_C], [38, 36, T.TREE_ORANGE],
-      [46, 35, T.TREE_GREEN], [47, 38, T.BUSH_A], [12, 34, T.BUSH_D],
+      [26, 8, T.TREE_GREEN], [27, 14, T.BUSH_B], [37, 5, T.BUSH_C],
+      [50, 8, T.TREE_ORANGE], [51, 14, T.BUSH_A], [36, 15, T.SHRUB],
+      [22, 22, T.BUSH_D], [25, 24, T.TREE_GREEN], [35, 23, T.BUSH_A],
+      [45, 23, T.TREE_ORANGE], [48, 24, T.BUSH_B], [39, 26, T.SHRUB],
+      [44, 33, T.TREE_GREEN], [46, 31, T.BUSH_C], [22, 44, T.BUSH_B],
+      [36, 42, T.TREE_ORANGE], [34, 44, T.BUSH_A], [24, 40, T.SHRUB],
+      [62, 24, T.TREE_GREEN], [66, 27, T.BUSH_D], [72, 25, T.TREE_ORANGE],
+      [64, 31, T.BUSH_A], [70, 33, T.TREE_GREEN], [74, 36, T.BUSH_C],
+      [62, 38, T.TREE_ORANGE], [68, 40, T.BUSH_B], [74, 42, T.SHRUB],
+      [47, 43, T.BUSH_D], [10, 22, T.BUSH_A], [6, 24, T.TREE_GREEN],
+      [4, 20, T.SHRUB], [23, 26, T.BUSH_C],
     ]
     for (const [c, r, f] of spots) {
       this.tile(c, r, f, 2)
       if (f === T.TREE_ORANGE || f === T.TREE_GREEN) this.block(c, r)
     }
-
-    // Wheat patch SW.
-    for (const [c, r] of [[6, 30], [7, 30], [8, 30], [6, 31], [7, 31], [8, 31]]) {
-      this.tile(c, r, T.GRASS_FLOWERS, 1).setTint(0xf3d36d)
-    }
   }
 
   // ============================================================
-  // BUILDINGS (the four in-town doors)
+  // VILLAGERS
   // ============================================================
-
-  private buildBuildings() {
-    for (const b of BUILDINGS) {
-      this.placeHouse(b)
-      const cxPx = (b.cx + b.w / 2) * TILE
-      const cyPx = (b.cy + 3) * TILE + 8
-      const hit = this.add.zone(cxPx, (b.cy + 1.5) * TILE, b.w * TILE, 2 * TILE)
-        .setInteractive({ useHandCursor: true })
-      hit.on('pointerdown', () => this.enterInterior(b.scene, b.key))
-      this.add.text(cxPx, cyPx, b.label, {
-        fontFamily: FONT_BODY, fontSize: '16px', color: '#3a2418', fontStyle: '500',
-      }).setOrigin(0.5).setResolution(3).setDepth(5)
-      if (isBuildingVisited(b.key)) {
-        this.add.text(cxPx, cyPx + 18, '~ returned ~', {
-          fontFamily: FONT_BODY, fontSize: '13px', color: '#8a5a2a', fontStyle: 'italic',
-        }).setOrigin(0.5).setResolution(3).setDepth(5)
-      }
-    }
-  }
-
-  private placeHouse(b: BuildingDef) {
-    const isRed = b.kind === 'red'
-    const ROOF_L = isRed ? T.RED_ROOF_L : T.BLUE_ROOF_L
-    const ROOF_M = isRed ? T.RED_ROOF_M : T.BLUE_ROOF_M
-    const ROOF_R = isRed ? T.RED_ROOF_R : T.BLUE_ROOF_R
-    const WALL_L = isRed ? T.RED_WALL_L : T.BLUE_WALL_L
-    const WALL_M = isRed ? T.RED_WALL_L : T.BLUE_WALL_L
-    const DOOR = isRed ? T.RED_DOOR : T.BLUE_DOOR
-    const WALL_R = isRed ? T.RED_WALL_R : T.BLUE_WALL_R
-
-    const doorCol = Math.floor(b.w / 2)
-    for (let i = 0; i < b.w; i++) {
-      this.tile(b.cx + i, b.cy, i === 0 ? ROOF_L : i === b.w - 1 ? ROOF_R : ROOF_M, 3)
-    }
-    for (let i = 0; i < b.w; i++) {
-      let frame: number
-      if (i === doorCol) frame = DOOR
-      else if (i === 0) frame = WALL_L
-      else if (i === b.w - 1) frame = WALL_R
-      else frame = WALL_M
-      this.tile(b.cx + i, b.cy + 1, frame, 3)
-    }
-    if (b.w >= 5) this.tile(b.cx + doorCol, b.cy - 1, T.ROOF_PEAK, 4)
-    this.blockRect(b.cx, b.cy, b.w, 2)
-  }
-
-  private enterInterior(sceneKey: string, buildingKey: string): void {
-    if (this.dialogOpen || this.fishing?.active) return
-    markBuildingVisited(buildingKey)
-    sfxDoor()
-    // return the visitor to where they stood, not to the spawn road
-    try {
-      this.registry.set('aetherveil.spawnAt', { x: this.player.x, y: this.player.y })
-    } catch { /* ignore */ }
-    this.cameras.main.fadeOut(280, 26, 16, 8)
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start(sceneKey)
-    })
-  }
-
-  // ============================================================
-  // CASTLE + WALLS + VILLAGERS
-  // ============================================================
-
-  private buildCastle() {
-    const cx = 22
-    const cy = 1
-    const W = 14
-    const peakCx = cx + Math.floor(W / 2) - 1
-    const KEEP_W = 3
-
-    for (let c = cx - 1; c <= cx + W; c++) this.tile(c, 0, T.GRASS_A, 0)
-
-    this.tile(peakCx + 1, 0, T.ROOF_PEAK, 5)
-    for (let i = 0; i < KEEP_W; i++) {
-      this.tile(peakCx + i, 1, i === 0 ? T.STONE_CREN_L : i === KEEP_W - 1 ? T.STONE_CREN_R : T.STONE_CREN_M, 5)
-    }
-    for (let i = 0; i < W; i++) {
-      this.tile(cx + i, cy + 1, i === 0 ? T.STONE_CREN_L : i === W - 1 ? T.STONE_CREN_R : T.STONE_CREN_M, 4)
-    }
-    for (let i = 0; i < W; i++) {
-      this.tile(cx + i, cy + 2, i === 0 ? T.STONE_SLIT_L : i === W - 1 ? T.STONE_SLIT_R : T.STONE_SLIT_M, 4)
-    }
-    const gateCol = Math.floor(W / 2)
-    for (let i = 0; i < W; i++) {
-      let f: number
-      if (i === gateCol) f = T.STONE_CASTLE_DOOR
-      else if (i === 0) f = T.STONE_WALL_L
-      else if (i === W - 1) f = T.STONE_WALL_R
-      else f = T.STONE_WALL_M
-      this.tile(cx + i, cy + 3, f, 4)
-    }
-    for (let i = 0; i < W; i++) {
-      this.tile(cx + i, cy + 4, i === 0 ? T.STONE_BASE_L : i === W - 1 ? T.STONE_BASE_R : T.STONE_BASE_M, 4)
-    }
-
-    const towerCols: number[] = [cx - 1, cx + W]
-    for (const tc of towerCols) {
-      this.tile(tc, cy, T.ROOF_PEAK, 5)
-      this.tile(tc, cy + 1, T.STONE_CREN_M, 5)
-      this.tile(tc, cy + 2, T.STONE_SLIT_M, 5)
-      this.tile(tc, cy + 3, T.STONE_WALL_M, 5)
-      this.tile(tc, cy + 4, T.STONE_BASE_M, 5)
-      const px = tc * TILE + TILE / 2
-      const py = cy * TILE + 4
-      const pennant = this.add.triangle(px + 8, py, 0, -6, 18, -2, 0, 10, 0xa83232)
-        .setStrokeStyle(1, 0x5a1818).setDepth(6).setOrigin(0, 0.5)
-      if (!this.reduced) {
-        this.tweens.add({
-          targets: pennant, scaleX: 0.55,
-          duration: 900, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
-        })
-      }
-    }
-    const keepBannerX = (peakCx + 1) * TILE + TILE / 2
-    const keepBanner = this.add.triangle(keepBannerX + 10, 4, 0, -8, 24, -2, 0, 14, 0xc04848)
-      .setStrokeStyle(1, 0x5a1818).setDepth(6).setOrigin(0, 0.5)
-    if (!this.reduced) {
-      this.tweens.add({
-        targets: keepBanner, scaleX: 0.6,
-        duration: 1100, ease: 'Sine.easeInOut', yoyo: true, repeat: -1, delay: 200,
-      })
-    }
-
-    this.add.text((cx + gateCol + 0.5) * TILE, (cy + 5) * TILE + 14, 'Castle Aetherveil', {
-      fontFamily: FONT_TITLE, fontSize: '17px', color: '#f5e5c5', fontStyle: '600',
-      stroke: '#3a2418', strokeThickness: 4,
-    }).setOrigin(0.5).setResolution(3).setLetterSpacing(2).setDepth(5)
-
-    this.blockRect(cx - 1, 0, W + 2, 6)
-  }
-
-  private buildPerimeterWalls() {
-    // West + east runs.
-    for (let r = 10; r < SOUTH_WALL; r++) {
-      const top = r === 10
-      const bottom = r === SOUTH_WALL - 1
-      const f = top ? T.STONE_CREN_M : bottom ? T.STONE_BASE_M : T.STONE_WALL_M
-      this.tile(WEST_WALL, r, f, 2)
-      this.block(WEST_WALL, r)
-      // east wall opens rows 17-19 -- the East Gate to the bridge road
-      if (r >= TOWN_CY - 1 && r <= TOWN_CY + 1) continue
-      this.tile(EAST_WALL, r, f, 2)
-      this.block(EAST_WALL, r)
-    }
-    // gate caps either side of the east opening
-    this.tile(EAST_WALL, TOWN_CY - 2, T.STONE_CREN_M, 2)
-    this.tile(EAST_WALL, TOWN_CY + 2, T.STONE_CREN_M, 2)
-    this.add.text(EAST_WALL * TILE + TILE / 2, (TOWN_CY - 2) * TILE - 6, 'Eastgate', {
-      fontFamily: FONT_BODY, fontSize: '13px', color: '#f5e5c5', fontStyle: 'italic',
-      stroke: '#3a2418', strokeThickness: 3,
-    }).setOrigin(0.5).setResolution(3).setDepth(5)
-
-    // South wall -- openings at Southgate (TOWN_CX) and the clock tower (41-43).
-    for (let c = WEST_WALL + 1; c < EAST_WALL; c++) {
-      if (c === TOWN_CX) continue
-      if (c >= 41 && c <= 43) continue
-      let f: number
-      if (c === TOWN_CX - 1) f = T.STONE_CREN_R
-      else if (c === TOWN_CX + 1) f = T.STONE_CREN_L
-      else if (c === WEST_WALL + 1) f = T.STONE_CREN_L
-      else if (c === EAST_WALL - 1) f = T.STONE_CREN_R
-      else f = T.STONE_CREN_M
-      this.tile(c, SOUTH_WALL, f, 2)
-      this.block(c, SOUTH_WALL)
-    }
-    this.tile(TOWN_CX, SOUTH_WALL - 1, T.STONE_GATE_ARCH, 2)
-    this.add.text(TOWN_CX * TILE + TILE / 2, (SOUTH_WALL + 1) * TILE + 6, 'Southgate', {
-      fontFamily: FONT_BODY, fontSize: '13px', color: '#f5e5c5',
-      fontStyle: 'italic', stroke: '#3a2418', strokeThickness: 3,
-    }).setOrigin(0.5).setResolution(3).setDepth(5)
-  }
 
   private buildVillagers() {
     interface VillagerDef {
@@ -621,35 +412,35 @@ export default class AetherveilOverworld extends Phaser.Scene {
     }
     const villagers: VillagerDef[] = [
       {
-        col: 9, row: 19, frame: 88, name: 'A Librarian',
+        col: 15, row: 34, frame: 88, name: 'A Librarian',
         beats: [
-          'The keeper does not speak. I tend the shelves while she sleeps. Three sheaves of scrolls arrived this moon -- try the cedar rack at the south wall, they still smell of pine.',
+          'The keeper of the Vaults does not speak. I tend the shelves while she sleeps. Three sheaves of scrolls arrived this moon -- try the cedar rack at the south wall, they still smell of pine.',
           'Take any you wish, only return them by dusk. The scrolls remember which hands held them last.',
         ],
       },
       {
-        col: 38, row: 16, frame: 109, name: "A Smith's Apprentice",
+        col: 61, row: 21, frame: 109, name: "A Smith's Apprentice",
         beats: [
           'Master tempers the steel by sound, not colour. I am still learning to hear it.',
           'If you bring a cracked blade he will look at it for a long time, then ask what you struck. The answer matters more than the steel.',
         ],
       },
       {
-        col: 24, row: 30, frame: 87, name: 'An Old Wanderer',
+        col: 9, row: 38.5, frame: 87, name: 'An Old Wanderer',
         beats: [
           'The road from Greybranch narrows each season. Soon only foxes and grief will pass that way.',
           'The Inn-keep keeps a fire for travellers who have nothing to trade. That is rare, in this age.',
         ],
       },
       {
-        col: 40, row: 24, frame: 99, name: 'A Noble in Travel Cloak',
+        col: 64, row: 54, frame: 99, name: 'A Noble in Travel Cloak',
         beats: [
           'If I light the flame at the Beacon tonight, my brother will see it from the hold by dawn. He always watches at dawn.',
           'It is a small magic, but small magics keep families standing.',
         ],
       },
       {
-        col: 16, row: 12, frame: 85, name: 'A Market Crier',
+        col: 35, row: 31.5, frame: 85, name: 'A Market Crier',
         beats: [
           'Onions! Crow-feathers! Apple-honey! All from the valley, none from the king\'s road.',
           'Trade fair, trade plain. The Mayor watches us, and he is gentle. He is also not entirely a man.',
@@ -674,27 +465,9 @@ export default class AetherveilOverworld extends Phaser.Scene {
     }
   }
 
-  private buildMayor() {
-    const fcx = TOWN_CX * TILE
-    const fcy = TOWN_CY * TILE + 56
-    this.add.ellipse(fcx, fcy + 26, 32, 9, 0x000000, 0.30).setDepth(5)
-    this.mayor = this.add.sprite(fcx, fcy, 'tiny-dungeon', 84)
-      .setScale(CHAR_SCALE).setDepth(6)
-    if (!this.reduced) {
-      this.tweens.add({
-        targets: this.mayor, y: fcy - 3,
-        duration: 1400, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
-      })
-    }
-    const hit = this.add.zone(fcx, fcy, 52, 56).setInteractive({ useHandCursor: true })
-    hit.on('pointerdown', () => this.openMayorDialog())
-    this.add.text(fcx, fcy - 36, 'Mayor Halden', {
-      fontFamily: FONT_BODY, fontSize: '15px', color: '#f5e5c5', fontStyle: '600',
-      stroke: '#3a2418', strokeThickness: 3,
-    }).setOrigin(0.5).setResolution(3).setDepth(7)
-  }
-
-  private openMayorDialog() {
+  // mayor dialog logic stays scene-owned; the square region places his
+  // sprite and calls back through this method
+  openMayorDialog() {
     const allVisited = ALL_BUILDING_KEYS.every((k) => isBuildingVisited(k))
     if (allVisited) {
       this.showDialog('Mayor Halden', [
@@ -714,13 +487,35 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   // ============================================================
+  // INTERIOR TRANSITIONS
+  // ============================================================
+
+  enterInteriorScene(sceneKey: string, buildingKey: string): void {
+    this.enterInterior(sceneKey, buildingKey)
+  }
+
+  private enterInterior(sceneKey: string, buildingKey: string): void {
+    if (this.dialogOpen || this.fishing?.active) return
+    markBuildingVisited(buildingKey)
+    sfxDoor()
+    // return the visitor to where they stood, not to the spawn road
+    try {
+      this.registry.set('aetherveil.spawnAt', { x: this.player.x, y: this.player.y })
+    } catch { /* ignore */ }
+    this.cameras.main.fadeOut(280, 26, 16, 8)
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start(sceneKey)
+    })
+  }
+
+  // ============================================================
   // PLAYER + HUD + AMBIENT
   // ============================================================
 
   private buildPlayer() {
-    // Default spawn: the south road between the lane and the beach.
-    let px = TOWN_CX * TILE + TILE / 2
-    let py = 39 * TILE
+    // Default spawn: the crossroads by the windmill (per the map: "YOU").
+    let px = 42.5 * TILE
+    let py = 39.5 * TILE
     // Returning from an interior: resume at the door.
     try {
       const back = this.registry.get('aetherveil.spawnAt') as { x: number; y: number } | undefined
@@ -730,20 +525,23 @@ export default class AetherveilOverworld extends Phaser.Scene {
         this.registry.remove('aetherveil.spawnAt')
       }
     } catch { /* ignore */ }
-    // Debug spawn override (?spawn=plaza|beach|falls|lane|tower) for screenshots.
+    // Debug spawn override (?spawn=plaza|grove|falls|...) for screenshots.
     try {
       if (typeof window !== 'undefined') {
         const sp = new URLSearchParams(window.location.search).get('spawn')
-        if (sp === 'castle') { px = 29 * TILE; py = 8 * TILE }
-        else if (sp === 'plaza' || sp === 'fountain') { px = 25 * TILE; py = 21 * TILE }
-        else if (sp === 'north') { px = 25 * TILE; py = 3 * TILE }
-        else if (sp === 'beach') { px = 30 * TILE; py = 42 * TILE }
-        else if (sp === 'dock') { px = 25.7 * TILE; py = 44 * TILE }
-        else if (sp === 'falls') { px = 53 * TILE; py = 12 * TILE }
-        else if (sp === 'bridge') { px = 52 * TILE; py = 18.5 * TILE }
-        else if (sp === 'lane') { px = 16 * TILE; py = 38.5 * TILE }
-        else if (sp === 'tower') { px = 42.5 * TILE; py = 27 * TILE }
-        else if (sp === 'grove') { px = 7 * TILE; py = 9 * TILE }
+        if (sp === 'plaza' || sp === 'square') { px = 34 * TILE; py = 36 * TILE }
+        else if (sp === 'grove') { px = 12.5 * TILE; py = 16 * TILE }
+        else if (sp === 'north') { px = 33 * TILE; py = 15 * TILE }
+        else if (sp === 'falls') { px = 60 * TILE; py = 16 * TILE }
+        else if (sp === 'keep') { px = 66 * TILE; py = 20 * TILE }
+        else if (sp === 'bridge') { px = 47 * TILE; py = 29 * TILE }
+        else if (sp === 'forge') { px = 58.5 * TILE; py = 27.5 * TILE }
+        else if (sp === 'lane') { px = 12 * TILE; py = 36.5 * TILE }
+        else if (sp === 'tower') { px = 45 * TILE; py = 39 * TILE }
+        else if (sp === 'gate') { px = 30.5 * TILE; py = 44 * TILE }
+        else if (sp === 'fields') { px = 60 * TILE; py = 41 * TILE }
+        else if (sp === 'beach') { px = 34 * TILE; py = 54.5 * TILE }
+        else if (sp === 'dock') { px = 43.5 * TILE; py = 55.5 * TILE }
       }
     } catch { /* ignore */ }
     this.playerShadow = this.add.ellipse(px, py + 22, 30, 9, 0x000000, 0.30).setDepth(5)
@@ -921,7 +719,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
   }
 
   private spawnBirds(): void {
-    const y = 80 + Math.random() * 400
+    const y = 80 + Math.random() * 500
     const flock = this.add.container(-80, y).setDepth(90)
     for (let i = 0; i < 5; i++) {
       const bx = (i % 3) * 26 - 26
@@ -936,7 +734,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
       targets: flock,
       x: WORLD_W + 120,
       y: y - 60 - Math.random() * 80,
-      duration: 16000,
+      duration: 18000,
       onComplete: () => flock.destroy(),
     })
   }
@@ -1091,8 +889,8 @@ export default class AetherveilOverworld extends Phaser.Scene {
     // Mayor greets the first-time visitor when they reach the square.
     if (this.mayorGreetPending) {
       const p = this.player
-      if (p.x > (TOWN_CX - 6) * TILE && p.x < (TOWN_CX + 5) * TILE
-        && p.y > (TOWN_CY - 4) * TILE && p.y < (TOWN_CY + 4) * TILE) {
+      if (p.x > 27 * TILE && p.x < 40 * TILE
+        && p.y > 28 * TILE && p.y < 38 * TILE) {
         this.openMayorDialog()
       }
     }
@@ -1100,7 +898,7 @@ export default class AetherveilOverworld extends Phaser.Scene {
 
   private updateZones(): void {
     const p = this.player
-    // bridge echo
+    // stone bridge echo
     const onBridge = this.bridgeRect
       && Phaser.Geom.Rectangle.Contains(this.bridgeRect, p.x, p.y)
     if (onBridge && !this.inBridge) {

@@ -1,7 +1,9 @@
 /**
- * Residential Lane -- five odd little houses on the south fields
- * (spec B.7.2): the Cat Lady's porch, the Inventor's workshop, the
- * Painter's cottage, the Hermit's hut, and the Music Hut.
+ * The West Lane -- the residential quarter from the design map: the
+ * Vaults of Whisperleaf (portfolio: scrolls), six trade shops (bakery,
+ * scribe, herbs, tailor, cobbler, potions), the odd houses (cat lady,
+ * inventor, painter, hermit, music hut), flower gardens, the LANE sign,
+ * and Quiet Grove down by the south wall.
  */
 import type Phaser from 'phaser'
 import type { WorldCtx } from '../ctx'
@@ -11,49 +13,155 @@ import { MUSIC_TRACKS, playMelody, stopMelody, sfxBlip } from '../audio'
 const FONT_TITLE = '"Cinzel", "Georgia", serif'
 const FONT_BODY = '"Cormorant Garamond", "Georgia", serif'
 
-const PEAK_ROW = 34
-const ROOF_ROW = 35
-const WALL_ROW = 36
-
 export function buildLane(ctx: WorldCtx): void {
-  buildLanePath(ctx)
+  buildVaults(ctx)
+  buildShops(ctx)
+  buildGardens(ctx)
+  buildLaneSign(ctx)
   buildCatLady(ctx)
   buildInventor(ctx)
   buildPainter(ctx)
   buildHermit(ctx)
   buildMusicHut(ctx)
+  buildQuietGrove(ctx)
 }
 
-// ---- shared cottage shell ------------------------------------------------------
+// ---- shared cottage shell ---------------------------------------------------------
 
-function cottage(ctx: WorldCtx, cx: number, kind: 'red' | 'blue', roofTint?: number): void {
+function cottage(ctx: WorldCtx, cx: number, roofRow: number, kind: 'red' | 'blue', roofTint?: number): void {
   const isRed = kind === 'red'
-  const ROOF = isRed ? [64, 65, 66] : [48, 49, 50]
+  const ROOF = isRed ? [64, 65, 66] : [60, 61, 62]
   const WALL = isRed ? [52, 55, 54] : [48, 51, 50]
   for (let i = 0; i < 3; i++) {
-    const roof = ctx.tile(cx + i, ROOF_ROW, ROOF[i], 3)
+    const roof = ctx.tile(cx + i, roofRow, ROOF[i], 3)
     if (roofTint) roof.setTint(roofTint)
-    ctx.tile(cx + i, WALL_ROW, WALL[i], 3)
+    ctx.tile(cx + i, roofRow + 1, WALL[i], 3)
   }
-  const peak = ctx.tile(cx + 1, PEAK_ROW, 67, 4)
+  const peak = ctx.tile(cx + 1, roofRow - 1, 67, 4)
   if (roofTint) peak.setTint(roofTint)
-  ctx.blockRect(cx, ROOF_ROW, 3, 2)
+  ctx.blockRect(cx, roofRow, 3, 2)
 }
 
-function houseLabel(ctx: WorldCtx, cx: number, label: string): void {
-  ctx.scene.add.text((cx + 1.5) * ctx.TILE, (WALL_ROW + 1) * ctx.TILE + 6, label, {
+function label(ctx: WorldCtx, cx: number, row: number, text: string): void {
+  ctx.scene.add.text((cx + 1.5) * ctx.TILE, row * ctx.TILE + 6, text, {
     fontFamily: FONT_BODY, fontSize: '13px', color: '#3a2418', fontStyle: '500',
   }).setOrigin(0.5).setResolution(3).setDepth(5)
 }
 
-function buildLanePath(ctx: WorldCtx): void {
-  // dirt lane along row 38 from the houses to the southgate road
-  for (let c = 4; c <= 31; c++) {
-    ctx.tile(c, 38, 39 + (c % 3), 1)
+// ---- Vaults of Whisperleaf (portfolio: scrolls) --------------------------------------
+
+function buildVaults(ctx: WorldCtx): void {
+  const { scene, TILE } = ctx
+  const cx = 10                      // cols 10-16
+  const cy = 29                      // roof row
+
+  const W = 7
+  for (let i = 0; i < W; i++) {
+    ctx.tile(cx + i, cy, i === 0 ? 60 : i === W - 1 ? 62 : 61, 3).setTint(0x9aa8c0)   // slate roof
+    let f: number
+    if (i === Math.floor(W / 2)) f = 51
+    else if (i === 0) f = 48
+    else if (i === W - 1) f = 50
+    else f = 48
+    ctx.tile(cx + i, cy + 1, f, 3).setTint(0xc8d0dc)
+  }
+  ctx.tile(cx + Math.floor(W / 2), cy - 1, 67, 4).setTint(0x9aa8c0)
+  ctx.blockRect(cx, cy, W, 2)
+
+  const px = (cx + W / 2) * TILE
+  scene.add.text(px, (cy + 2) * TILE + 8, 'VAULTS', {
+    fontFamily: FONT_TITLE, fontSize: '16px', color: '#3a2418', fontStyle: '600',
+  }).setOrigin(0.5).setResolution(3).setLetterSpacing(1).setDepth(5)
+  scene.add.text(px, (cy + 2) * TILE + 26, 'of Whisperleaf . scrolls', {
+    fontFamily: FONT_BODY, fontSize: '13px', color: '#6a4a2a', fontStyle: 'italic',
+  }).setOrigin(0.5).setResolution(3).setDepth(5)
+  if (ctx.visitedBuilding('vaults')) {
+    scene.add.text(px, (cy + 2) * TILE + 42, '~ returned ~', {
+      fontFamily: FONT_BODY, fontSize: '12px', color: '#8a5a2a', fontStyle: 'italic',
+    }).setOrigin(0.5).setResolution(3).setDepth(5)
+  }
+
+  const hit = scene.add.zone(px, (cy + 1) * TILE, W * TILE, 2 * TILE)
+    .setInteractive({ useHandCursor: true })
+  hit.on('pointerdown', () => ctx.enterInterior('VaultsOfWhisperleaf', 'vaults'))
+}
+
+// ---- six trade shops ------------------------------------------------------------------
+
+interface ShopDef {
+  cx: number
+  roofRow: number
+  kind: 'red' | 'blue'
+  awning: number
+  name: string
+  line: string
+}
+
+const SHOPS: ShopDef[] = [
+  { cx: 24, roofRow: 22, kind: 'red', awning: 0xc25b4a, name: 'BAKERY', line: 'the loaves are counted, the crumbs are not. take a crumb.' },
+  { cx: 13, roofRow: 24, kind: 'blue', awning: 0x4a7ab8, name: 'SCRIBE', line: 'letters written, letters softened. the scribe edits grief at no extra charge.' },
+  { cx: 27, roofRow: 24, kind: 'red', awning: 0x5a8a4e, name: 'HERBS', line: 'hung to dry: sage, bone-mint, and a braid of whisperleaf that will not stop humming.' },
+  { cx: 30, roofRow: 24, kind: 'blue', awning: 0x8a5a9a, name: 'TAILOR', line: 'the tailor measures travelers by eye. your cloak, apparently, forgives much.' },
+  { cx: 20, roofRow: 30, kind: 'red', awning: 0x8a6a3e, name: 'COBBLER', line: 'soles mended while you wait. the cobbler reads your road in the wear.' },
+  { cx: 17, roofRow: 39, kind: 'blue', awning: 0x7a4ab8, name: 'POTIONS', line: 'the purple ones are safe. the chartreuse one is a conversation.' },
+]
+
+function buildShops(ctx: WorldCtx): void {
+  const { scene, TILE } = ctx
+  for (const s of SHOPS) {
+    cottage(ctx, s.cx, s.roofRow, s.kind)
+    // striped awning over the door
+    const ax = (s.cx + 1.5) * TILE
+    const ay = (s.roofRow + 0.85) * TILE
+    scene.add.rectangle(ax, ay, 30, 9, s.awning).setStrokeStyle(1, 0x3a2418).setDepth(4)
+    scene.add.rectangle(ax, ay + 5, 30, 3, 0xe8e0c8).setDepth(4)
+    // tiny signboard
+    scene.add.rectangle(ax, (s.roofRow + 1.55) * TILE, 42, 13, 0xe8dcc0).setStrokeStyle(1, 0x6e4a26).setDepth(4)
+    scene.add.text(ax, (s.roofRow + 1.55) * TILE, s.name, {
+      fontFamily: FONT_TITLE, fontSize: '9px', color: '#3a2418', fontStyle: '600',
+    }).setOrigin(0.5).setResolution(4).setDepth(5)
+
+    const hit = scene.add.zone(ax, (s.roofRow + 1) * TILE, 3 * TILE, 2 * TILE)
+      .setInteractive({ useHandCursor: true })
+    hit.on('pointerdown', () => ctx.showDialog(`The ${s.name.charAt(0) + s.name.slice(1).toLowerCase()}`, [s.line]))
   }
 }
 
-// ---- house 1: the cat lady ------------------------------------------------------
+// ---- flower gardens ----------------------------------------------------------------
+
+function buildGardens(ctx: WorldCtx): void {
+  const { scene, TILE } = ctx
+  const plots: [number, number, number, number][] = [
+    [5, 27, 4, 3],
+    [24, 26.6, 3, 2],
+  ]
+  const colors = [0xd95763, 0xf7d36b, 0x9b8df2, 0xf08a4b, 0xdef0f8]
+  for (const [c0, r0, w, h] of plots) {
+    scene.add.rectangle((c0 + w / 2) * TILE, (r0 + h / 2) * TILE, w * TILE - 6, h * TILE - 6, 0x6a8a4a, 0.7)
+      .setStrokeStyle(2, 0x4a6a3a).setDepth(1)
+    for (let i = 0; i < w * h * 3; i++) {
+      const fx = (c0 + 0.3 + ((i * 37) % (w * 10)) / 10) * TILE
+      const fy = (r0 + 0.3 + ((i * 53) % (h * 10)) / 10) * TILE
+      scene.add.circle(fx, fy, 2.4, colors[i % colors.length]).setDepth(2)
+    }
+    ctx.blockRect(c0, r0, w, h)
+  }
+}
+
+function buildLaneSign(ctx: WorldCtx): void {
+  const { scene, TILE } = ctx
+  ctx.tile(21, 35, 83, 3)
+  ctx.block(21, 35)
+  scene.add.text(21.5 * TILE, 34.6 * TILE, 'LANE', {
+    fontFamily: FONT_TITLE, fontSize: '11px', color: '#f5e5c5', fontStyle: '600',
+    stroke: '#3a2418', strokeThickness: 3,
+  }).setOrigin(0.5).setResolution(3).setDepth(5)
+  const hit = scene.add.zone(21.5 * TILE, 35.5 * TILE, TILE, TILE).setInteractive({ useHandCursor: true })
+  hit.on('pointerdown', () =>
+    ctx.showDialog('Lane Sign', ['THE LANE -- mind the cats. the cats mind you.']))
+}
+
+// ---- the odd houses -------------------------------------------------------------------
 
 interface CatDef {
   id: string
@@ -68,9 +176,10 @@ interface CatDef {
 
 function buildCatLady(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  const cx = 4
-  cottage(ctx, cx, 'blue', 0x9ec98a)   // mossy roof
-  houseLabel(ctx, cx, "the Cat Lady's porch")
+  const cx = 3
+  const roofRow = 32
+  cottage(ctx, cx, roofRow, 'blue', 0x9ec98a)   // mossy roof
+  label(ctx, cx, roofRow + 2.6, "the Cat Lady's porch")
 
   const cats: CatDef[] = [
     { id: 'marigold', name: 'Marigold', dx: -0.6, dy: 1.4, frame: 120, tint: 0xf2a23c, pose: 'sit', line: "that's marigold. she'll be twelve come autumn." },
@@ -82,7 +191,7 @@ function buildCatLady(ctx: WorldCtx): void {
 
   for (const cat of cats) {
     const px = (cx + cat.dx + 0.5) * TILE
-    const py = (WALL_ROW + cat.dy) * TILE
+    const py = (roofRow + 1 + cat.dy) * TILE
     const spr = scene.add.image(px, py, 'tiny-dungeon', cat.frame)
       .setScale(1.6).setTint(cat.tint).setDepth(4)
     const hit = scene.add.zone(px, py, 30, 30).setInteractive({ useHandCursor: true })
@@ -104,20 +213,19 @@ function buildCatLady(ctx: WorldCtx): void {
   }
 }
 
-// ---- house 2: the inventor -------------------------------------------------------
-
 function buildInventor(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  const cx = 9
-  cottage(ctx, cx, 'red', 0xc88a5a)    // copper roof
-  houseLabel(ctx, cx, "the Inventor's workshop")
+  const cx = 3
+  const roofRow = 39
+  cottage(ctx, cx, roofRow, 'red', 0xc88a5a)    // copper roof
+  label(ctx, cx, roofRow + 2, "the Inventor's workshop")
   // copper pipe sticking out of the roof + smoke puffs
-  scene.add.rectangle((cx + 2.4) * TILE, (ROOF_ROW - 0.2) * TILE, 6, 16, 0xb87333).setDepth(4)
+  scene.add.rectangle((cx + 2.4) * TILE, (roofRow - 0.2) * TILE, 6, 16, 0xb87333).setDepth(4)
   if (!ctx.reduced) {
     scene.add.particles(0, 0, 'tiny-town', {
       frame: 5,
       x: (cx + 2.4) * TILE,
-      y: (ROOF_ROW - 0.5) * TILE,
+      y: (roofRow - 0.5) * TILE,
       lifespan: 2400,
       speedY: { min: -16, max: -8 },
       speedX: { min: -3, max: 3 },
@@ -130,14 +238,14 @@ function buildInventor(ctx: WorldCtx): void {
 
   // the contraption: gears + bellows + lantern, beside the house
   const px = (cx + 3.9) * TILE
-  const py = (WALL_ROW + 0.7) * TILE
+  const py = (roofRow + 1.7) * TILE
   const rig = scene.add.container(px, py).setDepth(4)
   const gearBig = makeGear(scene, 0, 0, 11, 0x8a8a92)
   const gearSmall = makeGear(scene, 13, -7, 7, 0xa8a8b0)
   const bellows = scene.add.rectangle(-13, 6, 16, 10, 0x7a5226).setStrokeStyle(1, 0x4a2e14)
   const lantern = scene.add.circle(13, 8, 4, 0xffd98a).setStrokeStyle(1, 0x6e5a3a)
   rig.add([bellows, gearBig, gearSmall, lantern])
-  ctx.block(cx + 4, WALL_ROW + 1)
+  ctx.block(cx + 4, roofRow + 2)
 
   let clicks = 0
   const hit = scene.add.zone(px, py, 52, 40).setInteractive({ useHandCursor: true })
@@ -177,7 +285,7 @@ function makeGear(scene: Phaser.Scene, x: number, y: number, r: number, color: n
   return gear
 }
 
-// ---- house 3: the painter ---------------------------------------------------------
+// ---- the painter -------------------------------------------------------------------
 
 interface PaintingDef {
   key: string
@@ -225,21 +333,22 @@ const PAINTINGS: PaintingDef[] = [
 
 function buildPainter(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  const cx = 14
-  cottage(ctx, cx, 'blue')
-  houseLabel(ctx, cx, "the Painter's cottage")
+  const cx = 12
+  const roofRow = 39
+  cottage(ctx, cx, roofRow, 'blue')
+  label(ctx, cx, roofRow + 2, "the Painter's cottage")
 
   // painter at the door
-  const painter = ctx.dtile(cx + 1.5, WALL_ROW + 0.9, 87, 4)
+  const painter = ctx.dtile(cx + 1.5, roofRow + 1.9, 87, 4)
   painter.setOrigin(0.5, 0.8).setScale(2)
-  const pHit = scene.add.zone((cx + 1.5) * TILE, (WALL_ROW + 0.9) * TILE, 30, 40)
+  const pHit = scene.add.zone((cx + 1.5) * TILE, (roofRow + 1.9) * TILE, 30, 40)
     .setInteractive({ useHandCursor: true })
   pHit.on('pointerdown', () =>
     ctx.showDialog('The Painter', ['take a look. some of them are finished. some of them never will be.']))
 
   PAINTINGS.forEach((p, i) => {
     const ex = (cx - 0.8 + i * 1.7) * TILE
-    const ey = (WALL_ROW + 2.1) * TILE
+    const ey = (roofRow + 3.1) * TILE
     // easel A-frame
     scene.add.line(ex, ey, -7, 14, 0, -10, 0x6e4a26).setLineWidth(2).setOrigin(0).setDepth(3)
     scene.add.line(ex, ey, 7, 14, 0, -10, 0x6e4a26).setLineWidth(2).setOrigin(0).setDepth(3)
@@ -301,7 +410,7 @@ function openPaintingModal(ctx: WorldCtx, p: PaintingDef): void {
   })
 }
 
-// ---- house 4: the hermit ------------------------------------------------------------
+// ---- the hermit ---------------------------------------------------------------------
 
 const RIDDLES: [string, string][] = [
   ['what walks the road without leaving a footprint?', "a thought. you carry many of them, i'd guess."],
@@ -311,23 +420,24 @@ const RIDDLES: [string, string][] = [
 
 function buildHermit(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  const cx = 19
-  cottage(ctx, cx, 'red', 0x8a7a5a)    // weathered roof
-  houseLabel(ctx, cx, "the Hermit's hut")
+  const cx = 22
+  const roofRow = 39
+  cottage(ctx, cx, roofRow, 'red', 0xd88ab8)    // the odd pink house from the map
+  label(ctx, cx, roofRow + 2, "the Hermit's hut")
   // herbs hanging by the door
   for (let i = 0; i < 3; i++) {
-    scene.add.rectangle((cx + 0.6 + i * 0.35) * TILE, (WALL_ROW + 0.25) * TILE, 4, 9, 0x5a7a3e).setDepth(4)
+    scene.add.rectangle((cx + 0.6 + i * 0.35) * TILE, (roofRow + 1.25) * TILE, 4, 9, 0x5a7a3e).setDepth(4)
   }
 
-  // hermit on a stump outside
-  const hx = (cx + 3.6) * TILE
-  const hy = (WALL_ROW + 1.1) * TILE
+  // hermit on a stump outside (west side -- the Inn crowds the east)
+  const hx = (cx - 1.3) * TILE
+  const hy = (roofRow + 2.1) * TILE
   scene.add.ellipse(hx, hy + 12, 24, 10, 0x6e4a26).setStrokeStyle(1, 0x4a2e14).setDepth(3)
   const hermit = scene.add.image(hx, hy, 'tiny-dungeon', 111).setScale(2.4).setDepth(4)
   if (!ctx.reduced) {
     scene.tweens.add({ targets: hermit, y: hy - 2, duration: 1900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
   }
-  ctx.block(cx + 4, WALL_ROW + 1)
+  ctx.block(cx - 1, roofRow + 2)
 
   let stage = 0
   const hit = scene.add.zone(hx, hy, 40, 48).setInteractive({ useHandCursor: true })
@@ -358,17 +468,18 @@ function buildHermit(ctx: WorldCtx): void {
   })
 }
 
-// ---- house 5: the music hut -----------------------------------------------------------
+// ---- the music hut --------------------------------------------------------------------
 
 function buildMusicHut(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  const cx = 28
-  cottage(ctx, cx, 'blue', 0x8aa8d8)
-  houseLabel(ctx, cx, 'the Music Hut')
+  const cx = 7
+  const row = 32
+  cottage(ctx, cx, row, 'blue', 0x8aa8d8)
+  label(ctx, cx, row + 2, 'the Music Hut')
 
   // painted notes on the door: circles with stems (procedural, font-safe)
   const dx = (cx + 1.5) * TILE
-  const dy = (WALL_ROW + 0.45) * TILE
+  const dy = (row + 1.45) * TILE
   const g = scene.add.graphics().setDepth(4)
   for (const [ox, oy] of [[-7, 0], [0, -5], [7, 1]] as const) {
     g.fillStyle(0x2a2438, 1)
@@ -377,7 +488,7 @@ function buildMusicHut(ctx: WorldCtx): void {
     g.lineBetween(dx + ox + 2, dy + oy, dx + ox + 2, dy + oy - 8)
   }
 
-  const hit = scene.add.zone(dx, (WALL_ROW + 0.5) * TILE, 3 * TILE, TILE * 1.4)
+  const hit = scene.add.zone(dx, (row + 1.5) * TILE, 3 * TILE, TILE * 1.4)
     .setInteractive({ useHandCursor: true })
   hit.on('pointerdown', () => openMusicBox(ctx))
 }
@@ -442,4 +553,18 @@ function openMusicBox(ctx: WorldCtx): void {
     scene.input.keyboard?.once('keydown-ESC', close)
   })
   layer.add(closeBtn)
+}
+
+// ---- Quiet Grove -----------------------------------------------------------------------
+
+function buildQuietGrove(ctx: WorldCtx): void {
+  const { scene, TILE } = ctx
+  const trees: [number, number][] = [[9, 44.4], [12, 45.2], [15, 44.2], [18, 45.4], [11, 43.6]]
+  for (const [c, r] of trees) {
+    ctx.tile(c, r, 4, 2)
+    ctx.block(c, r)
+  }
+  scene.add.text(13.5 * TILE, 43.4 * TILE, 'Quiet Grove', {
+    fontFamily: FONT_BODY, fontSize: '14px', color: '#3a5a30', fontStyle: 'italic',
+  }).setOrigin(0.5).setResolution(3).setDepth(5)
 }

@@ -8,7 +8,7 @@ Guidance for Claude Code when working in this repo.
 
 Active build: **Aetherveil — a 2D pixel-art town-square RPG**. Visitor arrives, Mayor Halden greets them in a Stardew/Pokemon/Harvest-Moon-style dialog box, then they wander five buildings (Atelier, Vaults of Whisperleaf, Embers' Forge, The Hearthlight Inn, Beacon of Distant Roads) each containing the craftsman's work — but the visitor never sees the craftsman's name. Fully in-world RPG language.
 
-**Source of truth:** [docs/spec/town-square-rpg.md](./docs/spec/town-square-rpg.md). Read it before any implementation work.
+**Source of truth:** [docs/spec/town-square-rpg.md](./docs/spec/town-square-rpg.md) for systems/content; [docs/spec/concept-map-j9.png](./docs/spec/concept-map-j9.png) for world layout (80x60 tiles @ 32px, single Phaser scene). Read both before any implementation work.
 
 ## Quick start
 

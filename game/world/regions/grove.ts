@@ -1,9 +1,11 @@
 /**
- * Cherry Blossom Grove extras -- the swing and the meditation stone.
- * (Petal particles + the cherry trees themselves are placed by the
- * overworld's decoration pass; this module adds the two interactives.)
+ * Cherry Blossom Grove (NW) -- a sakura oval per the design map: pink
+ * trees ringing a clearing, drifting petals, the swing, and the
+ * meditation stone. "sakura . swing . meditation"
  */
 import type { WorldCtx } from '../ctx'
+
+const FONT_BODY = '"Cormorant Garamond", "Georgia", serif'
 
 const QUOTES = [
   'the river does not hurry, yet it reaches the sea.',
@@ -13,17 +15,65 @@ const QUOTES = [
   'you are allowed to begin again, today, before noon.',
 ]
 
+// Oval ring of sakura around the clearing (centre ~ (13.5, 9)).
+const TREES: [number, number][] = [
+  [7, 5], [10, 4], [13, 3.6], [16, 4], [19, 5],
+  [5, 7], [21, 7], [4, 9.5], [22, 9.5],
+  [5, 12], [21, 12], [7, 14], [11, 14.6], [15, 14.6], [19, 14],
+  [9, 7.5], [17, 8], [12, 6],
+]
+
 export function buildGrove(ctx: WorldCtx): void {
+  const { scene, TILE } = ctx
+
+  // blossom carpet -- soft pink ground glow under the oval
+  const carpet = scene.add.ellipse(13.5 * TILE, 9.5 * TILE, 21 * TILE, 13 * TILE, 0xffd2e2, 0.18).setDepth(0)
+  void carpet
+
+  for (const [c, r] of TREES) {
+    // trunk from the tree tile, canopy as literal pink balls -- the design
+    // map draws sakura as circles, and tinting either tree frame goes muddy
+    ctx.tile(c, r, 3, 2).setTint(0xc88a6a)
+    const px = c * TILE + TILE / 2
+    const py = r * TILE + 8
+    scene.add.circle(px, py, 14, 0xf6b8d0).setStrokeStyle(1.5, 0xd890b0).setDepth(3)
+    scene.add.circle(px - 6, py - 5, 7, 0xfbd0e0).setDepth(3)
+    scene.add.circle(px + 7, py - 2, 5, 0xf0a8c4, 0.9).setDepth(3)
+    ctx.block(c, r)
+  }
+
+  scene.add.text(13.5 * TILE, 2.6 * TILE, 'Cherry Blossom Grove', {
+    fontFamily: FONT_BODY, fontSize: '17px', color: '#7a3957', fontStyle: 'italic',
+  }).setOrigin(0.5).setResolution(3).setDepth(5)
+  scene.add.text(13.5 * TILE, 3.3 * TILE, 'sakura . swing . meditation', {
+    fontFamily: FONT_BODY, fontSize: '12px', color: '#9a5977', fontStyle: 'italic',
+  }).setOrigin(0.5).setResolution(3).setDepth(5)
+
+  if (!ctx.reduced) {
+    scene.add.particles(0, 0, 'tiny-town', {
+      frame: 5,
+      x: { min: 4 * TILE, max: 23 * TILE },
+      y: { min: 3 * TILE, max: 14 * TILE },
+      lifespan: 5000,
+      speedX: { min: 12, max: 32 },
+      speedY: { min: 18, max: 38 },
+      scale: { start: 0.4, end: 0.15 },
+      alpha: { start: 0.85, end: 0 },
+      tint: [0xffaad0, 0xffc0d8, 0xff8aaa],
+      frequency: 140,
+    }).setDepth(4)
+  }
+
   buildSwing(ctx)
   buildMeditationStone(ctx)
 }
 
 function buildSwing(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  // Hangs from the big cherry tree at tile (8,2). Ropes + plank in a
-  // container so the sway tween moves them as one.
-  const ax = 8 * TILE + TILE / 2
-  const ay = 2 * TILE + 18
+  // Hangs from the big sakura at (12, 6). Ropes + plank in a container so
+  // the sway tween moves them as one.
+  const ax = 12 * TILE + TILE / 2
+  const ay = 6 * TILE + 18
   const swing = scene.add.container(ax, ay).setDepth(3)
   const ropeL = scene.add.line(0, 0, -8, 0, -8, 26, 0x6b4a2a).setLineWidth(1.5).setOrigin(0)
   const ropeR = scene.add.line(0, 0, 8, 0, 8, 26, 0x6b4a2a).setLineWidth(1.5).setOrigin(0)
@@ -51,8 +101,8 @@ function buildSwing(ctx: WorldCtx): void {
 
 function buildMeditationStone(ctx: WorldCtx): void {
   const { scene, TILE } = ctx
-  const cx = 6
-  const cy = 9
+  const cx = 17
+  const cy = 12
   const px = cx * TILE + TILE / 2
   const py = cy * TILE + TILE / 2
 
@@ -80,8 +130,7 @@ function buildMeditationStone(ctx: WorldCtx): void {
     idx++
   })
 
-  scene.add.text(px, py + 22, 'a stone for sitting', {
-    fontFamily: '"Cormorant Garamond", "Georgia", serif',
-    fontSize: '12px', color: '#7a3957', fontStyle: 'italic',
+  scene.add.text(px, py + 22, 'meditation stone', {
+    fontFamily: FONT_BODY, fontSize: '12px', color: '#7a3957', fontStyle: 'italic',
   }).setOrigin(0.5).setResolution(3).setDepth(3)
 }
