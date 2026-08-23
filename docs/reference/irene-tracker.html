@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bunny Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --bg-elev: #131316;
+    --bg-card: #18181c;
+    --border: #26262b;
+    --border-soft: #1e1e22;
+    --text: #f4f4f5;
+    --text-dim: #a1a1aa;
+    --text-faint: #52525b;
+    --rose: #fb7185;
+    --rose-soft: #fda4af;
+    --rose-deep: #be123c;
+    --lime: #a3e635;
+    --red: #ef4444;
+    --pink-bg: rgba(251, 113, 133, 0.08);
+    --pink-border: rgba(251, 113, 133, 0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Geist', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  body {
+    background:
+      radial-gradient(ellipse at top left, rgba(251, 113, 133, 0.08), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(163, 230, 53, 0.04), transparent 50%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* HEADER */
+  .header { margin-bottom: 28px; }
+  .eyebrow {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(36px, 8vw, 56px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--rose-soft);
+    font-weight: 300;
+  }
+  .subhead {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 10px;
+    max-width: 480px;
+    line-height: 1.5;
+  }
+
+  /* ROLLER */
+  .roller {
+    margin-top: 28px;
+    background: linear-gradient(135deg, rgba(251, 113, 133, 0.12), rgba(251, 113, 133, 0.03));
+    border: 1px solid var(--pink-border);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .roller::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 10%, rgba(251, 113, 133, 0.15), transparent 50%);
+    pointer-events: none;
+  }
+  .roller-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 12px;
+  }
+  .roller-result {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 400;
+    line-height: 1.15;
+    min-height: 1.2em;
+    margin-bottom: 6px;
+    transition: opacity 0.2s;
+  }
+  .roller-category {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-bottom: 20px;
+    font-family: 'Geist Mono', monospace;
+    text-transform: lowercase;
+  }
+  .roller-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    border: none; cursor: pointer;
+    font-family: 'Geist', sans-serif;
+    font-weight: 500;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: all 0.15s ease;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary {
+    background: var(--rose);
+    color: #1a0510;
+  }
+  .btn-primary:hover { background: var(--rose-soft); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
+  .btn-ghost.active {
+    color: var(--lime);
+    border-color: var(--lime);
+    background: rgba(163, 230, 53, 0.05);
+  }
+
+  /* PERIOD MODE */
+  .period-banner {
+    margin-top: 16px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: none;
+  }
+  .period-banner.active { display: block; }
+  .period-banner-title {
+    color: var(--red);
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .period-banner-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .period-banner-text strong { color: var(--red); }
+
+  /* SECTIONS */
+  .section { margin-top: 36px; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .section-count {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+  .section-desc {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 6px;
+  }
+  .item-list { display: flex; flex-direction: column; }
+  .item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 12px;
+    border-radius: 9px;
+    transition: background 0.12s;
+    group: item;
+  }
+  .item:hover { background: var(--bg-elev); }
+  .item-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--rose); flex-shrink: 0;
+  }
+  .section[data-type="dislike"] .item-dot,
+  .section[data-type="period"] .item-dot { background: var(--red); }
+  .section[data-type="gift"] .item-dot { background: var(--rose-soft); }
+  .item-text { flex: 1; font-size: 14px; }
+  .item-text.empty { color: var(--text-faint); font-style: italic; }
+  .item-delete {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-faint); font-size: 16px; padding: 4px 8px;
+    border-radius: 6px;
+    opacity: 0; transition: all 0.15s;
+  }
+  .item:hover .item-delete { opacity: 1; }
+  .item-delete:hover { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+
+  .add-row {
+    display: flex; gap: 8px; padding: 8px;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 4px;
+  }
+  .add-input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-input:focus { border-color: var(--rose); }
+  .add-btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+  .add-btn:hover { background: var(--rose); color: #1a0510; border-color: var(--rose); }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-soft);
+    color: var(--text-faint);
+    font-size: 12px;
+    text-align: center;
+    font-family: 'Geist Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+  .footer em {
+    color: var(--rose-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* CATEGORY FILTERS */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .filter-chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-family: 'Geist Mono', monospace;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-chip:hover { color: var(--text); border-color: var(--text-dim); }
+  .filter-chip.active {
+    background: var(--rose);
+    color: #1a0510;
+    border-color: var(--rose);
+  }
+
+  /* ANIMATION */
+  @keyframes rollIn {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .rolling { animation: rollIn 0.3s ease; }
+
+  /* SAVE INDICATOR */
+  .save-status {
+    position: fixed;
+    bottom: 16px; right: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .save-status.show { opacity: 1; }
+  .save-status.show .dot { color: var(--lime); }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="eyebrow">Internal · Fatih only</div>
+      <h1>For my <em>bunny</em>.</h1>
+      <p class="subhead">Roll buat hari ini, atau tambah hal baru yang kamu pelajari soal dia. Semua kesimpan otomatis.</p>
+    </header>
+
+    <!-- ROLLER -->
+    <section class="roller">
+      <div class="roller-label">Hari ini buat dia</div>
+      <div class="roller-result" id="rollerResult">Tekan roll buat ide.</div>
+      <div class="roller-category" id="rollerCategory">—</div>
+      <div class="roller-controls">
+        <button class="btn btn-primary" id="rollBtn">↻ Roll</button>
+        <button class="btn btn-ghost" data-filter="all">Semua</button>
+        <button class="btn btn-ghost" data-filter="food">Makanan</button>
+        <button class="btn btn-ghost" data-filter="gift">Hadiah</button>
+        <button class="btn btn-ghost" data-filter="gesture">Gesture</button>
+      </div>
+      <div class="period-banner" id="periodBanner">
+        <div class="period-banner-title">⚠ Mode haid aktif</div>
+        <div class="period-banner-text">Roll otomatis skip yg di blacklist haid. Inget — <strong>jangan</strong> es krim, jeruk kecut, asinan, kuah panas, keripik pedas.</div>
+      </div>
+      <div style="margin-top: 14px;">
+        <button class="btn btn-ghost" id="periodToggle">○ Dia lagi haid?</button>
+      </div>
+    </section>
+
+    <!-- MAKANAN SUKA -->
+    <section class="section" data-type="like" data-key="food_likes">
+      <div class="section-header">
+        <h2 class="section-title">Makanan dia suka</h2>
+        <span class="section-count" data-count></span>
+      </div>
+      <p class="section-desc">Yang udah kebukti dia seneng. Tambahin tiap kali nemu yg baru.</p>
+      <div class="card">
+        <div class="item-list" data-list></div>
+        <div class="add-row">
+          <input class="add-input" type="text" placeholder="Tambah makanan..." data-add-input />
+          <button class="add-btn" data-add-btn>+ ADD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAKANAN GA SUKA -->
+    <section class="section" data-type="dislike" data-key="food_dislikes">
+      <div class="section-header">
+        <h2 class="section-title">Yang dia <em style="font-family: Fraunces, serif; font-style: italic; color: var(--rose-soft);">ga</em> suka</h2>
+        <span class="section-count" data-count></span>
+      </div>
+      <p class="section-desc">Hindari. Jangan dikasih meski lagi diskon.</p>
+      <div class="card">
+        <div class="item-list" data-list></div>
+        <div class="add-row">
+          <input class="add-input" type="text" placeholder="Tambah yg dia ga suka..." data-add-input />
+          <button class="add-btn" data-add-btn>+ ADD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HADIAH -->
+    <section class="section" data-type="gift" data-key="gift_ideas">
+      <div class="section-header">
+        <h2 class="section-title">Ide hadiah</h2>
+        <span class="section-count" data-count></span>
+      </div>
+      <p class="section-desc">Gift giving = love language-nya. Gesture kecil tetep itung.</p>
+      <div class="card">
+        <div class="item-list" data-list></div>
+        <div class="add-row">
+          <input class="add-input" type="text" placeholder="Tambah ide hadiah..." data-add-input />
+          <button class="add-btn" data-add-btn>+ ADD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GESTURE -->
+    <section class="section" data-type="gesture" data-key="gestures">
+      <div class="section-header">
+        <h2 class="section-title">Gesture / care</h2>
+        <span class="section-count" data-count></span>
+      </div>
+      <p class="section-desc">Bukan barang, tapi cara kamu hadir. Yg bikin dia ngerasa dijaga.</p>
+      <div class="card">
+        <div class="item-list" data-list></div>
+        <div class="add-row">
+          <input class="add-input" type="text" placeholder="Tambah gesture..." data-add-input />
+          <button class="add-btn" data-add-btn>+ ADD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DISLIKES UMUM -->
+    <section class="section" data-type="dislike" data-key="general_dislikes">
+      <div class="section-header">
+        <h2 class="section-title">Trigger / red flags</h2>
+        <span class="section-count" data-count></span>
+      </div>
+      <p class="section-desc">Bukan soal makanan. Cara kamu sikap yg bikin dia illfeel. Inget ini.</p>
+      <div class="card">
+        <div class="item-list" data-list></div>
+        <div class="add-row">
+          <input class="add-input" type="text" placeholder="Tambah trigger..." data-add-input />
+          <button class="add-btn" data-add-btn>+ ADD</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HAID BLACKLIST -->
+    <section class="section" data-type="period" data-key="period_avoid">
+      <div class="section-header">
+        <h2 class="section-title" style="color: var(--red);">Blacklist saat haid</h2>
+        <span class="section-count" data-count></span>
+      </div>
+      <p class="section-desc">Per kontrak Pasal 6(5). Aktif otomatis kalau toggle "lagi haid" dinyalain.</p>
+      <div class="card">
+        <div class="item-list" data-list></div>
+        <div class="add-row">
+          <input class="add-input" type="text" placeholder="Tambah ke blacklist..." data-add-input />
+          <button class="add-btn" data-add-btn>+ ADD</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <em>"Yang bikin hambar bukan waktu, tapi berhenti berusaha."</em>
+      <div style="margin-top: 6px;">v1.0 · auto-saved</div>
+    </div>
+  </div>
+
+  <div class="save-status" id="saveStatus"><span class="dot">●</span> tersimpan</div>
+
+<script>
+  // STORAGE WRAPPER
+  const STORAGE_KEY = 'bunny-tracker-data';
+
+  const defaultData = {
+    food_likes: [
+      "Blackforest cake",
+      "Kopi (cek dia suka yg mana)"
+    ],
+    food_dislikes: [],
+    gift_ideas: [
+      "Edelweiss (dia terharu kalo dikasih)",
+      "Tulip pink",
+      "Stiker random",
+      "Kacamata frameless pink",
+      "Karangan bunga kecil",
+      "Surat tulis tangan"
+    ],
+    gestures: [
+      "VC bentar tanpa alesan",
+      "Tanya makan udah apa, spesifik",
+      "Spam tlp jam 6 kalo dia diem lama (dia minta sendiri)",
+      "Bilang 'aku ga kemana' pas dia spiral",
+      "Share 1 hal kecil dari hari kamu — tanpa diminta",
+      "React + 1 pertanyaan tiap dia cerita"
+    ],
+    general_dislikes: [
+      "Dikontrol",
+      "Send-off pasif 'hati-hati ya' (dia mau care yg spesifik)",
+      "Verbal reassurance doang tanpa action",
+      "Diem pas dia cerita",
+      "Reaksi 'waw' doang pas dia kirim once-view"
+    ],
+    period_avoid: [
+      "Es krim",
+      "Jeruk kecut",
+      "Asinan",
+      "Kuah panas",
+      "Keripik pedas"
+    ]
+  };
+
+  let data = JSON.parse(JSON.stringify(defaultData));
+  let periodMode = false;
+  let currentFilter = 'all';
+  let lastRoll = null;
+
+  // PERSISTENCE via window.storage
+  async function loadData() {
+    try {
+      const result = await window.storage.get(STORAGE_KEY);
+      if (result && result.value) {
+        const stored = JSON.parse(result.value);
+        // merge with defaults so new sections don't break
+        data = { ...defaultData, ...stored };
+      }
+    } catch (e) {
+      // key doesn't exist, use defaults
+    }
+    try {
+      const pm = await window.storage.get(STORAGE_KEY + '-period');
+      if (pm && pm.value) periodMode = JSON.parse(pm.value);
+    } catch (e) {}
+  }
+
+  async function saveData() {
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(data));
+      await window.storage.set(STORAGE_KEY + '-period', JSON.stringify(periodMode));
+      showSaved();
+    } catch (e) {
+      console.error('Save failed', e);
+    }
+  }
+
+  function showSaved() {
+    const el = document.getElementById('saveStatus');
+    el.classList.add('show');
+    clearTimeout(showSaved._t);
+    showSaved._t = setTimeout(() => el.classList.remove('show'), 1500);
+  }
+
+  // RENDER
+  function render() {
+    document.querySelectorAll('.section').forEach(section => {
+      const key = section.dataset.key;
+      const list = section.querySelector('[data-list]');
+      const count = section.querySelector('[data-count]');
+      const items = data[key] || [];
+
+      count.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+      if (items.length === 0) {
+        list.innerHTML = `<div class="item"><span class="item-text empty">Belum ada. Tambahin di bawah.</span></div>`;
+        return;
+      }
+
+      list.innerHTML = items.map((item, i) => `
+        <div class="item">
+          <div class="item-dot"></div>
+          <div class="item-text">${escapeHtml(item)}</div>
+          <button class="item-delete" data-delete="${key}" data-index="${i}" title="Hapus">×</button>
+        </div>
+      `).join('');
+    });
+
+    // Period banner
+    const banner = document.getElementById('periodBanner');
+    const toggle = document.getElementById('periodToggle');
+    if (periodMode) {
+      banner.classList.add('active');
+      toggle.classList.add('active');
+      toggle.textContent = '● Dia lagi haid (aktif)';
+    } else {
+      banner.classList.remove('active');
+      toggle.classList.remove('active');
+      toggle.textContent = '○ Dia lagi haid?';
+    }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ROLLER
+  function roll() {
+    let pool = [];
+    const sources = {
+      food: { items: data.food_likes, label: 'makanan' },
+      gift: { items: data.gift_ideas, label: 'hadiah' },
+      gesture: { items: data.gestures, label: 'gesture' }
+    };
+
+    const blacklist = periodMode ? new Set(data.period_avoid.map(s => s.toLowerCase().trim())) : new Set();
+
+    if (currentFilter === 'all') {
+      Object.entries(sources).forEach(([k, v]) => {
+        v.items.forEach(item => {
+          if (!blacklist.has(item.toLowerCase().trim())) {
+            pool.push({ text: item, category: v.label });
+          }
+        });
+      });
+    } else if (sources[currentFilter]) {
+      sources[currentFilter].items.forEach(item => {
+        if (!blacklist.has(item.toLowerCase().trim())) {
+          pool.push({ text: item, category: sources[currentFilter].label });
+        }
+      });
+    }
+
+    if (pool.length === 0) {
+      document.getElementById('rollerResult').textContent = 'Belum ada yg bisa di-roll.';
+      document.getElementById('rollerCategory').textContent = 'tambah dulu ke list di bawah';
+      return;
+    }
+
+    // avoid repeating last roll if possible
+    let pick;
+    if (pool.length > 1 && lastRoll) {
+      const filtered = pool.filter(p => p.text !== lastRoll);
+      pick = filtered[Math.floor(Math.random() * filtered.length)];
+    } else {
+      pick = pool[Math.floor(Math.random() * pool.length)];
+    }
+    lastRoll = pick.text;
+
+    const result = document.getElementById('rollerResult');
+    const cat = document.getElementById('rollerCategory');
+    result.classList.remove('rolling');
+    cat.classList.remove('rolling');
+    void result.offsetWidth;
+    result.textContent = pick.text;
+    cat.textContent = `// ${pick.category}`;
+    result.classList.add('rolling');
+    cat.classList.add('rolling');
+  }
+
+  // EVENTS
+  document.getElementById('rollBtn').addEventListener('click', roll);
+
+  document.getElementById('periodToggle').addEventListener('click', () => {
+    periodMode = !periodMode;
+    render();
+    saveData();
+  });
+
+  document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      roll();
+    });
+  });
+
+  document.querySelectorAll('.section').forEach(section => {
+    const key = section.dataset.key;
+    const input = section.querySelector('[data-add-input]');
+    const addBtn = section.querySelector('[data-add-btn]');
+
+    const add = () => {
+      const val = input.value.trim();
+      if (!val) return;
+      if (!data[key]) data[key] = [];
+      data[key].push(val);
+      input.value = '';
+      render();
+      saveData();
+    };
+    addBtn.addEventListener('click', add);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+  });
+
+  document.body.addEventListener('click', e => {
+    const btn = e.target.closest('[data-delete]');
+    if (!btn) return;
+    const key = btn.dataset.delete;
+    const i = parseInt(btn.dataset.index);
+    data[key].splice(i, 1);
+    render();
+    saveData();
+  });
+
+  // INIT
+  (async () => {
+    await loadData();
+    render();
+    // set default active filter
+    document.querySelector('[data-filter="all"]').classList.add('active');
+  })();
+</script>
+</body>
+</html>

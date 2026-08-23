@@ -1,0 +1,26 @@
+{
+  "$schema_note": "Jawaban plan v2 LUNAR tracker. Isi 'answer': plan item = true (ACC) / false (tolak), question = pilih salah satu 'options'. Himmel baca file ini sebelum eksekusi.",
+  "updated": null,
+  "plan": [
+    { "id": "p1-login",    "question": "Phase 1: login ringan tanpa email (access key + session), semua write wajib login?", "answer": null },
+    { "id": "p1-accounts", "question": "Phase 1: 2 akun awal - fatih (dev) + product (share tim)?", "answer": null },
+    { "id": "p1-matrix",   "question": "Phase 1: role matrix sesuai tabel di plan HTML?", "answer": null },
+    { "id": "p1-apikey",   "question": "Phase 1: api_token per user, header X-Api-Key untuk LLM/omp?", "answer": null },
+    { "id": "p2-worklog",  "question": "Phase 2: SP worklog harian per task (sp_log), done tanpa log auto-log sisa estimasi?", "answer": null },
+    { "id": "p2-stats",    "question": "Phase 2: stats baru (SP hari ini, availability, estimasi vs actual, burn 7 hari)?", "answer": null },
+    { "id": "p3-subtask",  "question": "Phase 3: sub-task + modal detail per roadmap card?", "answer": null },
+    { "id": "p3-ball",     "question": "Phase 3: bola per roadmap card (bola utama tetap)?", "answer": null },
+    { "id": "p3-fb",       "question": "Phase 3: feedback wajib pilih roadmap card, satu row per error, field link?", "answer": null },
+    { "id": "p3-q",        "question": "Phase 3: section Questions (wajib pilih roadmap, dev/system jawab inline)?", "answer": null },
+    { "id": "p4-tele",     "question": "Phase 4: Telegram notif (handover, feedback baru, question baru/dijawab)?", "answer": null },
+    { "id": "p4-upload",   "question": "Phase 4: upload gambar ke Fly volume, gdocs jadi opsional?", "answer": null }
+  ],
+  "questions": [
+    { "id": "q1", "question": "Read board publik atau semua di belakang login?", "options": { "public_read": "read publik, write wajib login (recommended)", "login_only": "semua wajib login" }, "answer": null },
+    { "id": "q2", "question": "Akun product: satu share atau per orang?", "options": { "shared": "satu akun share 'product' (recommended)", "per_person": "per orang (nana, dst)" }, "answer": null },
+    { "id": "q3a", "question": "Model SP: worklog harian per task?", "options": { "worklog": "ya, worklog harian (recommended)", "done_only": "tidak, hitung saat done saja" }, "answer": null },
+    { "id": "q3b", "question": "Max SP per hari?", "options": { "8": "tetap 8", "other": "isi angka lain di 'answer'" }, "answer": null },
+    { "id": "q4", "question": "Telegram bot: existing atau bikin baru?", "options": { "existing": "pakai bot existing (kamu kasih token + chat id)", "new": "Himmel buatkan bot baru via BotFather" }, "answer": null },
+    { "id": "q5", "question": "Seed sub-task dari mana?", "options": { "github_sync": "sync otomatis issue GitHub, butuh NUXT_GITHUB_TOKEN (recommended)", "manual": "manual dari 16 issue tersisa" }, "answer": null }
+  ]
+}

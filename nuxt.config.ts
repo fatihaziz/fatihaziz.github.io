@@ -16,9 +16,21 @@ export default defineNuxtConfig({
   },
   ssr: false,
   runtimeConfig: {
-    // Empty = open public writes (no login). Set NUXT_WRITE_SECRET to require
-    // an x-write-secret header on create/update.
+    // Legacy write lock (superseded by lunar auth, kept for non-lunar guards).
     writeSecret: process.env.NUXT_WRITE_SECRET || '',
+    // Lunar tracker accounts: access key doubles as X-Api-Key token.
+    // Empty = that account is disabled (fail closed).
+    lunarDevKey: process.env.NUXT_LUNAR_DEV_KEY || '',
+    lunarProductKey: process.env.NUXT_LUNAR_PRODUCT_KEY || '',
+    // Lunar tracker notifications + GitHub sync (all optional; empty = off).
+    telegramBotToken: process.env.NUXT_TELEGRAM_BOT_TOKEN || '',
+    telegramChatId: process.env.NUXT_TELEGRAM_CHAT_ID || '',
+    githubToken: process.env.NUXT_GITHUB_TOKEN || '',
+    public: {
+      // Absolute origin of the Lunar tracker API for static (gh-pages) builds,
+      // e.g. https://fatihaziz-web.fly.dev - empty = same origin (Fly / dev).
+      lunarApiBase: process.env.NUXT_PUBLIC_LUNAR_API_BASE || '',
+    },
   },
   plugins: [],
   components: true,

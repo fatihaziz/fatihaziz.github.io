@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUNAR Tracker - Plan v2 (checklist approval)</title>
+<style>
+:root{--ink:#1c2128;--muted:#59636e;--line:#d8dee4;--accent:#8a5a00;--ok:#116329;--bg:#faf8f4;--code:#f0ede6;--warn:#9a3412}
+body{margin:0 auto;max-width:54rem;padding:2rem 1.25rem 6rem;background:var(--bg);color:var(--ink);
+  font:15px/1.65 "Segoe UI",system-ui,sans-serif}
+h1{font-size:1.55rem;margin:.2rem 0}
+h2{font-size:1.12rem;margin:2.4rem 0 .7rem;border-bottom:1px solid var(--line);padding-bottom:.35rem}
+h3{font-size:.95rem;margin:1.4rem 0 .5rem;color:var(--accent)}
+p.meta{color:var(--muted);font-size:.8rem;margin:0 0 1rem}
+table{border-collapse:collapse;width:100%;font-size:.84rem;margin:.6rem 0}
+th,td{border:1px solid var(--line);padding:.38rem .55rem;text-align:left;vertical-align:top}
+th{background:var(--code)}
+code{font-family:Consolas,monospace;font-size:.82rem;background:var(--code);border-radius:4px;padding:.06rem .3rem}
+.item{display:flex;gap:.6rem;align-items:flex-start;padding:.45rem .6rem;border:1px solid var(--line);
+  border-radius:.5rem;background:#fff;margin:.4rem 0}
+.item input{margin-top:.25rem;width:1.05rem;height:1.05rem;accent-color:var(--ok);flex:none;cursor:pointer}
+.item label{cursor:pointer;flex:1}
+.item.checked{background:#eef7ef;border-color:#bcd8c2}
+.item small{display:block;color:var(--muted)}
+.q .item{border-left:3px solid var(--accent)}
+.note{background:var(--code);border-left:3px solid var(--warn);padding:.6rem .9rem;font-size:.85rem;border-radius:0 .4rem .4rem 0}
+.dim{color:var(--muted)}
+.count{position:fixed;bottom:1rem;right:1rem;background:var(--ink);color:#fff;border-radius:999px;
+  padding:.45rem .9rem;font-size:.8rem;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.count button{border:0;border-radius:.4rem;background:#fff;color:var(--ink);font-size:.75rem;
+  padding:.25rem .6rem;cursor:pointer;margin-left:.3rem}
+.count button:hover{background:var(--code)}
+</style>
+</head>
+<body>
+<h1>LUNAR Tracker - Plan v2</h1>
+<p class="meta">2026-07-20 - approval checklist. Centang yang di-ACC; kosongkan yang ditolak.
+Centangan tersimpan otomatis di browser ini (localStorage). Belum ada koding yang jalan sebelum checklist ini balik ke Himmel.</p>
+
+<div class="note">Sumber: feedback tim 20 Jul (SP ga ke-track, sub-task modal, feedback wajib nyangkut roadmap,
+bola per card, section questions, akses LLM, auth+role) + chat Nana 21:40-22:00.</div>
+
+<h2>Phase 1 - Auth &amp; Roles (prioritas)</h2>
+<div class="item"><input type="checkbox" id="p1-login"><label for="p1-login"><b>Login ringan tanpa email</b> - akun manual, access key (passphrase), session httpOnly. Tabel <code>users(id, name, role, key_hash, api_token)</code>.<small>Semua WRITE wajib login. Tanpa login = read-only.</small></label></div>
+<div class="item"><input type="checkbox" id="p1-accounts"><label for="p1-accounts"><b>2 akun awal</b>: <code>fatih</code> (role dev) + <code>product</code> (share, role product, dipakai Nana + tim).</label></div>
+<div class="item"><input type="checkbox" id="p1-matrix"><label for="p1-matrix"><b>Role matrix di bawah ini</b> berlaku sebagaimana tertulis.</label></div>
+
+<table>
+<tr><th>Aksi</th><th>dev</th><th>product</th></tr>
+<tr><td>Ganti SP task / max SP per hari</td><td>v</td><td>-</td></tr>
+<tr><td>Edit angka coverage, hapus target</td><td>v</td><td>-</td></tr>
+<tr><td>Tambah task/bugfix</td><td>v</td><td>v (status <code>proposed</code>, dev approve -&gt; todo)</td></tr>
+<tr><td>Ubah status task</td><td>v</td><td>hanya task buatan sendiri</td></tr>
+<tr><td>Bola (global &amp; per card): serah ke product</td><td>v</td><td>-</td></tr>
+<tr><td>Bola: kembalikan ke dev</td><td>-</td><td>v</td></tr>
+<tr><td>Kirim feedback / question</td><td>v</td><td>v</td></tr>
+<tr><td>Jawab question, resolve feedback</td><td>v</td><td>ack saja</td></tr>
+<tr><td>Kelola user &amp; token</td><td>v</td><td>-</td></tr>
+</table>
+
+<div class="item"><input type="checkbox" id="p1-apikey"><label for="p1-apikey"><b>Akses LLM/omp</b>: tiap user punya <code>api_token</code> long-lived, header <code>X-Api-Key</code>, role mengikuti user. Token dev disimpan di keyring; endpoint didokumentasi di CLAUDE.md lunar (agent auto-update tetap jalan).</label></div>
+
+<h2>Phase 2 - Sprint Point beneran ke-track</h2>
+<div class="item"><input type="checkbox" id="p2-worklog"><label for="p2-worklog"><b>Worklog harian</b> - tabel <code>sp_log(task_id, points, spent_on, user)</code>. Dev/agent log SP per task per hari; "SP hari ini" dihitung dari log, bukan dari task done.<small>Task done tanpa log -&gt; auto-log sisa estimasi (fallback).</small></label></div>
+<div class="item"><input type="checkbox" id="p2-stats"><label for="p2-stats"><b>Stats baru</b>: SP hari ini/max + availability + estimasi vs actual per task + bar burn 7 hari terakhir.</label></div>
+
+<h2>Phase 3 - Struktur roadmap card</h2>
+<div class="item"><input type="checkbox" id="p3-subtask"><label for="p3-subtask"><b>Sub-task + modal per card</b> - tabel <code>subtasks(feature_id, title, status, issue_ref, points)</code>; klik kartu roadmap -&gt; modal: checklist sub-task (selesai vs sisa), bola card, feedback &amp; questions card itu.</label></div>
+<div class="item"><input type="checkbox" id="p3-ball"><label for="p3-ball"><b>Bola per card</b> - kolom <code>ball</code> di features + handover per card (notif Telegram). Bola utama di atas tetap bola project.</label></div>
+<div class="item"><input type="checkbox" id="p3-fb"><label for="p3-fb"><b>Feedback wajib nyangkut roadmap</b> - <code>feature_id</code> wajib (dropdown), satu row per error, field link gdocs/screenshot. Feedback KYC existing dimigrasi ke card KYC.</label></div>
+<div class="item"><input type="checkbox" id="p3-q"><label for="p3-q"><b>Section Questions</b> di bawah feedback - <code>questions(feature_id wajib, author, question, answer, answered_by, status)</code>. Product nanya, dev/system jawab inline, status open/answered.</label></div>
+
+<h2>Phase 4 - Notif &amp; lampiran</h2>
+<div class="item"><input type="checkbox" id="p4-tele"><label for="p4-tele"><b>Telegram nyala</b> - <code>fly secrets set NUXT_TELEGRAM_BOT_TOKEN + CHAT_ID</code>. Event: handover global &amp; per-card, feedback baru, question baru, question dijawab.</label></div>
+<div class="item"><input type="checkbox" id="p4-upload"><label for="p4-upload"><b>Upload gambar</b> - <code>POST /api/lunar/upload</code> (multipart, max 5MB, wajib login) -&gt; Fly volume <code>/data/uploads</code>. Feedback/question bisa lampirkan langsung, gdocs jadi opsional.</label></div>
+
+<h2 class="q">Keputusan yang kubutuhkan</h2>
+<h3>Q1 - Read board</h3>
+<div class="q">
+<div class="item"><input type="checkbox" id="q1-a"><label for="q1-a">Read tetap <b>publik</b>, hanya write yang wajib login (recommended - client tetap bisa lihat progress).</label></div>
+<div class="item"><input type="checkbox" id="q1-b"><label for="q1-b">Semua di belakang login, termasuk read.</label></div>
+</div>
+<h3>Q2 - Akun product</h3>
+<div class="q">
+<div class="item"><input type="checkbox" id="q2-a"><label for="q2-a">Satu akun share <code>product</code> (recommended, sesuai "kasih aku akses 1 product").</label></div>
+<div class="item"><input type="checkbox" id="q2-b"><label for="q2-b">Per orang (nana, dst) biar <code>created_by</code> jelas.</label></div>
+</div>
+<h3>Q3 - SP</h3>
+<div class="q">
+<div class="item"><input type="checkbox" id="q3-a"><label for="q3-a">Worklog harian per task (recommended).</label></div>
+<div class="item"><input type="checkbox" id="q3-b"><label for="q3-b">Max SP/hari tetap 8. <span class="dim">(kalau beda, tulis: ____)</span></label></div>
+</div>
+<h3>Q4 - Telegram</h3>
+<div class="q">
+<div class="item"><input type="checkbox" id="q4-a"><label for="q4-a">Pakai bot existing - kamu kasih token + chat id group.</label></div>
+<div class="item"><input type="checkbox" id="q4-b"><label for="q4-b">Himmel buatkan bot baru via BotFather (butuh kamu jalankan sekali dari akun Telegram).</label></div>
+</div>
+<h3>Q5 - Seed sub-task</h3>
+<div class="q">
+<div class="item"><input type="checkbox" id="q5-a"><label for="q5-a">Sync otomatis dari issue GitHub (butuh <code>NUXT_GITHUB_TOKEN</code> di Fly, repo private) (recommended).</label></div>
+<div class="item"><input type="checkbox" id="q5-b"><label for="q5-b">Manual dari daftar 16 issue tersisa, tanpa token.</label></div>
+</div>
+
+<h2>Urutan &amp; risiko</h2>
+<p class="dim">Eksekusi: Phase 1 -&gt; 2 -&gt; 3 -&gt; 4, tiap phase deploy + verifikasi live sendiri. Risiko utama: cookie
+cross-origin gh-pages -&gt; fly.dev (SameSite=None; fallback session token di localStorage board). Data existing
+aman - migrasi kolom, bukan rebuild.</p>
+
+<div class="count">
+  <span id="n">0</span> dicentang
+  &nbsp;|&nbsp;
+  <button id="copyBtn" type="button">Salin JSON</button>
+  <button id="dlBtn" type="button">Download JSON</button>
+</div>
+
+<script>
+// Persist ticks in localStorage so the checklist survives reload.
+const KEY = 'lunar-plan-v2';
+const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+const boxes = document.querySelectorAll('input[type=checkbox]');
+const counter = document.getElementById('n');
+function paint() {
+  let n = 0;
+  boxes.forEach((b) => { b.closest('.item').classList.toggle('checked', b.checked); if (b.checked) n++; });
+  counter.textContent = n;
+}
+boxes.forEach((b) => {
+  b.checked = !!saved[b.id];
+  b.addEventListener('change', () => { saved[b.id] = b.checked; localStorage.setItem(KEY, JSON.stringify(saved)); paint(); });
+});
+paint();
+
+// ---- Export jawaban sebagai JSON (question + answer) --------------------
+const PLAN_ITEMS = {
+  'p1-login':    'Phase 1: login ringan tanpa email (access key + session), semua write wajib login?',
+  'p1-accounts': 'Phase 1: 2 akun awal - fatih (dev) + product (share tim)?',
+  'p1-matrix':   'Phase 1: role matrix sesuai tabel?',
+  'p1-apikey':   'Phase 1: api_token per user, header X-Api-Key untuk LLM/omp?',
+  'p2-worklog':  'Phase 2: SP worklog harian per task, done tanpa log auto-log sisa estimasi?',
+  'p2-stats':    'Phase 2: stats baru (SP hari ini, availability, estimasi vs actual, burn 7 hari)?',
+  'p3-subtask':  'Phase 3: sub-task + modal detail per roadmap card?',
+  'p3-ball':     'Phase 3: bola per roadmap card (bola utama tetap)?',
+  'p3-fb':       'Phase 3: feedback wajib pilih roadmap card, satu row per error, field link?',
+  'p3-q':        'Phase 3: section Questions (wajib pilih roadmap, dev/system jawab inline)?',
+  'p4-tele':     'Phase 4: Telegram notif (handover, feedback baru, question baru/dijawab)?',
+  'p4-upload':   'Phase 4: upload gambar ke Fly volume, gdocs jadi opsional?',
+};
+// [question id, question text, {checkbox id: option key}]
+const QUESTIONS = [
+  ['q1',  'Read board publik atau semua di belakang login?', { 'q1-a': 'public_read', 'q1-b': 'login_only' }],
+  ['q2',  'Akun product: satu share atau per orang?',        { 'q2-a': 'shared', 'q2-b': 'per_person' }],
+  ['q3a', 'Model SP: worklog harian per task?',              { 'q3-a': 'worklog' }],
+  ['q3b', 'Max SP per hari?',                                { 'q3-b': '8' }],
+  ['q4',  'Telegram bot: existing atau bikin baru?',         { 'q4-a': 'existing', 'q4-b': 'new' }],
+  ['q5',  'Seed sub-task dari mana?',                        { 'q5-a': 'github_sync', 'q5-b': 'manual' }],
+];
+function buildAnswers() {
+  const on = (id) => document.getElementById(id).checked;
+  return {
+    updated: new Date().toISOString(),
+    plan: Object.entries(PLAN_ITEMS).map(([id, question]) => ({ id, question, answer: on(id) })),
+    questions: QUESTIONS.map(([id, question, map]) => {
+      const picked = Object.entries(map).filter(([box]) => on(box)).map(([, key]) => key);
+      return {
+        id, question,
+        answer: picked.length === 0 ? null : picked.length === 1 ? picked[0] : 'CONFLICT: pilih satu - ' + picked.join(' + '),
+      };
+    }),
+  };
+}
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  await navigator.clipboard.writeText(JSON.stringify(buildAnswers(), null, 2));
+  document.getElementById('copyBtn').textContent = 'Tersalin!';
+  setTimeout(() => { document.getElementById('copyBtn').textContent = 'Salin JSON'; }, 1500);
+});
+document.getElementById('dlBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(buildAnswers(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'lunar-tracker-plan-v2.answers.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+</script>
+</body>
+</html>

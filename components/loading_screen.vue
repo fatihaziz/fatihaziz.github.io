@@ -61,12 +61,14 @@ const route = useRoute();
 const isLovePage = computed(() => route.path === '/i-love-you-dian');
 const isNovelPage = computed(() => route.path === '/laut');
 const isJournalPage = computed(() => route.path.startsWith('/journal'));
+// Client trackers are plain dashboards -- no village intro either.
+const isClientsPage = computed(() => route.path.startsWith('/clients'));
 // Aetherveil has its own in-game Boot loading bar -- keep this intro short,
 // just enough to cover the font + Phaser init.
 const isGamePage = computed(() => route.path === '/' || route.path.startsWith('/aetherveil'));
 
 // The journal has its own per-story backdrop, so skip the village intro there.
-const loading = ref(!isJournalPage.value);
+const loading = ref(!isJournalPage.value && !isClientsPage.value);
 const progress = ref(0);
 const currentMessage = ref('');
 

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUNAR Tracker - context & spec</title>
+<style>
+:root{--ink:#1c2128;--muted:#59636e;--line:#d8dee4;--accent:#8a5a00;--bg:#faf8f4;--code:#f0ede6}
+body{margin:0 auto;max-width:52rem;padding:2rem 1.25rem 5rem;background:var(--bg);color:var(--ink);
+  font:15px/1.65 "Segoe UI",system-ui,sans-serif}
+h1{font-size:1.6rem;margin:.2rem 0}
+h2{font-size:1.1rem;margin:2.2rem 0 .6rem;border-bottom:1px solid var(--line);padding-bottom:.3rem}
+p.meta{color:var(--muted);font-size:.8rem;margin:0 0 1.5rem}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:.4rem .6rem;text-align:left;vertical-align:top}
+th{background:var(--code)}
+code,pre{font-family:Consolas,monospace;font-size:.83rem;background:var(--code);border-radius:4px}
+code{padding:.08rem .3rem}
+pre{padding:.8rem 1rem;overflow-x:auto}
+blockquote{margin:.8rem 0;padding:.6rem 1rem;border-left:3px solid var(--accent);background:var(--code);
+  font-size:.85rem;white-space:pre-wrap}
+.dim{color:var(--muted)}
+</style>
+</head>
+<body>
+<h1>LUNAR Tracker - context &amp; spec</h1>
+<p class="meta">Dibuat 2026-07-20. Halaman: <code>fatihaziz.com/clients/turnkey/lunar-project</code>.
+Sumber kebutuhan: chat Telegram Fatih &lt;-&gt; NANA PRODUCT, 2026-07-17.</p>
+
+<h2>Konteks chat (2026-07-17)</h2>
+<blockquote>[17:38] Fatih: nanti tracking task ku di fatihaziz.com/clients/turnkey/lunar-project
+belum ku upload, disitu nanti cukup ke gambar bola nya di siapa
+[17:39] Fatih: kalau bolanya udah ku serahin, meaning aku nunggu feedback kalian jga dpt notif
+[17:39] NANA PRODUCT: okay itu nnti dapet notifnya lewat apa mas?
+[17:39] Fatih: tele
+[17:40] NANA PRODUCT: okay, kalo orbit gimana mas trackingnya?
+[17:47] Fatih: orbit nanti
+[17:48] Fatih: tracking itu gunanya gini, apakah bolanya di aku (developer) ato di mereka (tim product),
+ada indikator jelasnya disitu. tiap task dan tiap bugfix bisa ke isi sprint pointnya, jadi disitu ada
+kayak sprint point spent, dan availability, max sehari berapa sprint point misal.
+terus di bawah-bawah itu nanti ada sejenis table utk list commit dan github issue
+yg sedang berjalan dan udah selesai.</blockquote>
+
+<h2>Kebutuhan yang diimplementasi</h2>
+<table>
+<tr><th>Kebutuhan</th><th>Implementasi</th></tr>
+<tr><td>Indikator "bola di siapa" (developer vs tim product), gambar bola</td>
+  <td>Hero section: orb bulan yang berpindah sisi DEV &lt;-&gt; PRODUCT. Global handover + bola per-task.</td></tr>
+<tr><td>Notif Telegram saat bola diserahkan / task baru / feedback baru</td>
+  <td><code>server/utils/lunar-telegram.ts</code> - aktif kalau env
+  <code>NUXT_TELEGRAM_BOT_TOKEN</code> + <code>NUXT_TELEGRAM_CHAT_ID</code> diset; no-op kalau kosong.</td></tr>
+<tr><td>Sprint point per task/bugfix: spent, availability, max per hari</td>
+  <td>Kartu stats: SP terpakai hari ini, availability, total sprint, in-flight. Max/hari editable.</td></tr>
+<tr><td>Features coverage progress lunar-crm-project</td>
+  <td>Scope = target user trial 27 Jul: 8 milestone relevan (M1-M3, M7, M9-M10, M13-M14, 50 issues)
+  + 8 workstream trial. SUMSUB / PSP CREGIS / PayOK / Rebate-Rewards / Greylabel / Hardening
+  <b>dihapus dari target</b> per keputusan product 2026-07-20 (asal data lama: docs/ROADMAP.md
+  lunar-crm-project). Angka bisa dikoreksi tim (+/-, status, hapus target).</td></tr>
+<tr><td>Tim internal bisa nambah task</td><td>Form "Tasks &amp; bugfix" - judul, tipe, area, SP, nama.</td></tr>
+<tr><td>Tim internal bikin feedback reports</td><td>Form "Feedback reports" - severity critical/major/minor/note, status open/ack/resolved.</td></tr>
+<tr><td>Table commit + GitHub issue (berjalan / selesai)</td>
+  <td>Tabel activity + tombol <b>Sync GitHub</b> (repo <code>turnkey-devs/lunar-crm-project</code>;
+  repo private butuh env <code>NUXT_GITHUB_TOKEN</code>) + input manual via <code>POST /api/lunar/activity</code>.</td></tr>
+<tr><td>Orbit</td><td class="dim">Belum ("orbit nanti") - tinggal duplikasi route + DB path baru.</td></tr>
+</table>
+
+<h2>Arsitektur</h2>
+<pre>pages/clients/turnkey/lunar-project.vue     dashboard (SPA, fetch /api/lunar/*)
+server/utils/lunar.ts                       SQLite (better-sqlite3) + seed; file: LUNAR_DB_PATH || data/lunar.db
+server/utils/lunar-telegram.ts              notif Telegram (opsional)
+server/api/lunar/state.get.ts               payload dashboard lengkap
+server/api/lunar/handover.post.ts           bola global dev &lt;-&gt; product (+ notif)
+server/api/lunar/tasks.post.ts              tambah task
+server/api/lunar/tasks/[id].patch.ts        status / bola / points (+ notif saat serah terima)
+server/api/lunar/feedback.post.ts           feedback report baru (+ notif)
+server/api/lunar/feedback/[id].patch.ts     ack / resolve
+server/api/lunar/features/[id].patch.ts     koreksi coverage
+server/api/lunar/activity.post.ts           commit / issue manual
+server/api/lunar/sync-github.post.ts        tarik 30 commit + 50 issue terakhir dari GitHub
+server/api/lunar/settings.patch.ts          max SP per hari + window sprint</pre>
+
+<h2>Deploy (LIVE sejak 2026-07-20)</h2>
+<p>Arsitektur hybrid:</p>
+<table>
+<tr><th>Bagian</th><th>Dimana</th></tr>
+<tr><td>Halaman statis (semua route, termasuk tracker)</td>
+  <td>GitHub Pages (Cloudflare -&gt; gh-pages branch <code>fatihaziz/fatihaziz.github.io</code>) = <code>fatihaziz.com</code></td></tr>
+<tr><td>API + SQLite</td>
+  <td>Fly.io app <b><code>fatihaziz-web</code></b>, region sin, volume <code>journal_data</code> di <code>/data</code>
+  (<code>DB_PATH=/data/journal.db</code>, <code>LUNAR_DB_PATH=/data/lunar.db</code>) = <code>https://fatihaziz-web.fly.dev</code></td></tr>
+</table>
+<p>Halaman statis manggil API lintas origin: build gh-pages di-bake dengan
+<code>NUXT_PUBLIC_LUNAR_API_BASE=https://fatihaziz-web.fly.dev</code>; CORS untuk
+<code>/api/lunar/*</code> di <code>server/middleware/lunar-cors.ts</code> (allow
+fatihaziz.com + localhost:3000). Deploy ulang:</p>
+<pre>fly deploy --ha=false --remote-only                       # API (dari root repo)
+NUXT_PUBLIC_LUNAR_API_BASE=https://fatihaziz-web.fly.dev pnpm build-github
+# gh-pages npm kena ENAMETOOLONG di Windows -> push manual .output/public ke branch gh-pages</pre>
+<p>Notif Telegram / GitHub sync nyala dengan:
+<code>fly secrets set NUXT_TELEGRAM_BOT_TOKEN=... NUXT_TELEGRAM_CHAT_ID=... NUXT_GITHUB_TOKEN=...</code></p>
+<p>Write-guard lama (<code>NUXT_WRITE_SECRET</code>) sudah digantikan auth phase 1
+untuk semua endpoint lunar.</p>
+
+<h2>Phase 1-4 (live sejak 2026-07-21)</h2>
+<p><strong>Auth:</strong> dua akun tetap - <code>fatih</code> (role dev, akses penuh) dan
+<code>product</code> (akun share tim: task, feedback, question, flip bola). Access key
+dikirim via Fly secrets <code>NUXT_LUNAR_DEV_KEY</code> / <code>NUXT_LUNAR_PRODUCT_KEY</code>
+(key kosong = akun mati, fail closed). Login: <code>POST /api/lunar/auth/login</code>
+<code>{username, key}</code> -&gt; Bearer token 30 hari (tabel <code>sessions</code>).
+Agent LLM/omp: header <code>X-Api-Key: &lt;access key&gt;</code> langsung, tanpa login.
+Key lokal tersimpan di keyring: <code>keyring get lunar-tracker dev|product</code>.
+Read (<code>GET /api/lunar/state</code>) tetap publik (keputusan q1 public_read).</p>
+<p><strong>SP worklog (phase 2):</strong> tabel <code>sp_log(task_id, user, points, spent_on, note)</code>.
+<code>POST /api/lunar/tasks/{id}/worklog</code> (dev only). SP harian + burn 7 hari dihitung
+dari log, bukan dari task done. Task yang di-done tanpa log otomatis nge-log sisa
+estimasi. State menambah <code>sprint.estimateOpen</code>, <code>sprint.burn7</code>,
+<code>tasks[].logged_points</code>.</p>
+<p><strong>Roadmap detail (phase 3):</strong> tabel <code>subtasks</code> (16 issue trial-critical
+ter-seed per milestone, sinkron via <code>POST /api/lunar/sync-github</code>) + modal detail
+per card; kolom <code>features.ball</code> = bola per card (bola utama tetap di settings).
+Feedback wajib <code>featureId</code> (satu row per error, field <code>link</code> gdocs +
+<code>attachment</code>); tabel <code>questions</code> terpisah dari feedback, wajib
+<code>featureId</code>, dev jawab inline (<code>PATCH /api/lunar/questions/{id}</code>).</p>
+<p><strong>Upload + Telegram (phase 4):</strong> <code>POST /api/lunar/upload</code> (multipart
+<code>file</code>, png/jpg/webp/gif maks 5MB) ke volume Fly (<code>/data/lunar-uploads</code>),
+diserve dari <code>GET /api/lunar/uploads/{name}</code>. Telegram notif untuk handover,
+task baru/done, feedback baru, question baru/dijawab, flip bola card - aktif setelah
+<code>NUXT_TELEGRAM_BOT_TOKEN</code> + <code>NUXT_TELEGRAM_CHAT_ID</code> di-set (belum di-set).</p>
+</body>
+</html>

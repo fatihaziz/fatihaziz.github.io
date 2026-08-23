@@ -2,7 +2,7 @@
 # Conforms to __standards/flyio-deployment (adapted from Go to Node/Nitro).
 # Deploy: fly deploy --ha=false --local-only   (ONE machine; SQLite = single writer).
 
-app = "CHANGE-ME"        # set with `fly apps create <name>`, then put the name here
+app = "fatihaziz-web"
 primary_region = "sin"   # Singapore -- closest to Indonesia
 
 [build]
@@ -12,6 +12,7 @@ primary_region = "sin"   # Singapore -- closest to Indonesia
   PORT = "8080"
   HOST = "0.0.0.0"
   DB_PATH = "/data/journal.db"
+  LUNAR_DB_PATH = "/data/lunar.db"
 
 [http_service]
   internal_port = 8080
