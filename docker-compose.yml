@@ -1,11 +1,12 @@
 # Local production-parity run (standard flyio-deployment Testing section):
-#   docker compose up --build    -> http://localhost:8080
-#   docker compose down -v        -> reset the SQLite volume
+#   docker compose up --build            -> http://localhost:8080
+#   WEB_PORT=8090 docker compose up -d   -> http://localhost:8090 (8080 taken)
+#   docker compose down -v               -> reset the SQLite volume
 services:
   journal:
     build: .
     ports:
-      - "8080:8080"
+      - "${WEB_PORT:-8080}:8080"
     environment:
       PORT: "8080"
       HOST: "0.0.0.0"
