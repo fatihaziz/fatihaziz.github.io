@@ -773,6 +773,7 @@ onMounted(() => {
         letter.word.z + (index % 2 ? -4.5 : 4.5),
       );
       const base = assembled.lerp(exitPosition, exit);
+      if (isMobileViewport) base.x *= 0.72;
       const hoverLift = hoveredIndex === index ? 0.52 : 0;
       const pulse = Math.max(0, letter.dragOffset.y);
       const bob = Math.sin(elapsed * 1.25 + letter.phase) * 0.06 * motion * (1 - exit);
@@ -782,6 +783,9 @@ onMounted(() => {
       letter.dragOffset.y *= 0.9;
       const targetRotY = THREE.MathUtils.lerp(letter.baseRotation, 0, assemble) + (hoveredIndex === index ? 0.22 : 0) + exit * direction * 0.22;
       letter.group.rotation.y += (targetRotY - letter.group.rotation.y) * 0.1;
+      const letterScale = isMobileViewport ? 0.82 : 1;
+      const nextScale = THREE.MathUtils.lerp(letter.group.scale.x, letterScale, 0.12);
+      letter.group.scale.setScalar(nextScale);
       letter.group.rotation.z += ((draggedIndex === index ? pointer.x * 0.08 : 0) - letter.group.rotation.z) * 0.1;
       letter.mesh.material.opacity = worldFade;
       letter.hitTarget.visible = progress < 0.36;
