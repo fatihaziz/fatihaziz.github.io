@@ -17,7 +17,7 @@
       <header class="ff-header">
         <div class="ff-brand">
           <span class="ff-brand-dot" aria-hidden="true"></span>
-          <span>FLOAT</span>
+          <span>FATIH</span>
           <small>pool-world experiment</small>
         </div>
         <button class="ff-skip" type="button" @click="goToSection('about')">
@@ -44,26 +44,15 @@
       </nav>
 
       <section class="ff-hero" :style="heroStyle" aria-label="Intro">
-        <p class="ff-hero-kicker">SAMPLE F / SCROLL TO ASSEMBLE</p>
-        <h1>FLOAT</h1>
-        <p>creative studio &middot; lorem ipsum</p>
+        <p class="ff-hero-kicker">INTERACTIVE POOL</p>
+        <h1>FATIH</h1>
+        <p>software maker &middot; placeholder world</p>
       </section>
 
-      <div class="ff-letter-controls" :style="letterControlsStyle" aria-label="Nudge a letter">
-        <button
-          v-for="(letter, index) in letters"
-          :aria-label="`Nudge 3D letter ${letter}`"
-          :key="letter"
-          type="button"
-          @click="pulseLetter(index)"
-        >
-          <span>{{ letter }}</span>
-        </button>
-      </div>
 
       <p class="ff-scroll-cue" :style="heroStyle">
         <span aria-hidden="true">&#8595;</span>
-        drag the letters &middot; then scroll
+        scroll to explore
       </p>
 
       <article
@@ -142,13 +131,6 @@
         </button>
       </article>
 
-      <div class="ff-progress" aria-label="Intro progress">
-        <span :style="{ height: `${Math.max(4, scrollProgress * 100)}%` }"></span>
-      </div>
-
-      <div class="ff-corner-note" aria-hidden="true">
-        SAMPLE F &middot; draggable pool world
-      </div>
     </div>
   </div>
 </template>
@@ -157,6 +139,7 @@
 import * as THREE from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import helvetiker from 'three/examples/fonts/helvetiker_bold.typeface.json';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 
@@ -184,7 +167,7 @@ interface Ripple {
 }
 
 useHead({
-  title: 'Sample F - FLOAT Pool World',
+  title: 'Sample F - FATIH Pool World',
   meta: [
     { name: 'robots', content: 'noindex' },
     { name: 'theme-color', content: '#83d6e8' },
@@ -192,7 +175,7 @@ useHead({
 });
 
 
-const letters = ['F', 'L', 'O', 'A', 'T'];
+const letters = ['F', 'A', 'T', 'I', 'H'];
 const palette = [0x8fd3e1, 0xf2c84b, 0xf4a0b2, 0x62bde2, 0xf0dfb5];
 const sections: NavSection[] = [
   { id: 'about', label: 'About', icon: '◉', progress: 0.38 },
@@ -234,13 +217,6 @@ const heroStyle = computed(() => {
   return {
     opacity: String(fade),
     transform: `translate3d(0, ${Math.round((1 - fade) * -24)}px, 0)`,
-    pointerEvents: fade > 0.4 ? 'auto' : 'none',
-  };
-});
-const letterControlsStyle = computed(() => {
-  const fade = 1 - smoothstep(0.18, 0.31, scrollProgress.value);
-  return {
-    opacity: String(fade),
     pointerEvents: fade > 0.4 ? 'auto' : 'none',
   };
 });
@@ -524,6 +500,8 @@ onMounted(() => {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.copy(position);
+    mesh.userData.floatBaseX = position.x;
+    mesh.userData.floatBaseY = position.y;
     mesh.castShadow = true;
     scene.add(mesh);
     poolObjects.push(mesh);
@@ -532,66 +510,95 @@ onMounted(() => {
   const limeRing = makeFloatRing(0xf4e177, new THREE.Vector3(-6.2, 0.16, -6.2), 1.15);
   const coralRing = makeFloatRing(0xffa681, new THREE.Vector3(0.4, 0.18, -8.4), 0.88);
 
-  function makeSoftBlock(color: number, x: number, z: number, scale: number) {
-    const geometry = new THREE.BoxGeometry(1.15, 0.48, 1.05, 3, 2, 3);
-    geometries.push(geometry);
-    const material = new THREE.MeshPhysicalMaterial({
-      color,
-      roughness: 0.3,
-      clearcoat: 0.55,
-      transparent: true,
-    });
-    materials.push(material);
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, 0.18, z);
-    mesh.rotation.y = x * 0.08;
-    mesh.scale.setScalar(scale);
-    mesh.castShadow = true;
-    scene.add(mesh);
-    poolObjects.push(mesh);
-    return mesh;
-  }
-  const blocks = [
-    makeSoftBlock(0xf4a7bb, -5.8, 2.5, 0.82),
-    makeSoftBlock(0xd9edf1, 5.7, 2.2, 0.9),
-    makeSoftBlock(0x8bbbc9, -0.8, -8.6, 0.75),
-  ];
+  const floatingProps: THREE.Object3D[] = [limeRing, coralRing];
+  const modelRoots: THREE.Object3D[] = [];
+  const modelMixers: THREE.AnimationMixer[] = [];
+  let modelsDisposed = false;
 
-  // Original mascot: a tiny robot lounging on a yellow ring.
+  function prepareModel(object: THREE.Object3D, targetSize: number) {
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const longest = Math.max(size.x, size.y, size.z, 0.0001);
+    object.scale.setScalar(targetSize / longest);
+
+    const fitted = new THREE.Box3().setFromObject(object);
+    const center = fitted.getCenter(new THREE.Vector3());
+    object.position.set(-center.x, -fitted.min.y, -center.z);
+    object.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      child.castShadow = true;
+      child.receiveShadow = true;
+      geometries.push(child.geometry);
+      const childMaterials = Array.isArray(child.material) ? child.material : [child.material];
+      childMaterials.forEach((material) => {
+        material.transparent = true;
+        materials.push(material);
+      });
+    });
+  }
+
+  function loadProp(
+    url: string,
+    targetSize: number,
+    position: THREE.Vector3,
+    rotationY: number,
+  ) {
+    new GLTFLoader().load(url, (gltf) => {
+      if (modelsDisposed) return;
+      const wrapper = new THREE.Group();
+      prepareModel(gltf.scene, targetSize);
+      wrapper.add(gltf.scene);
+      wrapper.position.copy(position);
+      wrapper.rotation.y = rotationY;
+      wrapper.userData.floatBaseY = position.y;
+      wrapper.userData.floatBaseX = position.x;
+      scene.add(wrapper);
+      modelRoots.push(wrapper);
+      floatingProps.push(wrapper);
+      if (gltf.animations[0]) {
+        const mixer = new THREE.AnimationMixer(gltf.scene);
+        mixer.clipAction(gltf.animations[0]).play();
+        modelMixers.push(mixer);
+      }
+    });
+  }
+
+  // Actual objects with semantic purpose: software maker's desk items.
+  loadProp('/models/pool-world/laptop.glb', 1.55, new THREE.Vector3(-4.4, 0.12, 2.0), 0.28);
+  loadProp('/models/pool-world/smartphone.glb', 0.9, new THREE.Vector3(4.2, 0.12, 1.7), -0.38);
+  loadProp('/models/pool-world/mug.glb', 1.05, new THREE.Vector3(-5.7, 0.12, -5.1), 0.32);
+  loadProp('/models/pool-world/keyboard.glb', 1.8, new THREE.Vector3(-0.8, 0.1, -8.4), -0.05);
+  loadProp('/models/pool-world/mouse.glb', 0.72, new THREE.Vector3(3.6, 0.12, -8.05), 0.45);
+
+  // Kenney CC0 character on a float: a real model, not a primitive robot.
   const mascot = new THREE.Group();
   const mascotRingGeometry = new THREE.TorusGeometry(1.02, 0.28, 18, 64);
-  const mascotRingMaterial = new THREE.MeshPhysicalMaterial({ color: 0xf4c95d, roughness: 0.3, clearcoat: 0.7, transparent: true });
+  const mascotRingMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0xf4c95d,
+    roughness: 0.3,
+    clearcoat: 0.7,
+    transparent: true,
+  });
   geometries.push(mascotRingGeometry);
   materials.push(mascotRingMaterial);
   const mascotRing = new THREE.Mesh(mascotRingGeometry, mascotRingMaterial);
   mascotRing.rotation.x = -Math.PI / 2;
+  mascotRing.castShadow = true;
   mascot.add(mascotRing);
 
-  const bodyGeometry = new THREE.CapsuleGeometry(0.3, 0.56, 6, 14);
-  const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x225e84, roughness: 0.48, transparent: true });
-  geometries.push(bodyGeometry);
-  materials.push(bodyMaterial);
-  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-  body.position.set(0, 0.62, 0.08);
-  body.rotation.z = -0.25;
-  mascot.add(body);
-
-  const headGeometry = new THREE.SphereGeometry(0.36, 24, 24);
-  const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffd7bd, roughness: 0.56, transparent: true });
-  geometries.push(headGeometry);
-  materials.push(headMaterial);
-  const head = new THREE.Mesh(headGeometry, headMaterial);
-  head.position.set(-0.18, 1.2, 0.06);
-  mascot.add(head);
-
-  const visorGeometry = new THREE.BoxGeometry(0.48, 0.15, 0.38);
-  const visorMaterial = new THREE.MeshPhysicalMaterial({ color: 0x0e405d, metalness: 0.22, roughness: 0.18, transparent: true });
-  geometries.push(visorGeometry);
-  materials.push(visorMaterial);
-  const visor = new THREE.Mesh(visorGeometry, visorMaterial);
-  visor.position.set(-0.2, 1.25, 0.27);
-  visor.rotation.z = -0.08;
-  mascot.add(visor);
+  new GLTFLoader().load('/models/pool-world/character.glb', (gltf) => {
+    if (modelsDisposed) return;
+    prepareModel(gltf.scene, 1.75);
+    gltf.scene.position.y += 0.22;
+    gltf.scene.rotation.y = Math.PI * 0.78;
+    mascot.add(gltf.scene);
+    modelRoots.push(gltf.scene);
+    if (gltf.animations[0]) {
+      const mixer = new THREE.AnimationMixer(gltf.scene);
+      mixer.clipAction(gltf.animations[0]).play();
+      modelMixers.push(mixer);
+    }
+  });
 
   mascot.position.set(5.4, 0.28, -7.8);
   mascot.rotation.y = -0.35;
@@ -748,9 +755,13 @@ onMounted(() => {
 
   const clock = new THREE.Clock();
   let raf = 0;
+  let lastElapsed = 0;
 
   function renderFrame() {
     const elapsed = clock.getElapsedTime();
+    const delta = Math.min(0.05, elapsed - lastElapsed);
+    lastElapsed = elapsed;
+    modelMixers.forEach((mixer) => mixer.update(delta));
     const now = performance.now();
     const motion = prefersReducedMotion.value ? 0 : 1;
     const target = scrollProgress.value;
@@ -791,12 +802,11 @@ onMounted(() => {
       letter.hitTarget.visible = progress < 0.36;
     });
 
-    limeRing.position.x = isMobileViewport ? -4.35 : -6.2;
-    blocks[0].position.x = isMobileViewport ? -3.8 : -5.8;
-    blocks[1].position.x = isMobileViewport ? 3.8 : 5.7;
-
-    [limeRing, coralRing, ...blocks].forEach((object, index) => {
-      object.position.y = 0.15 + Math.sin(elapsed * 0.8 + index) * 0.05 * motion;
+    floatingProps.forEach((object, index) => {
+      const baseX = Number(object.userData.floatBaseX ?? object.position.x);
+      const baseY = Number(object.userData.floatBaseY ?? 0.15);
+      object.position.x = isMobileViewport ? baseX * 0.72 : baseX;
+      object.position.y = baseY + Math.sin(elapsed * 0.8 + index) * 0.05 * motion;
       object.rotation.y += 0.0018 * motion;
       object.traverse((child) => {
         if (child instanceof THREE.Mesh && 'opacity' in child.material) {
@@ -868,6 +878,8 @@ onMounted(() => {
     cancelAnimationFrame(raf);
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', resize);
+    modelsDisposed = true;
+    modelRoots.forEach((model) => scene.remove(model));
     motionQuery.removeEventListener('change', onMotionChange);
     targetCanvas.removeEventListener('pointermove', onPointerMove);
     targetCanvas.removeEventListener('pointerdown', onPointerDown);
