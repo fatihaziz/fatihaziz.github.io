@@ -24,10 +24,12 @@ jobs:
         with:
           version: 11
 
+      # pnpm 11 requires the node:sqlite builtin (Node 22+). Node 20 fails the
+      # install step with ERR_UNKNOWN_BUILTIN_MODULE.
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
 
       - name: Install dependencies
@@ -35,6 +37,11 @@ jobs:
 
       - name: Build project & Static HTML export with Nuxt GithubPages preset
         run: pnpm build-github
+        env:
+          # The static bake has no server, so the tracker page must call the Fly
+          # API cross-origin. Without this it hits fatihaziz.com/api/lunar/* (404)
+          # and the board renders empty.
+          NUXT_PUBLIC_LUNAR_API_BASE: https://fatihaziz-web.fly.dev
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4

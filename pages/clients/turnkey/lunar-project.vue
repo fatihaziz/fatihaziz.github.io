@@ -77,35 +77,52 @@
       <!-- ============ SPRINT POINTS ============ -->
       <section class="stats" aria-label="Sprint points">
         <div class="stat">
-          <span class="stat-num">{{ state.sprint.spentToday }}<span class="of">/{{ state.sprint.maxPerDay }}</span></span>
-          <span class="stat-label">SP terpakai hari ini</span>
-          <div class="bar"><div class="bar-fill" :style="{ width: pct(state.sprint.spentToday, state.sprint.maxPerDay) }"></div></div>
+          <span class="stat-num">{{ spProgress.done }}<span class="of">/{{ spProgress.total }}</span></span>
+          <span class="stat-label">Scope selesai (estimasi)</span>
+          <div class="bar"><div class="bar-fill" :style="{ width: pct(spProgress.done, spProgress.total) }"></div></div>
+          <span class="dim small">total scope {{ spProgress.total }} SP = {{ toDays(spProgress.total) }} hari kerja tim normal</span>
         </div>
         <div class="stat">
-          <span class="stat-num">{{ state.sprint.availableToday }}</span>
-          <span class="stat-label">SP availability hari ini</span>
-          <div class="bar"><div class="bar-fill alt" :style="{ width: pct(state.sprint.availableToday, state.sprint.maxPerDay) }"></div></div>
-        </div>
-        <div class="stat">
-          <span class="stat-num">{{ state.sprint.spentSprint }}</span>
-          <span class="stat-label">SP selesai total sprint</span>
-          <span class="dim small">{{ state.sprint.start }} -> {{ state.sprint.end }}</span>
-        </div>
-        <div class="stat">
-          <span class="stat-num">{{ state.sprint.inFlight }}</span>
-          <span class="stat-label">SP sedang dikerjakan</span>
-          <span class="dim small">sisa estimasi open: {{ state.sprint.estimateOpen }} SP</span>
+          <span class="stat-num" :class="{ under: daysSaved.saved > 0, over: daysSaved.saved < 0 }">
+            {{ daysSaved.saved > 0 ? '+' : '' }}{{ daysSaved.saved }}<span class="of"> hari</span>
+          </span>
+          <span class="stat-label">Hemat waktu sejak {{ daysSaved.since }}</span>
+          <span class="dim small">
+            scope selesai {{ daysSaved.est }} SP = {{ daysSaved.planned }} hari kerja tim normal @ {{ spDay }} SP/hari,
+            dikerjakan {{ daysSaved.elapsed }} hari
+          </span>
           <label v-if="isDev" class="dim small maxday">
-            max/hari:
+            SP/hari tim normal:
             <input
               class="inp tiny"
               type="number"
-              min="1"
+              min="0.5"
               max="40"
-              :value="state.sprint.maxPerDay"
-              @change="saveMaxPerDay(($event.target as HTMLInputElement).value)"
+              step="0.5"
+              :value="state.sprint.spPerDay"
+              @change="saveSpPerDay(($event.target as HTMLInputElement).value)"
             />
           </label>
+        </div>
+        <div class="stat">
+          <span class="stat-num">{{ remaining.sp }}<span class="of"> SP</span></span>
+          <span class="stat-label">Sisa scope</span>
+          <span class="dim small">= {{ remaining.days }} hari kerja tim normal</span>
+          <span v-if="remaining.eta > 0" class="dim small">
+            pace dev sekarang {{ remaining.pace }} SP/hari -> sekitar {{ remaining.eta }} hari lagi
+          </span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">{{ state.sprint.spentSprint }}</span>
+          <span class="stat-label">Effort dev (worklog)</span>
+          <span class="dim small">
+            {{ state.sprint.start }} -> {{ state.sprint.end }} = {{ wlBreakdown.days }} hari kerja tim normal
+          </span>
+          <span class="dim small">
+            = {{ wlBreakdown.scope }} sesuai estimasi + {{ wlBreakdown.overrun }} overrun{{
+              wlBreakdown.inflight ? ` + ${wlBreakdown.inflight} task berjalan` : ''
+            }}{{ wlBreakdown.other ? ` + ${wlBreakdown.other} lainnya` : '' }}
+          </span>
         </div>
         <div class="stat burn">
           <span class="stat-label">Burn 7 hari (SP/worklog)</span>
@@ -171,9 +188,13 @@
       <!-- ============ TASKS ============ -->
       <section aria-label="Tasks">
         <div class="sec-head">
-          <h2>Tasks & bugfix</h2>
-          <p class="dim">Tiap task punya deadline, sprint point + bola sendiri.</p>
+          <h2>Tasks &amp; bugfix</h2>
+          <p class="dim">
+            {{ taskProgress.done }}/{{ taskProgress.total }} task selesai ({{ pct(taskProgress.done, taskProgress.total) }})
+            - tiap task punya deadline, sprint point + bola sendiri.
+          </p>
         </div>
+        <div class="bar big"><div class="bar-fill" :style="{ width: pct(taskProgress.done, taskProgress.total) }"></div></div>
 
         <form v-if="me" class="add-form" @submit.prevent="addTask">
           <label class="field grow"><span class="f-label">Judul</span>
@@ -326,8 +347,12 @@
       <section aria-label="Feedback reports">
         <div class="sec-head">
           <h2>Feedback reports</h2>
-          <p class="dim">Laporan hasil test / UAT dari tim. Feedback baru = notif Telegram ke developer.</p>
+          <p class="dim">
+            {{ fbProgress.done }}/{{ fbProgress.total }} feedback resolved ({{ pct(fbProgress.done, fbProgress.total) }})
+            - laporan hasil test / UAT dari tim. Feedback baru = notif Telegram ke developer.
+          </p>
         </div>
+        <div class="bar big"><div class="bar-fill alt" :style="{ width: pct(fbProgress.done, fbProgress.total) }"></div></div>
         <form v-if="me" class="add-form" @submit.prevent="addFeedback">
           <LunarSelect
             v-model="newFb.featureId"
@@ -613,11 +638,12 @@ interface LunarState {
   sprint: {
     start: string; end: string; maxPerDay: number; spentToday: number
     availableToday: number; spentSprint: number; inFlight: number
-    estimateOpen: number; burn7: Array<{ day: string; points: number }>
+    estimateOpen: number; savingsSince: string; spPerDay: number; burn7: Array<{ day: string; points: number }>
   }
   coverage: { issuesDone: number; issuesTotal: number; trialDone: number; trialTotal: number }
   features: Feature[]; subtasks: Subtask[]; tasks: Task[]; feedback: Feedback[]
   questions: Question[]; activity: Activity[]
+  worklog: Array<{ id: number; task_id: number; user: string; points: number; spent_on: string; note: string; auto: number }>
 }
 interface Me { username: string; role: string }
 
@@ -725,6 +751,59 @@ const milestoneFeatures = computed(() => state.value?.features.filter((f) => f.g
 const coveragePct = computed(() => {
   const c = state.value?.coverage
   return c && c.issuesTotal ? Math.round((c.issuesDone / c.issuesTotal) * 100) : 0
+})
+// SP accounting for the progress cards. Cancelled + archived tasks leave every
+// figure, mirroring the server's SP math.
+const liveTasks = computed(() =>
+  (state.value?.tasks ?? []).filter((t) => !t.archived && t.status !== 'cancelled'),
+)
+const spProgress = computed(() => ({
+  done: liveTasks.value.filter((t) => t.status === 'done').reduce((s, t) => s + t.points, 0),
+  total: liveTasks.value.reduce((s, t) => s + t.points, 0),
+}))
+// Worklog != scope: logs can exceed a task's estimate (overrun) or sit on
+// unfinished tasks. Decompose the sprint-window worklog so the card explains
+// its own gap against "Scope selesai" instead of looking contradictory.
+const wlBreakdown = computed(() => {
+  const byTask = new Map<number, number>()
+  for (const w of state.value?.worklog ?? []) byTask.set(w.task_id, (byTask.get(w.task_id) ?? 0) + w.points)
+  const tasks = new Map((state.value?.tasks ?? []).map((t) => [t.id, t]))
+  let scope = 0, overrun = 0, inflight = 0, other = 0
+  for (const [tid, logged] of byTask) {
+    const t = tasks.get(tid)
+    if (!t || t.archived || t.status === 'cancelled') other += logged
+    else if (t.status === 'done') { const w = Math.min(logged, t.points); scope += w; overrun += logged - w }
+    else inflight += logged
+  }
+  const days = Math.round(((state.value?.sprint.spentSprint ?? 0) / spDay.value) * 10) / 10
+  return { scope, overrun, inflight, other, days }
+})
+// One conversion for the whole section: hari kerja TIM NORMAL. spPerDay is a
+// setting (default 2 SP/hari, ~20 SP per sprint 2 minggu) -- deliberately NOT
+// the dev's own logging pace, otherwise "hemat" measures nothing.
+const spDay = computed(() => Math.max(0.5, state.value?.sprint.spPerDay ?? 2))
+const round1 = (n: number) => Math.round(n * 10) / 10
+function toDays(sp: number): number {
+  return round1(sp / spDay.value)
+}
+// Hemat = hari kerja tim normal untuk scope yang selesai sejak baseline,
+// dikurangi hari kalender yang terpakai. done_at is an ISO stamp, so the
+// lexicographic compare against the YYYY-MM-DD cutoff is exact. Fallback
+// mirrors the server default (static bake can outlive the API field).
+const daysSaved = computed(() => {
+  const since = state.value?.sprint.savingsSince || '2026-07-20'
+  const done = liveTasks.value.filter((t) => t.status === 'done' && t.done_at !== null && t.done_at >= since)
+  const est = done.reduce((s, t) => s + t.points, 0)
+  const planned = round1(est / spDay.value)
+  const elapsed = Math.max(0, Math.round((Date.now() - new Date(since + 'T00:00:00Z').getTime()) / 86400000))
+  return { since, est, count: done.length, planned, elapsed, saved: round1(planned - elapsed) }
+})
+// Sisa scope + proyeksi: pace dev nyata = scope selesai sejak baseline per
+// hari berjalan; ETA sisa dari pace itu.
+const remaining = computed(() => {
+  const sp = Math.max(0, spProgress.value.total - spProgress.value.done)
+  const pace = daysSaved.value.elapsed > 0 ? daysSaved.value.est / daysSaved.value.elapsed : 0
+  return { sp, days: toDays(sp), pace: round1(pace), eta: pace > 0 ? round1(sp / pace) : 0 }
 })
 const daysToTrial = computed(() => {
   const end = state.value?.sprint.end || '2026-07-27'
@@ -884,6 +963,11 @@ const taskGroups = computed(() => {
   return { aktif, selesai, arsip }
 })
 const visibleTasks = computed(() => taskGroups.value[taskTab.value])
+// Arsip leaves the ratio: progress is over live work only.
+const taskProgress = computed(() => ({
+  done: taskGroups.value.selesai.length,
+  total: taskGroups.value.aktif.length + taskGroups.value.selesai.length,
+}))
 
 function startEditTask(t: Task) {
   editTaskId.value = t.id
@@ -910,6 +994,10 @@ const fbGroups = computed(() => {
   }
 })
 const visibleFeedback = computed(() => fbGroups.value[fbTab.value])
+const fbProgress = computed(() => ({
+  done: fbGroups.value.resolved.length,
+  total: fbGroups.value.aktif.length + fbGroups.value.resolved.length,
+}))
 function startEditFb(f: Feedback) {
   editFbId.value = f.id
   Object.assign(editFbDraft, { body: f.body, link: f.link, attachments: attList(f.attachment) })
@@ -1080,11 +1168,11 @@ const removeFeature = (f: Feature) =>
     await $fetch(`${API}/api/lunar/features/${f.id}`, { method: 'DELETE', headers: authHeaders() })
   })
 
-const saveMaxPerDay = (v: string) =>
+const saveSpPerDay = (v: string) =>
   mutate(() =>
     $fetch(`${API}/api/lunar/settings`, {
       method: 'PATCH',
-      body: { maxPerDay: Number(v) },
+      body: { spPerDay: Number(v) },
       headers: authHeaders(),
     }),
   )
@@ -1210,6 +1298,8 @@ h3.grp { margin: 2rem 0 0.8rem; color: var(--muted); font: 600 0.7rem var(--font
 .stat { border: 1px solid var(--line); border-radius: 1rem; background: var(--paper-2); padding: 1rem 1.1rem; display: grid; gap: 0.35rem; align-content: start; }
 .stat-num { font: 500 2rem/1 var(--font-display); }
 .stat-num .of { color: var(--muted); font-size: 1.1rem; }
+.stat-num.under { color: var(--ok); }
+.stat-num.over { color: var(--danger); }
 .stat-label { color: var(--muted); font: 600 0.66rem var(--font-mono); letter-spacing: 0.13em; text-transform: uppercase; }
 .maxday { display: flex; align-items: center; gap: 0.4rem; }
 

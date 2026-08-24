@@ -75,6 +75,12 @@ export default defineEventHandler(() => {
       spentSprint,
       inFlight,
       estimateOpen,
+      // Baseline for the "SP hemat" figure. Setting, not a constant, so the
+      // next sprint moves it with one row update instead of a redeploy.
+      savingsSince: getSetting('savings_since', '2026-07-20'),
+      // Konversi SP -> hari kerja "tim normal" (bukan pace dev). Default 2
+      // SP/hari ~ 20 SP per sprint 2 minggu.
+      spPerDay: Number(getSetting('sp_per_day', '2')) || 2,
       burn7,
     },
     coverage,
