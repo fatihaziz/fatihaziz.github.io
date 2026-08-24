@@ -30,21 +30,9 @@
           </a>
         </div>
         <dl class="fa-hero-stats" aria-label="Career statistics">
-          <div class="fa-stat">
-            <dt>Years shipping</dt>
-            <dd>8+</dd>
-          </div>
-          <div class="fa-stat">
-            <dt>Years in fintech</dt>
-            <dd>6+</dd>
-          </div>
-          <div class="fa-stat">
-            <dt>Live accounts served</dt>
-            <dd>50–200</dd>
-          </div>
-          <div class="fa-stat">
-            <dt>Commits authored</dt>
-            <dd>9,200+</dd>
+          <div class="fa-stat" v-for="s in stats" :key="s.label">
+            <dt>{{ s.label }}</dt>
+            <dd>{{ s.value }}</dd>
           </div>
         </dl>
       </div>
@@ -262,6 +250,13 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue';
 import * as THREE from 'three';
 
+const { stats, projects, stackGroups } = useProfile();
+
+useHead({
+  title: 'Sample A - single-column narrative',
+  meta: [{ name: 'robots', content: 'noindex' }],
+});
+
 const year = new Date().getFullYear();
 const heroSection = ref<HTMLElement | null>(null);
 const heroCanvas = ref<HTMLCanvasElement | null>(null);
@@ -269,60 +264,6 @@ const prefersReducedMotion =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const projects = [
-  {
-    name: 'metatrader5-rs',
-    glyph: '⬢',
-    desc: 'Rust SDK over MetaTrader 5 Manager API — typed FFI, sandbox, capability gates, fleet client.',
-    stack: ['Rust', 'FFI', 'SQLite'],
-    tag: 'trading sdk',
-  },
-  {
-    name: 'tradether',
-    glyph: '⇄',
-    desc: 'Server-side MT5 copy trader: one manager session, SQLite replication state, sizing and risk controls.',
-    stack: ['Rust', 'Axum', 'gRPC'],
-    tag: 'trading service',
-  },
-  {
-    name: 'Foyer',
-    glyph: '▣',
-    desc: 'Windows-first desktop manager for AI coding agents — Wails, Go, ConPTY, xterm.js, 260+ tests.',
-    stack: ['Go', 'Wails', 'TypeScript'],
-    tag: 'desktop tooling',
-  },
-  {
-    name: 'lifestyle-fatih',
-    glyph: '♥',
-    desc: 'Workout and diet tracker I run my own cutting program on — Go, SQLite, live on Fly.io.',
-    stack: ['Go', 'SQLite', 'Fly.io'],
-    tag: 'personal ops',
-  },
-  {
-    name: 'cctv-livestream-manager',
-    glyph: '◉',
-    desc: 'Multi-tenant CCTV dashboard aggregating YouTube livestreams, with owner/admin/user roles.',
-    stack: ['Go', 'Vanilla JS', 'Docker'],
-    tag: 'client product',
-  },
-  {
-    name: 'fatihaziz.com',
-    glyph: '◎',
-    desc: 'This site — Nuxt 3 with an interactive Three.js hero, built and operated solo.',
-    stack: ['Nuxt', 'Three.js', 'Tailwind'],
-    tag: 'this site',
-  },
-];
-
-const stackGroups = [
-  { label: 'Languages', items: ['Rust', 'Go', 'TypeScript', 'Python', 'MQL5', 'SQL'] },
-  { label: 'Rust', items: ['tokio', 'actix-web', 'axum', 'sqlx', 'async-graphql', 'PyO3', 'ZeroMQ'] },
-  { label: 'Go', items: ['Gin', 'gRPC', 'Clean Architecture', 'Ory Kratos', 'modernc SQLite'] },
-  { label: 'TypeScript', items: ['Apollo GraphQL', 'MikroORM', 'Next.js', 'Vue 3', 'Cypress'] },
-  { label: 'Data', items: ['PostgreSQL', 'MongoDB', 'Redis'] },
-  { label: 'Infrastructure', items: ['Docker', 'Kubernetes', 'Helm', 'nginx', 'CI/CD', 'OpenTelemetry'] },
-  { label: 'Trading', items: ['MetaTrader 5 Manager API', 'MT4/MT5 terminals', 'FIX API'] },
-];
 
 let cleanup: (() => void) | null = null;
 
