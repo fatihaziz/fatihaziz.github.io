@@ -54,12 +54,21 @@ export default defineNuxtConfig({
   },
   app:{
     head: {
-      title: 'FatihAziz.com - Backend & Server Nerd',
+      title: 'Muhammad Fatih Al-Aziz - Fintech Platform Engineer',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: 'Website About Fatih Aziz' },
-        // Add other meta tags here
+        { hid: 'description', name: 'description', content: 'Fintech platform engineer with 8+ years in software and 6+ years building live retail-brokerage systems: CRM, back office, payments, KYC, PAMM, commissions, and MetaTrader integrations in Rust, Go, and TypeScript.' },
+        { name: 'author', content: 'Muhammad Fatih Al-Aziz' },
+        { name: 'theme-color', content: '#0b0406' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: 'fatihaziz.com' },
+        { property: 'og:title', content: 'Muhammad Fatih Al-Aziz - Fintech Platform Engineer' },
+        { property: 'og:description', content: 'Brokerage CRM, back office, and trading infrastructure. Rust, Go, TypeScript. Yogyakarta, GMT+7, remote-first.' },
+        { property: 'og:url', content: 'https://fatihaziz.com' },
+        { name: 'twitter:card', content: 'summary' },
+        { name: 'twitter:title', content: 'Muhammad Fatih Al-Aziz - Fintech Platform Engineer' },
+        { name: 'twitter:description', content: 'Brokerage CRM, back office, and trading infrastructure. Rust, Go, TypeScript.' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }, // Default favicon
