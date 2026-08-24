@@ -1,0 +1,24 @@
+POOL WORLD MODEL SOURCES
+
+All files in this directory are CC0 / public domain. Attribution is not
+required; sources are recorded for provenance.
+
+character.glb
+  Source: Kenney Mini Characters, character-male-a.glb
+  https://kenney.nl/assets/mini-characters
+  License: Creative Commons CC0 1.0
+
+laptop.glb, keyboard.glb, mouse.glb
+  Source: Kenney Furniture Kit
+  https://kenney.nl/assets/furniture-kit
+  License: Creative Commons CC0 1.0
+
+smartphone.glb
+  Source: Smartphone by smallbigsquare on Poly Pizza
+  https://poly.pizza/m/4DRZmTs3jq
+  License: Creative Commons CC0 1.0
+
+mug.glb
+  Source: Mug by MilkAndBanana on Poly Pizza
+  https://poly.pizza/m/0uSqGCZqE8
+  License: Creative Commons CC0 1.0
